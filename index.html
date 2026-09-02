@@ -109,7 +109,7 @@
     }
 
     .stat-list {
-      margin: 20px 0;
+      margin: 16px 0 20px 0;
       border-top: 1px solid #333;
       padding-top: 15px;
     }
@@ -140,6 +140,21 @@
 
     .stat-btn:hover {
       background-color: #505050;
+    }
+
+    /* === 경고 박스 스타일 === */
+    .warning-box {
+      background-color: rgba(255, 152, 0, 0.1);
+      border: 1px solid #ff9800;
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin-top: 12px;
+      font-size: 0.85rem;
+      color: #ffb74d;
+      line-height: 1.4;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
     }
 
     .error-msg {
@@ -225,7 +240,7 @@
     #toast.warning { background-color: #e65100; border-color: #f57c00; }
 
     .hidden {
-      display: none;
+      display: none !important;
     }
   </style>
 </head>
@@ -260,7 +275,20 @@
     <div id="character-section" class="hidden">
       <h1 id="display-username">캐릭터 이름</h1>
       <p style="margin-bottom: 6px; color: #aaa;">직급: <span id="display-role" style="color: #fff;">-</span></p>
-      <p style="margin-bottom: 12px; color: #aaa;">남은 포인트: <span id="available-pts" style="color: #ffc107; font-weight: bold;">0</span></p>
+      
+      <!-- 포인트 잔여 / 저장 완료 안내 -->
+      <p id="points-container" style="margin-bottom: 8px; color: #aaa;">
+        남은 포인트: <span id="available-pts" style="color: #ffc107; font-weight: bold;">0</span>
+      </p>
+      <p id="completed-notice" class="hidden" style="margin-bottom: 12px; color: #4caf50; font-size: 0.9rem;">
+        ✔ 스탯 설정이 완료된 캐릭터입니다.
+      </p>
+
+      <!-- 스탯 미확정 시 표시되는 경고 문구 -->
+      <div id="stat-warning-box" class="warning-box">
+        <span>⚠️</span>
+        <div>초기 스탯은 저장 이후 <b>수정이 불가능</b>합니다. 신중하게 분배해 주세요!</div>
+      </div>
       
       <div class="stat-list">
         <!-- 지혜 -->
@@ -272,7 +300,7 @@
             </span>
             : <span id="wisdom-val">1</span>
           </div>
-          <div class="btn-controls">
+          <div class="btn-controls stat-ctrl">
             <button class="stat-btn" onclick="decreaseStat('wisdom')">-</button>
             <button class="stat-btn" onclick="increaseStat('wisdom')">+</button>
           </div>
@@ -287,7 +315,7 @@
             </span>
             : <span id="willpower-val">1</span>
           </div>
-          <div class="btn-controls">
+          <div class="btn-controls stat-ctrl">
             <button class="stat-btn" onclick="decreaseStat('willpower')">-</button>
             <button class="stat-btn" onclick="increaseStat('willpower')">+</button>
           </div>
@@ -302,7 +330,7 @@
             </span>
             : <span id="divine-val">1</span>
           </div>
-          <div class="btn-controls">
+          <div class="btn-controls stat-ctrl">
             <button class="stat-btn" onclick="decreaseStat('divine')">-</button>
             <button class="stat-btn" onclick="increaseStat('divine')">+</button>
           </div>
@@ -317,14 +345,15 @@
             </span>
             : <span id="affinity-val">1</span>
           </div>
-          <div class="btn-controls">
+          <div class="btn-controls stat-ctrl">
             <button class="stat-btn" onclick="decreaseStat('affinity')">-</button>
             <button class="stat-btn" onclick="increaseStat('affinity')">+</button>
           </div>
         </div>
       </div>
 
-      <div class="btn-group">
+      <!-- 하단 조작 버튼 그룹 -->
+      <div id="action-btn-group" class="btn-group">
         <button class="reset-btn" onclick="resetStats()">초기화</button>
         <button class="save-btn" onclick="saveStats()">스탯 저장하기</button>
       </div>
@@ -344,7 +373,7 @@
 
   let currentUserId = null;
   let characterData = null;
-  let initialCharacterData = null; // 초기화용 백업 데이터
+  let initialCharacterData = null;
 
   // 직급별 기본 설정
   const ROLE_CONFIG = {
@@ -447,7 +476,6 @@
     }
 
     characterData = data;
-    // 현재 원본 상태를 백업 (초기화 시 사용)
     initialCharacterData = JSON.parse(JSON.stringify(data));
 
     updateUI();
@@ -468,6 +496,31 @@
     document.getElementById('willpower-val').innerText = characterData.willpower;
     document.getElementById('divine-val').innerText = characterData.divine;
     document.getElementById('affinity-val').innerText = characterData.affinity;
+
+    // 이미 저장이 끝난 캐릭터(남은 포인트가 0)인지 확인하여 UI 전환
+    const isCompleted = characterData.available_points === 0 && initialCharacterData.available_points === 0;
+
+    const ctrlBtns = document.querySelectorAll('.stat-ctrl');
+    const actionGroup = document.getElementById('action-btn-group');
+    const pointsContainer = document.getElementById('points-container');
+    const completedNotice = document.getElementById('completed-notice');
+    const warningBox = document.getElementById('stat-warning-box');
+
+    if (isCompleted) {
+      // 저장이 이미 완료된 상태: 버튼 및 경고창 감추기
+      ctrlBtns.forEach(btn => btn.classList.add('hidden'));
+      actionGroup.classList.add('hidden');
+      pointsContainer.classList.add('hidden');
+      warningBox.classList.add('hidden');
+      completedNotice.classList.remove('hidden');
+    } else {
+      // 스탯 분배 중인 상태: 버튼 및 경고창 보여주기
+      ctrlBtns.forEach(btn => btn.classList.remove('hidden'));
+      actionGroup.classList.remove('hidden');
+      pointsContainer.classList.remove('hidden');
+      warningBox.classList.remove('hidden');
+      completedNotice.classList.add('hidden');
+    }
   }
 
   // 스탯 증가 처리
@@ -484,10 +537,9 @@
 
   // 스탯 감소 처리 (-)
   function decreaseStat(statName) {
-    // 저장 전 기준(또는 기본 최소치 1) 이하로 내려가지 못하게 방지
     const minLimit = initialCharacterData[statName];
     if (characterData[statName] <= minLimit) {
-      showToast(`스탯은 기존 값(${minLimit}) 미만으로 내릴 수 없습니다.`, 'warning');
+      showToast(`스탯은 최소 ${minLimit} 미만으로 내릴 수 없습니다.`, 'warning');
       return;
     }
 
@@ -496,7 +548,7 @@
     updateUI();
   }
 
-  // 스탯 초기화 버튼 (저장 전 상태로 복원)
+  // 스탯 초기화 버튼
   function resetStats() {
     characterData = JSON.parse(JSON.stringify(initialCharacterData));
     updateUI();
@@ -507,6 +559,16 @@
   async function saveStats() {
     const errorDiv = document.getElementById('stat-error');
     errorDiv.innerText = '';
+
+    if (characterData.available_points > 0) {
+      if (!confirm(`남은 포인트가 ${characterData.available_points}pt 있습니다. 저장 후에는 수정할 수 없습니다. 정말 확정하시겠습니까?`)) {
+        return;
+      }
+    } else {
+      if (!confirm('스탯을 저장한 후에는 다시 변경할 수 없습니다. 이대로 확정하시겠습니까?')) {
+        return;
+      }
+    }
 
     const { error } = await supabaseClient
       .from('characters')
@@ -522,9 +584,9 @@
     if (error) {
       errorDiv.innerText = '스탯 저장 실패: ' + error.message;
     } else {
-      // 저장 성공 시 백업 데이터도 최신화
       initialCharacterData = JSON.parse(JSON.stringify(characterData));
-      showToast('스탯이 성공적으로 저장되었습니다!', 'success');
+      updateUI();
+      showToast('스탯이 최종 저장되었습니다!', 'success');
     }
   }
 
