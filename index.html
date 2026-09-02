@@ -475,47 +475,53 @@
     loadCharacterData();
   }
 
-// loadCharacterData 함수 수정 예시
-async function loadCharacterData() {
-  const { data, error } = await supabaseClient
-    .from('characters')
-    .select('*')
-    .eq('user_id', currentUserId)
-    .maybeSingle(); // single() 대신 maybeSingle() 사용 (데이터 없어도 에러 안 남)
-
-  if (error) {
-    document.getElementById('auth-error').innerText = '데이터 로드 에러: ' + error.message;
-    return;
-  }
-
-  // 계정은 있지만 characters 데이터가 지워진 경우 처리
-  if (!data) {
-    document.getElementById('auth-error').innerText = '캐릭터 정보가 없습니다. Authentication 계정도 삭제 후 다시 시도해주세요.';
-    return;
-  }
-
-  characterData = data;
-  initialCharacterData = JSON.parse(JSON.stringify(data));
-
-  updateUI();
-
-  document.getElementById('auth-section').classList.add('hidden');
-  document.getElementById('character-section').classList.remove('hidden');
-}
-
-  // 캐릭터 데이터 로드
+  // 캐릭터 데이터 로드 (수정 및 통합 완료)
   async function loadCharacterData() {
     const { data, error } = await supabaseClient
       .from('characters')
       .select('*')
       .eq('user_id', currentUserId)
-      .single();
+      .maybeSingle(); // single() 대신 maybeSingle()을 사용하여 데이터가 없어도 에러 없이 null 반환
 
     if (error) {
       document.getElementById('auth-error').innerText = '데이터 로드 에러: ' + error.message;
       return;
     }
 
+    // 로그인에는 성공했지만 캐릭터 데이터가 DB에서 지워진 경우 (자동 재등록 처리)
+    if (!data) {
+      const charName = document.getElementById('char-name').value.trim();
+      const roleKey = document.getElementById('role-select').value;
+
+      if (!charName) {
+        document.getElementById('auth-error').innerText = '캐릭터 데이터가 존재하지 않습니다. [캐릭터 이름]을 입력 후 다시 시작하기를 누르면 새로 생성됩니다.';
+        return;
+      }
+
+      const roleInfo = ROLE_CONFIG[roleKey];
+      const { error: insertError } = await supabaseClient.from('characters').insert([
+        {
+          user_id: currentUserId,
+          name: charName,
+          role: roleInfo.name,
+          wisdom: 1,
+          willpower: 1,
+          divine: 1,
+          affinity: 1,
+          available_points: roleInfo.pts
+        }
+      ]);
+
+      if (insertError) {
+        document.getElementById('auth-error').innerText = '캐릭터 생성 실패: ' + insertError.message;
+        return;
+      }
+
+      // 새로 생성 후 재로드
+      return loadCharacterData();
+    }
+
+    // 정상적으로 데이터를 불러온 경우
     characterData = data;
     initialCharacterData = JSON.parse(JSON.stringify(data));
 
