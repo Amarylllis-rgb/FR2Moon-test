@@ -3,149 +3,425 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>달에서. - 스탯 시스템 테스트</title>
+  <title>[달에서.] TRPG 테스트</title>
+  <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    body { font-family: 'Apple SD Gothic Neo', sans-serif; background: #121212; color: #e0e0e0; padding: 20px; }
-    .card { background: #1e1e1e; padding: 20px; border-radius: 8px; max-width: 400px; margin: 0 auto 20px; border: 1px solid #333; }
-    input, select, button { width: 100%; padding: 10px; margin: 5px 0 15px; box-sizing: border-box; background: #2a2a2a; color: #fff; border: 1px solid #444; border-radius: 4px; }
-    button { background: #4a6fa5; cursor: pointer; font-weight: bold; }
-    button:hover { background: #3b5984; }
-    .stat-row { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; }
-    .stat-row button { width: 40px; margin: 0; padding: 5px; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    }
+
+    body {
+      background-color: #121212;
+      color: #e0e0e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .card {
+      background-color: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 28px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+      color: #aaa;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid #444;
+      background-color: #2a2a2a;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: #4b6cb7;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 6px;
+      border: none;
+      background-color: #3b5998;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #4c70ba;
+    }
+
+    button.save-btn {
+      background-color: #2e7d32;
+    }
+
+    button.save-btn:hover {
+      background-color: #388e3c;
+    }
+
+    .stat-list {
+      margin: 20px 0;
+      border-top: 1px solid #333;
+      padding-top: 15px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      font-size: 0.95rem;
+    }
+
+    .stat-btn {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      margin: 0;
+      line-height: 32px;
+      font-size: 1.1rem;
+      border-radius: 4px;
+      background-color: #3a3a3a;
+    }
+
+    .stat-btn:hover {
+      background-color: #505050;
+    }
+
+    .error-msg {
+      color: #ff6b6b;
+      font-size: 0.85rem;
+      margin-top: 12px;
+      word-break: break-all;
+    }
+
+    /* === 툴팁 CSS 스타일 === */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+      border-bottom: 1px dotted #888;
+    }
+
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 220px;
+      background-color: #2a2a2a;
+      color: #fff;
+      text-align: center;
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 0.85rem;
+      font-weight: normal;
+      position: absolute;
+      z-index: 10;
+      bottom: 125%; 
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.2s ease-in-out;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+    }
+
+    .tooltip .tooltiptext::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #2a2a2a transparent transparent transparent;
+    }
+
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
 
-  <!-- 1. 로그인 / 회원가입 및 캐릭터 생성 -->
-  <div id="setup-section" class="card">
-    <h2>[달에서.] 테스트 접속</h2>
-    <input type="text" id="username" placeholder="아이디" />
-    <input type="password" id="password" placeholder="비밀번호 (6자리 이상)" />
-    <input type="text" id="char-name" placeholder="캐릭터 이름 (첫 접속 시)" />
-    
-    <label for="role-select">직급 선택:</label>
-    <select id="role-select">
-      <option value="student">일반 학생 (초기 10pt / 스탯 상한 5)</option>
-      <option value="president">학생회장 (초기 15pt / 스탯 상한 7)</option>
-      <option value="teacher">교사/관찰자 (초기 20pt / 스탯 상한 10)</option>
-    </select>
+  <div class="card">
+    <!-- 1. 로그인 / 회원가입 세션 -->
+    <div id="auth-section">
+      <h1>[달에서.] 테스트 접속</h1>
+      <div class="form-group">
+        <input type="text" id="username" placeholder="아이디 입력" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <input type="password" id="password" placeholder="비밀번호 (6자리 이상)">
+      </div>
+      <div class="form-group">
+        <input type="text" id="char-name" placeholder="캐릭터 이름 입력">
+      </div>
+      <div class="form-group">
+        <label>직급 선택:</label>
+        <select id="role-select">
+          <option value="student">일반 학생 (초기 10pt / 스탯 상한 5)</option>
+          <option value="council">학생회장 (초기 12pt / 스탯 상한 6)</option>
+          <option value="teacher">교사 (초기 15pt / 스탯 상한 7)</option>
+        </select>
+      </div>
+      <button onclick="handleAuth()">시작하기 (접속/가입)</button>
+      <div id="auth-error" class="error-msg"></div>
+    </div>
 
-    <button onclick="handleStart()">시작하기 (접속/가입)</button>
-    <p id="auth-msg" style="color: #ff8a80;"></p>
-  </div>
+    <!-- 2. 캐릭터 스탯 관리 세션 -->
+    <div id="character-section" class="hidden">
+      <h1 id="display-username">캐릭터 이름</h1>
+      <p style="margin-bottom: 6px; color: #aaa;">직급: <span id="display-role" style="color: #fff;">-</span></p>
+      <p style="margin-bottom: 12px; color: #aaa;">남은 포인트: <span id="available-pts" style="color: #ffc107; font-weight: bold;">0</span></p>
+      
+      <div class="stat-list">
+        <!-- 지혜 -->
+        <div class="stat-row">
+          <div>
+            <span class="tooltip">
+              지혜 (Wisdom)
+              <span class="tooltiptext">지식, 추리력, 마법 주문 이해도 및 통찰력</span>
+            </span>
+            : <span id="wisdom-val">1</span>
+          </div>
+          <button class="stat-btn" onclick="increaseStat('wisdom')">+</button>
+        </div>
 
-  <!-- 2. 캐릭터 정보 및 스탯 투자 화면 -->
-  <div id="game-section" class="card" style="display:none;">
-    <h2 id="display-name">캐릭터 시트</h2>
-    <p>직급: <b id="display-role"></b></p>
-    <p>남은 포인트: <b id="display-pts" style="color: #ffd54f;">0</b></p>
-    <hr style="border-color: #333;" />
+        <!-- 의지 -->
+        <div class="stat-row">
+          <div>
+            <span class="tooltip">
+              의지 (Willpower)
+              <span class="tooltiptext">정신력, 멘탈 저항, 집중력 및 위기 극복 능력</span>
+            </span>
+            : <span id="willpower-val">1</span>
+          </div>
+          <button class="stat-btn" onclick="increaseStat('willpower')">+</button>
+        </div>
 
-    <div class="stat-row"><span>지혜 (Wisdom): <b id="val-wisdom">0</b></span> <button onclick="addStat('wisdom')">+</button></div>
-    <div class="stat-row"><span>의지 (Willpower): <b id="val-willpower">0</b></span> <button onclick="addStat('willpower')">+</button></div>
-    <div class="stat-row"><span>가호 (Divine): <b id="val-divine">0</b></span> <button onclick="addStat('divine')">+</button></div>
-    <div class="stat-row"><span>교감 (Affinity): <b id="val-affinity">0</b></span> <button onclick="addStat('affinity')">+</button></div>
+        <!-- 가호 -->
+        <div class="stat-row">
+          <div>
+            <span class="tooltip">
+              가호 (Divine)
+              <span class="tooltiptext">운, 신성한 보호, 기적 발동 및 치명적 위기 회피</span>
+            </span>
+            : <span id="divine-val">1</span>
+          </div>
+          <button class="stat-btn" onclick="increaseStat('divine')">+</button>
+        </div>
 
-    <br/>
-    <button onclick="saveStats()" style="background: #2e7d32;">스탯 저장하기</button>
+        <!-- 교감 -->
+        <div class="stat-row">
+          <div>
+            <span class="tooltip">
+              교감 (Affinity)
+              <span class="tooltiptext">타인과의 소통, 사역마/정령 교감, 설득 및 매력</span>
+            </span>
+            : <span id="affinity-val">1</span>
+          </div>
+          <button class="stat-btn" onclick="increaseStat('affinity')">+</button>
+        </div>
+      </div>
+
+      <button class="save-btn" onclick="saveStats()">스탯 저장하기</button>
+      <div id="stat-error" class="error-msg"></div>
+    </div>
   </div>
 
   <script>
-    // ⚠️ 아래 두 항목을 본인의 Supabase 주소 및 키로 입력하세요!
-    const SUPABASE_URL = 'https://ussdpozmngczyrabcgun.supabase.co';
+    // Supabase 연동 설정 (본인의 Project URL과 Anon Key가 입력되어 있는지 확인하세요)
+    const SUPABASE_URL = 'https://your-supabase-url.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_NHt6pA_nGOl4zDKgUTntfA_LGioJewy';
-    
-    const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let myChar = null;
+    let currentUserId = null;
+    let characterData = null;
 
+    // 직급별 기본 설정
     const ROLE_CONFIG = {
-      student: { name: '일반 학생', points: 10, maxCap: 5 },
-      president: { name: '학생회장', points: 15, maxCap: 7 },
-      teacher: { name: '교사', points: 20, maxCap: 10 }
+      student: { name: '일반 학생', pts: 10, maxStat: 5 },
+      council: { name: '학생회장', pts: 12, maxStat: 6 },
+      teacher: { name: '교사', pts: 15, maxStat: 7 }
     };
 
-    async function handleStart() {
+    // 가입 및 접속 처리
+    async function handleAuth() {
       const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value.trim();
       const charName = document.getElementById('char-name').value.trim();
-      const role = document.getElementById('role-select').value;
-      const msg = document.getElementById('auth-msg');
+      const roleKey = document.getElementById('role-select').value;
+      const errorDiv = document.getElementById('auth-error');
 
-      if(!username || !password) return msg.innerText = "아이디와 비밀번호를 입력해주세요.";
-      if(password.length < 6) return msg.innerText = "비밀번호는 최소 6자리 이상이어야 합니다.";
-      
+      errorDiv.innerText = '';
+
+      if (!username || !password) {
+        errorDiv.innerText = '아이디와 비밀번호를 입력해 주세요.';
+        return;
+      }
+
+      // 내부에 식별용 가짜 이메일 생성
       const fakeEmail = `${username}@lunar-academy.trpg`;
 
       // 1. 로그인 시도
-      let { data, error } = await dbClient.auth.signInWithPassword({ email: fakeEmail, password });
+      let { data, error } = await supabase.auth.signInWithPassword({
+        email: fakeEmail,
+        password: password
+      });
 
-      // 2. 가입 시도 (계정이 없으면 자동 생성)
+      // 2. 로그인 실패 시 회원가입 시도
       if (error) {
-        const signUpRes = await dbClient.auth.signUp({ email: fakeEmail, password });
-        if (signUpRes.error) return msg.innerText = "접속 에러: " + signUpRes.error.message;
+        if (!charName) {
+          errorDiv.innerText = '신규 회원가입 시 캐릭터 이름을 입력해야 합니다.';
+          return;
+        }
+
+        const signUpRes = await supabase.auth.signUp({
+          email: fakeEmail,
+          password: password
+        });
+
+        if (signUpRes.error) {
+          errorDiv.innerText = '회원가입 에러: ' + signUpRes.error.message;
+          return;
+        }
+
         data = signUpRes.data;
+
+        // DB에 새 캐릭터 초기 생성
+        const roleInfo = ROLE_CONFIG[roleKey];
+        const { error: insertError } = await supabase.from('characters').insert([
+          {
+            user_id: data.user.id,
+            name: charName,
+            role: roleInfo.name,
+            wisdom: 1,
+            willpower: 1,
+            divine: 1,
+            affinity: 1,
+            available_points: roleInfo.pts
+          }
+        ]);
+
+        if (insertError) {
+          errorDiv.innerText = '캐릭터 생성 에러: ' + insertError.message;
+          return;
+        }
       }
 
-      const user = data.user;
-      if (!user) return msg.innerText = "사용자 정보를 불러올 수 없습니다.";
+      currentUserId = data.user.id;
+      loadCharacterData();
+    }
 
-      // 3. 캐릭터 조회 및 생성
-      let charRes = await dbClient.from('characters').select('*').eq('user_id', user.id).maybeSingle();
+    // 캐릭터 데이터 로드
+    async function loadCharacterData() {
+      const { data, error } = await supabase
+        .from('characters')
+        .select('*')
+        .eq('user_id', currentUserId)
+        .single();
 
-      if (!charRes.data) {
-        if(!charName) return msg.innerText = "새 캐릭터 이름을 입력해 주세요.";
-        
-        const config = ROLE_CONFIG[role];
-        const newChar = {
-          user_id: user.id,
-          name: charName,
-          role: role,
-          wisdom: 1, willpower: 1, divine: 1, affinity: 1,
-          available_points: config.points - 4
-        };
-
-        const insertRes = await dbClient.from('characters').insert([newChar]).select().single();
-        if (insertRes.error) return msg.innerText = "캐릭터 생성 에러: " + insertRes.error.message;
-        myChar = insertRes.data;
-      } else {
-        myChar = charRes.data;
+      if (error) {
+        document.getElementById('auth-error').innerText = '데이터 로드 에러: ' + error.message;
+        return;
       }
 
-      renderUI();
+      characterData = data;
+
+      // UI에 데이터 표시
+      document.getElementById('display-username').innerText = characterData.name;
+      document.getElementById('display-role').innerText = characterData.role;
+      document.getElementById('available-pts').innerText = characterData.available_points;
+
+      document.getElementById('wisdom-val').innerText = characterData.wisdom;
+      document.getElementById('willpower-val').innerText = characterData.willpower;
+      document.getElementById('divine-val').innerText = characterData.divine;
+      document.getElementById('affinity-val').innerText = characterData.affinity;
+
+      document.getElementById('auth-section').classList.add('hidden');
+      document.getElementById('character-section').classList.remove('hidden');
     }
 
-    function renderUI() {
-      document.getElementById('setup-section').style.display = 'none';
-      document.getElementById('game-section').style.display = 'block';
+    // 스탯 증가 처리
+    function increaseStat(statName) {
+      if (characterData.available_points <= 0) {
+        alert('사용 가능한 포인트가 없습니다.');
+        return;
+      }
 
-      document.getElementById('display-name').innerText = myChar.name;
-      document.getElementById('display-role').innerText = ROLE_CONFIG[myChar.role].name;
-      document.getElementById('display-pts').innerText = myChar.available_points;
+      characterData[statName] += 1;
+      characterData.available_points -= 1;
 
-      document.getElementById('val-wisdom').innerText = myChar.wisdom;
-      document.getElementById('val-willpower').innerText = myChar.willpower;
-      document.getElementById('val-divine').innerText = myChar.divine;
-      document.getElementById('val-affinity').innerText = myChar.affinity;
+      document.getElementById(`${statName}-val`).innerText = characterData[statName];
+      document.getElementById('available-pts').innerText = characterData.available_points;
     }
 
-    function addStat(statName) {
-      const config = ROLE_CONFIG[myChar.role];
-
-      if (myChar.available_points <= 0) return alert("사용 가능한 포인트가 없습니다.");
-      if (myChar[statName] >= config.maxCap) return alert(`${config.name} 직급은 스탯을 ${config.maxCap} 초과하여 올릴 수 없습니다.`);
-
-      myChar[statName] += 1;
-      myChar.available_points -= 1;
-      renderUI();
-    }
-
+    // DB에 스탯 저장하기
     async function saveStats() {
-      const { error } = await dbClient.from('characters').upsert(myChar);
-      if(error) alert("저장 실패: " + error.message);
-      else alert("성공적으로 저장되었습니다!");
+      const errorDiv = document.getElementById('stat-error');
+      errorDiv.innerText = '';
+
+      const { error } = await supabase
+        .from('characters')
+        .update({
+          wisdom: characterData.wisdom,
+          willpower: characterData.willpower,
+          divine: characterData.divine,
+          affinity: characterData.affinity,
+          available_points: characterData.available_points
+        })
+        .eq('user_id', currentUserId);
+
+      if (error) {
+        errorDiv.innerText = '스탯 저장 실패: ' + error.message;
+      } else {
+        alert('스탯이 성공적으로 저장되었습니다!');
+      }
     }
+
+    // 모바일 터치 시 툴팁 동작 지원
+    document.querySelectorAll('.tooltip').forEach(elem => {
+      elem.addEventListener('touchstart', function() {}, { passive: true });
+    });
   </script>
 </body>
 </html>
