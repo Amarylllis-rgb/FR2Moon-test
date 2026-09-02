@@ -21,7 +21,7 @@
   <div id="setup-section" class="card">
     <h2>[달에서.] 테스트 접속</h2>
     <input type="text" id="username" placeholder="아이디" />
-    <input type="password" id="password" placeholder="비밀번호" />
+    <input type="password" id="password" placeholder="비밀번호 (6자리 이상)" />
     <input type="text" id="char-name" placeholder="캐릭터 이름 (첫 접속 시)" />
     
     <label for="role-select">직급 선택:</label>
@@ -52,10 +52,11 @@
   </div>
 
   <script>
-    // ⚠️ 아래 두 항목을 본인의 Supabase 정보로 교체하세요!
-    const SUPABASE_URL = 'sb_publishable_NHt6pA_nGOl4zDKgUTntfA_LGioJewy';
+    // ⚠️ 아래 두 항목을 본인의 Supabase 주소 및 키로 입력하세요!
+    const SUPABASE_URL = 'https://ussdpozmngczyrabcgun.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_NHt6pA_nGOl4zDKgUTntfA_LGioJewy';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let myChar = null;
 
@@ -73,23 +74,25 @@
       const msg = document.getElementById('auth-msg');
 
       if(!username || !password) return msg.innerText = "아이디와 비밀번호를 입력해주세요.";
+      if(password.length < 6) return msg.innerText = "비밀번호는 최소 6자리 이상이어야 합니다.";
       
       const fakeEmail = `${username}@moon.internal`;
 
       // 1. 로그인 시도
-      let { data, error } = await supabase.auth.signInWithPassword({ email: fakeEmail, password });
+      let { data, error } = await dbClient.auth.signInWithPassword({ email: fakeEmail, password });
 
       // 2. 가입 시도 (계정이 없으면 자동 생성)
       if (error) {
-        const signUpRes = await supabase.auth.signUp({ email: fakeEmail, password });
+        const signUpRes = await dbClient.auth.signUp({ email: fakeEmail, password });
         if (signUpRes.error) return msg.innerText = "접속 에러: " + signUpRes.error.message;
         data = signUpRes.data;
       }
 
       const user = data.user;
+      if (!user) return msg.innerText = "사용자 정보를 불러올 수 없습니다.";
 
       // 3. 캐릭터 조회 및 생성
-      let charRes = await supabase.from('characters').select('*').eq('user_id', user.id).single();
+      let charRes = await dbClient.from('characters').select('*').eq('user_id', user.id).maybeSingle();
 
       if (!charRes.data) {
         if(!charName) return msg.innerText = "새 캐릭터 이름을 입력해 주세요.";
@@ -100,10 +103,11 @@
           name: charName,
           role: role,
           wisdom: 1, willpower: 1, divine: 1, affinity: 1,
-          available_points: config.points - 4 // 기본 1pt 제외 후 분배
+          available_points: config.points - 4
         };
 
-        const insertRes = await supabase.from('characters').insert([newChar]).select().single();
+        const insertRes = await dbClient.from('characters').insert([newChar]).select().single();
+        if (insertRes.error) return msg.innerText = "캐릭터 생성 에러: " + insertRes.error.message;
         myChar = insertRes.data;
       } else {
         myChar = charRes.data;
@@ -138,7 +142,7 @@
     }
 
     async function saveStats() {
-      const { error } = await supabase.from('characters').upsert(myChar);
+      const { error } = await dbClient.from('characters').upsert(myChar);
       if(error) alert("저장 실패: " + error.message);
       else alert("성공적으로 저장되었습니다!");
     }
