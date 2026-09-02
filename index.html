@@ -369,7 +369,9 @@
 
     document.getElementById('display-username').innerText = characterData.name;
     const roleMap = { student: '일반 학생', council: '학생회장', teacher: '교사' };
-    document.getElementById('display-role').innerText = roleMap[characterData.role] || characterData.role;
+    // .trim()으로 공백 제거, .toLowerCase()로 소문자 변환
+    const cleanRole = (characterData.role || '').toString().trim().toLowerCase();
+    document.getElementById('display-role').innerText = roleMap[cleanRole] || characterData.role;
     document.getElementById('available-pts').innerText = characterData.available_points;
 
     document.getElementById('wisdom-val').innerText = characterData.wisdom;
