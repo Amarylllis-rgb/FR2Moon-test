@@ -382,6 +382,19 @@
     teacher: { name: '교사', pts: 15, maxStat: 7 }
   };
 
+  // 직급명 또는 Key를 가져와 해당 직급의 maxStat을 찾는 헬퍼 함수
+  function getMaxStatForRole(roleStr) {
+    if (!roleStr) return 5;
+    const cleanRole = roleStr.toString().trim();
+    
+    for (const key in ROLE_CONFIG) {
+      if (key === cleanRole || ROLE_CONFIG[key].name === cleanRole) {
+        return ROLE_CONFIG[key].maxStat;
+      }
+    }
+    return 5; // 기본값
+  }
+
   // 토스트 알림 표시 함수
   let toastTimeout = null;
   function showToast(message, type = 'success') {
@@ -523,10 +536,16 @@
     }
   }
 
-  // 스탯 증가 처리
+  // 스탯 증가 처리 (상한선 제한 적용)
   function increaseStat(statName) {
     if (characterData.available_points <= 0) {
       showToast('사용 가능한 포인트가 없습니다.', 'warning');
+      return;
+    }
+
+    const maxLimit = getMaxStatForRole(characterData.role);
+    if (characterData[statName] >= maxLimit) {
+      showToast(`${characterData.role}의 최대 스탯 상한선은 ${maxLimit}입니다.`, 'warning');
       return;
     }
 
