@@ -368,7 +368,8 @@
     characterData = data;
 
     document.getElementById('display-username').innerText = characterData.name;
-    document.getElementById('display-role').innerText = characterData.role;
+    const roleMap = { student: '일반 학생', council: '학생회장', teacher: '교사' };
+    document.getElementById('display-role').innerText = roleMap[characterData.role] || characterData.role;
     document.getElementById('available-pts').innerText = characterData.available_points;
 
     document.getElementById('wisdom-val').innerText = characterData.wisdom;
