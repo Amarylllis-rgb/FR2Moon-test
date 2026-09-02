@@ -475,6 +475,34 @@
     loadCharacterData();
   }
 
+// loadCharacterData 함수 수정 예시
+async function loadCharacterData() {
+  const { data, error } = await supabaseClient
+    .from('characters')
+    .select('*')
+    .eq('user_id', currentUserId)
+    .maybeSingle(); // single() 대신 maybeSingle() 사용 (데이터 없어도 에러 안 남)
+
+  if (error) {
+    document.getElementById('auth-error').innerText = '데이터 로드 에러: ' + error.message;
+    return;
+  }
+
+  // 계정은 있지만 characters 데이터가 지워진 경우 처리
+  if (!data) {
+    document.getElementById('auth-error').innerText = '캐릭터 정보가 없습니다. Authentication 계정도 삭제 후 다시 시도해주세요.';
+    return;
+  }
+
+  characterData = data;
+  initialCharacterData = JSON.parse(JSON.stringify(data));
+
+  updateUI();
+
+  document.getElementById('auth-section').classList.add('hidden');
+  document.getElementById('character-section').classList.remove('hidden');
+}
+
   // 캐릭터 데이터 로드
   async function loadCharacterData() {
     const { data, error } = await supabaseClient
