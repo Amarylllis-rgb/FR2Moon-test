@@ -269,159 +269,157 @@
   </div>
 
   <script>
-    // Supabase 연동 설정 (본인의 Project URL과 Anon Key가 입력되어 있는지 확인하세요)
-    const SUPABASE_URL = 'https://ussdpozmngczyrabcgun.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_NHt6pA_nGOl4zDKgUTntfA_LGioJewy';
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  // Supabase 연동 설정 (본인의 URL과 Key를 입력하세요)
+  const SUPABASE_URL = 'https://your-supabase-url.supabase.co';
+  const SUPABASE_KEY = 'your-anon-key';
+  
+  // CDN과 변수명 충돌 방지를 위해 supabaseClient 사용
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let currentUserId = null;
-    let characterData = null;
+  let currentUserId = null;
+  let characterData = null;
 
-    // 직급별 기본 설정
-    const ROLE_CONFIG = {
-      student: { name: '일반 학생', pts: 10, maxStat: 5 },
-      council: { name: '학생회장', pts: 12, maxStat: 6 },
-      teacher: { name: '교사', pts: 15, maxStat: 7 }
-    };
+  // 직급별 기본 설정
+  const ROLE_CONFIG = {
+    student: { name: '일반 학생', pts: 10, maxStat: 5 },
+    council: { name: '학생회장', pts: 12, maxStat: 6 },
+    teacher: { name: '교사', pts: 15, maxStat: 7 }
+  };
 
-    // 가입 및 접속 처리
-    async function handleAuth() {
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const charName = document.getElementById('char-name').value.trim();
-      const roleKey = document.getElementById('role-select').value;
-      const errorDiv = document.getElementById('auth-error');
+  // 가입 및 접속 처리
+  async function handleAuth() {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const charName = document.getElementById('char-name').value.trim();
+    const roleKey = document.getElementById('role-select').value;
+    const errorDiv = document.getElementById('auth-error');
 
-      errorDiv.innerText = '';
+    errorDiv.innerText = '';
 
-      if (!username || !password) {
-        errorDiv.innerText = '아이디와 비밀번호를 입력해 주세요.';
+    if (!username || !password) {
+      errorDiv.innerText = '아이디와 비밀번호를 입력해 주세요.';
+      return;
+    }
+
+    const fakeEmail = `${username}@lunar-academy.trpg`;
+
+    // 1. 로그인 시도
+    let { data, error } = await supabaseClient.auth.signInWithPassword({
+      email: fakeEmail,
+      password: password
+    });
+
+    // 2. 로그인 실패 시 회원가입 시도
+    if (error) {
+      if (!charName) {
+        errorDiv.innerText = '신규 회원가입 시 캐릭터 이름을 입력해야 합니다.';
         return;
       }
 
-      // 내부에 식별용 가짜 이메일 생성
-      const fakeEmail = `${username}@lunar-academy.trpg`;
-
-      // 1. 로그인 시도
-      let { data, error } = await supabase.auth.signInWithPassword({
+      const signUpRes = await supabaseClient.auth.signUp({
         email: fakeEmail,
         password: password
       });
 
-      // 2. 로그인 실패 시 회원가입 시도
-      if (error) {
-        if (!charName) {
-          errorDiv.innerText = '신규 회원가입 시 캐릭터 이름을 입력해야 합니다.';
-          return;
-        }
-
-        const signUpRes = await supabase.auth.signUp({
-          email: fakeEmail,
-          password: password
-        });
-
-        if (signUpRes.error) {
-          errorDiv.innerText = '회원가입 에러: ' + signUpRes.error.message;
-          return;
-        }
-
-        data = signUpRes.data;
-
-        // DB에 새 캐릭터 초기 생성
-        const roleInfo = ROLE_CONFIG[roleKey];
-        const { error: insertError } = await supabase.from('characters').insert([
-          {
-            user_id: data.user.id,
-            name: charName,
-            role: roleInfo.name,
-            wisdom: 1,
-            willpower: 1,
-            divine: 1,
-            affinity: 1,
-            available_points: roleInfo.pts
-          }
-        ]);
-
-        if (insertError) {
-          errorDiv.innerText = '캐릭터 생성 에러: ' + insertError.message;
-          return;
-        }
-      }
-
-      currentUserId = data.user.id;
-      loadCharacterData();
-    }
-
-    // 캐릭터 데이터 로드
-    async function loadCharacterData() {
-      const { data, error } = await supabase
-        .from('characters')
-        .select('*')
-        .eq('user_id', currentUserId)
-        .single();
-
-      if (error) {
-        document.getElementById('auth-error').innerText = '데이터 로드 에러: ' + error.message;
+      if (signUpRes.error) {
+        errorDiv.innerText = '회원가입 에러: ' + signUpRes.error.message;
         return;
       }
 
-      characterData = data;
+      data = signUpRes.data;
 
-      // UI에 데이터 표시
-      document.getElementById('display-username').innerText = characterData.name;
-      document.getElementById('display-role').innerText = characterData.role;
-      document.getElementById('available-pts').innerText = characterData.available_points;
+      const roleInfo = ROLE_CONFIG[roleKey];
+      const { error: insertError } = await supabaseClient.from('characters').insert([
+        {
+          user_id: data.user.id,
+          name: charName,
+          role: roleInfo.name,
+          wisdom: 1,
+          willpower: 1,
+          divine: 1,
+          affinity: 1,
+          available_points: roleInfo.pts
+        }
+      ]);
 
-      document.getElementById('wisdom-val').innerText = characterData.wisdom;
-      document.getElementById('willpower-val').innerText = characterData.willpower;
-      document.getElementById('divine-val').innerText = characterData.divine;
-      document.getElementById('affinity-val').innerText = characterData.affinity;
-
-      document.getElementById('auth-section').classList.add('hidden');
-      document.getElementById('character-section').classList.remove('hidden');
-    }
-
-    // 스탯 증가 처리
-    function increaseStat(statName) {
-      if (characterData.available_points <= 0) {
-        alert('사용 가능한 포인트가 없습니다.');
+      if (insertError) {
+        errorDiv.innerText = '캐릭터 생성 에러: ' + insertError.message;
         return;
       }
-
-      characterData[statName] += 1;
-      characterData.available_points -= 1;
-
-      document.getElementById(`${statName}-val`).innerText = characterData[statName];
-      document.getElementById('available-pts').innerText = characterData.available_points;
     }
 
-    // DB에 스탯 저장하기
-    async function saveStats() {
-      const errorDiv = document.getElementById('stat-error');
-      errorDiv.innerText = '';
+    currentUserId = data.user.id;
+    loadCharacterData();
+  }
 
-      const { error } = await supabase
-        .from('characters')
-        .update({
-          wisdom: characterData.wisdom,
-          willpower: characterData.willpower,
-          divine: characterData.divine,
-          affinity: characterData.affinity,
-          available_points: characterData.available_points
-        })
-        .eq('user_id', currentUserId);
+  // 캐릭터 데이터 로드
+  async function loadCharacterData() {
+    const { data, error } = await supabaseClient
+      .from('characters')
+      .select('*')
+      .eq('user_id', currentUserId)
+      .single();
 
-      if (error) {
-        errorDiv.innerText = '스탯 저장 실패: ' + error.message;
-      } else {
-        alert('스탯이 성공적으로 저장되었습니다!');
-      }
+    if (error) {
+      document.getElementById('auth-error').innerText = '데이터 로드 에러: ' + error.message;
+      return;
     }
 
-    // 모바일 터치 시 툴팁 동작 지원
-    document.querySelectorAll('.tooltip').forEach(elem => {
-      elem.addEventListener('touchstart', function() {}, { passive: true });
-    });
-  </script>
+    characterData = data;
+
+    document.getElementById('display-username').innerText = characterData.name;
+    document.getElementById('display-role').innerText = characterData.role;
+    document.getElementById('available-pts').innerText = characterData.available_points;
+
+    document.getElementById('wisdom-val').innerText = characterData.wisdom;
+    document.getElementById('willpower-val').innerText = characterData.willpower;
+    document.getElementById('divine-val').innerText = characterData.divine;
+    document.getElementById('affinity-val').innerText = characterData.affinity;
+
+    document.getElementById('auth-section').classList.add('hidden');
+    document.getElementById('character-section').classList.remove('hidden');
+  }
+
+  // 스탯 증가 처리
+  function increaseStat(statName) {
+    if (characterData.available_points <= 0) {
+      alert('사용 가능한 포인트가 없습니다.');
+      return;
+    }
+
+    characterData[statName] += 1;
+    characterData.available_points -= 1;
+
+    document.getElementById(`${statName}-val`).innerText = characterData[statName];
+    document.getElementById('available-pts').innerText = characterData.available_points;
+  }
+
+  // DB에 스탯 저장하기
+  async function saveStats() {
+    const errorDiv = document.getElementById('stat-error');
+    errorDiv.innerText = '';
+
+    const { error } = await supabaseClient
+      .from('characters')
+      .update({
+        wisdom: characterData.wisdom,
+        willpower: characterData.willpower,
+        divine: characterData.divine,
+        affinity: characterData.affinity,
+        available_points: characterData.available_points
+      })
+      .eq('user_id', currentUserId);
+
+    if (error) {
+      errorDiv.innerText = '스탯 저장 실패: ' + error.message;
+    } else {
+      alert('스탯이 성공적으로 저장되었습니다!');
+    }
+  }
+
+  document.querySelectorAll('.tooltip').forEach(elem => {
+    elem.addEventListener('touchstart', function() {}, { passive: true });
+  });
+</script>
 </body>
 </html>
