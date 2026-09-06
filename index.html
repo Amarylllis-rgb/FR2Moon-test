@@ -303,7 +303,10 @@
 
       <div class="form-group">
         <label>계정 닉네임 (본닉 - 신규가입 시):</label>
-        <input type="text" id="user-nickname" placeholder="예: 낙화">
+        <div style="display: flex; gap: 6px;">
+          <input type="text" id="user-nickname" placeholder="예: 구름">
+          <button type="button" onclick="checkNicknameDuplicate()" style="width: 100px; margin-top: 0; font-size: 0.85rem; background-color: #555;">중복확인</button>
+        </div>
       </div>
 
       <div class="form-group">
@@ -485,11 +488,13 @@
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const ADMIN_USERNAME = 'admin';
+    const FORBIDDEN_WORDS = ['admin', '낙화', '달에서', '운영자', '관리자', 'master'];
 
     let currentUserId = null;
     let currentUsername = null;
     let currentUserNickname = '';
     let characterData = null;
+    let isNicknameChecked = false;
 
     const ROLE_CONFIG = {
       student: { name: '일반 학생', pts: 10, max: 5 },
@@ -504,10 +509,54 @@
       setTimeout(() => t.classList.remove('show'), 2500);
     }
 
+    // 닉네임 유효성 및 금지어 검사
+    function validateNickname(nick, isSystemAdmin = false) {
+      if (isSystemAdmin) return true;
+      const lowerNick = nick.toLowerCase();
+      for (const word of FORBIDDEN_WORDS) {
+        if (lowerNick.includes(word.toLowerCase())) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    // 닉네임 중복 확인 함수
+    async function checkNicknameDuplicate() {
+      const username = document.getElementById('username').value.trim();
+      const userNickname = document.getElementById('user-nickname').value.trim();
+      const isSystemAdmin = username === ADMIN_USERNAME;
+
+      if (!userNickname && !isSystemAdmin) {
+        return alert('검사할 계정 닉네임을 입력해주세요.');
+      }
+
+      const targetNick = userNickname || '낙화';
+
+      if (!validateNickname(targetNick, isSystemAdmin)) {
+        return alert(`'${targetNick}'은(는) 예약어 및 사용금지어가 포함되어 지정할 수 없습니다.`);
+      }
+
+      // 게시글 저자의 author_name 내 (@닉네임) 패턴 검색을 통해 중복을 간이 식별
+      const { data } = await supabaseClient
+        .from('posts')
+        .select('author_name')
+        .ilike('author_name', `%(@${targetNick})%`)
+        .limit(1);
+
+      if (data && data.length > 0) {
+        isNicknameChecked = false;
+        return alert('이미 사용 중인 계정 닉네임입니다.');
+      }
+
+      isNicknameChecked = true;
+      showToast('사용 가능한 계정 닉네임입니다.');
+    }
+
     async function handleAuth() {
       const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value.trim();
-      const userNickname = document.getElementById('user-nickname').value.trim();
+      let userNickname = document.getElementById('user-nickname').value.trim();
       const charName = document.getElementById('char-name').value.trim();
       const roleKey = document.getElementById('role-select').value;
       const errBox = document.getElementById('auth-error');
@@ -517,21 +566,28 @@
 
       currentUsername = username;
       const email = `${username}@lunar-academy.trpg`;
+      const isSystemAdmin = username === ADMIN_USERNAME;
+
+      if (isSystemAdmin && !userNickname) {
+        userNickname = '낙화';
+      }
       
       // 1. 로그인 시도
       let { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
-      // 2. 로그인 실패 시 (회원가입 진행)
+      // 2. 로그인 실패 시 (신규 가입 처리)
       if (error) {
-        if (!userNickname || !charName) {
-          return alert('신규 가입을 원하시면 계정 닉네임과 캐릭터 이름을 모두 입력해주세요.');
+        const finalNickname = userNickname || (isSystemAdmin ? '낙화' : username);
+
+        if (!validateNickname(finalNickname, isSystemAdmin)) {
+          return alert('사용할 수 없는 계정 닉네임입니다. (금지어 포함)');
         }
 
         const signUp = await supabaseClient.auth.signUp({ 
           email, 
           password,
           options: {
-            data: { user_nickname: userNickname }
+            data: { user_nickname: finalNickname }
           }
         });
 
@@ -539,10 +595,11 @@
 
         data = signUp.data;
         const roleInfo = ROLE_CONFIG[roleKey];
+        const finalCharName = charName || (isSystemAdmin ? '운영진' : username);
         
         const { error: insertErr } = await supabaseClient.from('characters').insert([{
           user_id: data.user.id,
-          name: charName,
+          name: finalCharName,
           role: roleInfo.name,
           wisdom: 1, willpower: 1, divine: 1, affinity: 1,
           available_points: roleInfo.pts
@@ -556,7 +613,7 @@
       }
 
       currentUserId = data.user.id;
-      currentUserNickname = data.user.user_metadata?.user_nickname || username;
+      currentUserNickname = isSystemAdmin ? '낙화' : (data.user.user_metadata?.user_nickname || username);
       loadFlow();
     }
 
@@ -699,7 +756,7 @@
 
       await supabaseClient.from('posts').insert([{
         user_id: currentUserId,
-        author_name: `운영진 (@${currentUserNickname})`,
+        author_name: `운영진 (@낙화)`,
         content: content,
         visibility: 'public',
         is_notice: true
@@ -792,7 +849,7 @@
       if (!data) return showToast('프로필 정보를 불러올 수 없습니다.');
 
       const { data: userData } = await supabaseClient.auth.admin?.getUserById(userId) || {};
-      const targetNick = userData?.user?.user_metadata?.user_nickname || '사용자';
+      const targetNick = userData?.user?.user_metadata?.user_nickname || '낙화';
 
       document.getElementById('modal-char-name').innerText = `${data.name} (@${targetNick})`;
       document.getElementById('modal-role').innerText = data.role;
