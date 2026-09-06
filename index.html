@@ -132,6 +132,7 @@
 
     .error-msg { color: #ff6b6b; font-size: 0.85rem; margin-top: 10px; }
 
+    /* 헤더 및 알림 영역 */
     .app-header {
       position: sticky;
       top: 0;
@@ -143,6 +144,12 @@
       justify-content: space-between;
       padding: 0 24px;
       z-index: 100;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
     }
 
     .logo {
@@ -175,6 +182,73 @@
       border-bottom-color: #ffc107;
       font-weight: bold;
     }
+
+    .noti-wrapper {
+      position: relative;
+    }
+
+    .noti-btn {
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      color: #ccc;
+      cursor: pointer;
+      position: relative;
+      padding: 4px;
+      width: auto;
+      margin-top: 0;
+    }
+
+    .noti-badge {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background-color: #e53935;
+      color: #fff;
+      font-size: 0.65rem;
+      padding: 2px 5px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+
+    .noti-dropdown {
+      position: absolute;
+      right: 0;
+      top: 45px;
+      width: 320px;
+      max-height: 400px;
+      background-color: #252525;
+      border: 1px solid #444;
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      overflow-y: auto;
+      z-index: 200;
+    }
+
+    .noti-header {
+      padding: 12px 16px;
+      font-weight: bold;
+      border-bottom: 1px solid #333;
+      font-size: 0.9rem;
+      color: #fff;
+      background-color: #1e1e1e;
+    }
+
+    .noti-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 16px;
+      border-bottom: 1px solid #333;
+      font-size: 0.85rem;
+      transition: background-color 0.2s;
+    }
+
+    .noti-item:hover { background-color: #2e2e2e; }
+    .noti-item.unread { background-color: #2c323f; }
+
+    .noti-content { flex: 1; color: #ddd; }
+    .noti-time { font-size: 0.75rem; color: #888; margin-top: 4px; }
 
     .main-layout {
       max-width: 960px;
@@ -226,7 +300,6 @@
       gap: 8px;
     }
 
-    /* 더보기 토글 스타일 */
     .post-more-container {
       position: relative;
       display: inline-block;
@@ -244,9 +317,7 @@
       line-height: 1;
     }
 
-    .post-more-btn:hover {
-      color: #fff;
-    }
+    .post-more-btn:hover { color: #fff; }
 
     .post-dropdown-menu {
       position: absolute;
@@ -277,15 +348,8 @@
       width: 100%;
     }
 
-    .post-dropdown-item:hover {
-      background-color: #3b5998;
-      color: #fff;
-    }
-
-    .post-dropdown-item.delete:hover {
-      background-color: #d32f2f;
-      color: #fff;
-    }
+    .post-dropdown-item:hover { background-color: #3b5998; color: #fff; }
+    .post-dropdown-item.delete:hover { background-color: #d32f2f; color: #fff; }
 
     .author-wrapper {
       display: inline-flex;
@@ -309,6 +373,81 @@
     }
 
     .post-content { font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; }
+
+    /* 댓글 및 답글 관련 스타일 */
+    .comments-section {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid #2d2d2d;
+    }
+
+    .comment-item {
+      padding: 8px 0;
+      font-size: 0.85rem;
+      border-bottom: 1px dashed #2a2a2a;
+    }
+
+    .comment-item.reply {
+      margin-left: 24px;
+      border-left: 2px solid #333;
+      padding-left: 10px;
+    }
+
+    .comment-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .comment-author {
+      font-weight: bold;
+      color: #bbb;
+      cursor: pointer;
+    }
+
+    .comment-actions {
+      display: flex;
+      gap: 8px;
+      color: #777;
+      font-size: 0.75rem;
+    }
+
+    .comment-action-btn {
+      cursor: pointer;
+      color: #888;
+    }
+    .comment-action-btn:hover { color: #fff; text-decoration: underline; }
+
+    .comment-input-box {
+      margin-top: 10px;
+      position: relative;
+    }
+
+    .mention-dropdown {
+      position: absolute;
+      bottom: 100%;
+      left: 0;
+      background-color: #2a2a2a;
+      border: 1px solid #444;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+      max-height: 150px;
+      overflow-y: auto;
+      width: 200px;
+      z-index: 100;
+    }
+
+    .mention-item {
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: #ddd;
+    }
+    .mention-item:hover { background-color: #3b5998; color: #fff; }
 
     .modal-overlay {
       position: fixed;
@@ -451,11 +590,24 @@
   <div id="main-community-section" class="hidden">
     <header class="app-header">
       <div class="logo">🌙 달에서.</div>
-      <div class="nav-tabs">
-        <button type="button" class="nav-btn active" id="btn-tab-notice" onclick="switchMainTab('notice')">공지사항</button>
-        <button type="button" class="nav-btn" id="btn-tab-story" onclick="switchMainTab('story')">커뮤니티</button>
-        <button type="button" class="nav-btn" id="btn-tab-profile" onclick="switchMainTab('profile')">내 프로필</button>
-        <button type="button" class="nav-btn" id="btn-tab-friends" onclick="switchMainTab('friends')">친구 관리</button>
+      <div class="header-right">
+        <div class="nav-tabs">
+          <button type="button" class="nav-btn active" id="btn-tab-notice" onclick="switchMainTab('notice')">공지사항</button>
+          <button type="button" class="nav-btn" id="btn-tab-story" onclick="switchMainTab('story')">커뮤니티</button>
+          <button type="button" class="nav-btn" id="btn-tab-profile" onclick="switchMainTab('profile')">내 프로필</button>
+          <button type="button" class="nav-btn" id="btn-tab-friends" onclick="switchMainTab('friends')">친구 관리</button>
+        </div>
+
+        <!-- 오른쪽 상단 알림 영역 -->
+        <div class="noti-wrapper">
+          <button type="button" class="noti-btn" onclick="toggleNotiDropdown(event)">
+            🔔<span id="noti-badge-count" class="noti-badge hidden">0</span>
+          </button>
+          <div id="noti-dropdown-menu" class="noti-dropdown hidden">
+            <div class="noti-header">최근 알림</div>
+            <div id="noti-list-body"></div>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -586,8 +738,7 @@
     const ADMIN_USERNAME = 'admin';
     const FORBIDDEN_WORDS = ['admin', '낙화', '달에서', '운영자', '관리자', 'master'];
     
-    // Base64 인코딩된 기본 SVG 실루엣 아바타
-    const DEFAULT_AVATAR_SVG = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzg4ODg4OCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSI+PHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTAgM2MxLjY2IDAgMyAxLjM0IDMgM3MtMS4zNCAzLTMgMy0zLTEuMzQtMy0zIDEuMzQtMyAzLTN6bTAgMTQuMmMtMi41IDAtNC43MS0xLjI4LTYtMy4yMi4wMy0xLjk5IDQtMy4w鉢IDYtMy4wOCAxLjk5IDAgNS45NyAxLjA5IDYgMy4wOC0xLjI5IDEuOTQtMy40IDMuMjItNiAzLjIyeiIvPjwvc3ZnPg==';
+    const DEFAULT_AVATAR_SVG = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzg4ODg4OCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSI+PHBhdGggZD0iTTEyIDJDNi44OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTAgM2MxLjY2IDAgMyAxLjM0IDMgM3MtMS4zNCAzLTMgMy0zLTEuMzQtMy0zIDEuMzQtMyAzLTN6bTAgMTQuMmMtMi41IDAtNC43MS0xLjI4LTYtMy4yMi4wMy0xLjk5IDQtMy4wOCA2LTMuMDggMS45OSAwIDUuOTcgMS4wOSA2IDMuMDgtMS4yOSAxLjk0LTMuNCAzLjIyLTYgMy4yMnoiLz48L3N2Zz4=';
 
     let currentUserId = null;
     let currentUsername = null;
@@ -595,6 +746,7 @@
     let characterData = null;
     let isNicknameChecked = false;
     let editingPostId = null;
+    let allCharactersList = []; // 언급 멘션용 캐릭터 목록
 
     const ROLE_CONFIG = {
       student: { name: '일반 학생', pts: 10, max: 5 },
@@ -602,10 +754,12 @@
       teacher: { name: '교사', pts: 15, max: 7 }
     };
 
-    // 외부 클릭 시 게시글 더보기 드롭다운 닫기
     document.addEventListener('click', function(e) {
       if (!e.target.closest('.post-more-container')) {
         document.querySelectorAll('.post-dropdown-menu').forEach(menu => menu.classList.add('hidden'));
+      }
+      if (!e.target.closest('.noti-wrapper')) {
+        document.getElementById('noti-dropdown-menu').classList.add('hidden');
       }
     });
 
@@ -650,9 +804,7 @@
       if (isSystemAdmin) return true;
       const lowerNick = nick.toLowerCase();
       for (const word of FORBIDDEN_WORDS) {
-        if (lowerNick.includes(word.toLowerCase())) {
-          return false;
-        }
+        if (lowerNick.includes(word.toLowerCase())) return false;
       }
       return true;
     }
@@ -662,9 +814,7 @@
       const userNickname = document.getElementById('user-nickname').value.trim();
       const isSystemAdmin = username === ADMIN_USERNAME;
 
-      if (!userNickname && !isSystemAdmin) {
-        return alert('검사할 계정 닉네임을 입력해주세요.');
-      }
+      if (!userNickname && !isSystemAdmin) return alert('검사할 계정 닉네임을 입력해주세요.');
 
       const targetNick = userNickname || '낙화';
 
@@ -702,9 +852,7 @@
       const email = `${username}@lunar-academy.trpg`;
       const isSystemAdmin = username === ADMIN_USERNAME;
 
-      if (isSystemAdmin && !userNickname) {
-        userNickname = '낙화';
-      }
+      if (isSystemAdmin && !userNickname) userNickname = '낙화';
       
       let { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
@@ -718,9 +866,7 @@
         const signUp = await supabaseClient.auth.signUp({ 
           email, 
           password,
-          options: {
-            data: { user_nickname: finalNickname }
-          }
+          options: { data: { user_nickname: finalNickname } }
         });
 
         if (signUp.error) return alert('회원가입 실패: ' + signUp.error.message);
@@ -739,7 +885,6 @@
         }]);
 
         if (insertErr) {
-          console.error(insertErr);
           errBox.innerText = '캐릭터 생성 오류: ' + insertErr.message;
           return;
         }
@@ -755,15 +900,13 @@
         const { data, error } = await supabaseClient.from('characters').select('*').eq('user_id', currentUserId).maybeSingle();
         
         if (error) {
-          console.error(error);
           document.getElementById('auth-error').innerText = '캐릭터 불러오기 오류: ' + error.message;
           return;
         }
 
         if (!data) {
           const charName = document.getElementById('char-name').value.trim() || currentUsername;
-          
-          const { data: newChar, error: createErr } = await supabaseClient.from('characters').insert([{
+          const { data: newChar } = await supabaseClient.from('characters').insert([{
             user_id: currentUserId,
             name: charName,
             role: '일반 학생',
@@ -771,15 +914,14 @@
             available_points: 10,
             avatar_url: null
           }]).select().single();
-
-          if (createErr) {
-            document.getElementById('auth-error').innerText = '기본 캐릭터 생성 오류: ' + createErr.message;
-            return;
-          }
           characterData = newChar;
         } else {
           characterData = data;
         }
+
+        // 전체 캐릭터 목록 캐싱 (멘션 창 용)
+        const { data: chars } = await supabaseClient.from('characters').select('*');
+        if (chars) allCharactersList = chars;
 
         document.getElementById('auth-section').classList.add('hidden');
 
@@ -790,7 +932,6 @@
           enterCommunity();
         }
       } catch (err) {
-        console.error(err);
         document.getElementById('auth-error').innerText = '시스템 오류가 발생했습니다.';
       }
     }
@@ -839,6 +980,7 @@
         document.getElementById('notice-write-box').classList.add('hidden');
       }
 
+      loadNotifications();
       switchMainTab('notice');
     }
 
@@ -858,112 +1000,188 @@
       if (tab === 'friends') loadFriends();
     }
 
-    function renderProfileView() {
-      document.getElementById('profile-char-name-display').innerText = `${characterData.name} (@${currentUserNickname})`;
-      document.getElementById('profile-role').innerText = characterData.role;
-      document.getElementById('profile-avatar-preview-area').innerHTML = getAvatarHtml(characterData.avatar_url, 70);
+    /* ========================================================
+       알림 기능 로직
+       ======================================================== */
+    async function loadNotifications() {
+      const { data } = await supabaseClient
+        .from('notifications')
+        .select('*')
+        .eq('user_id', currentUserId)
+        .order('created_at', { ascending: false });
 
-      document.getElementById('profile-wisdom').innerText = characterData.wisdom;
-      document.getElementById('profile-willpower').innerText = characterData.willpower;
-      document.getElementById('profile-divine').innerText = characterData.divine;
-      document.getElementById('profile-affinity').innerText = characterData.affinity;
+      const notiBody = document.getElementById('noti-list-body');
+      const badge = document.getElementById('noti-badge-count');
+      notiBody.innerHTML = '';
 
-      document.getElementById('edit-char-name').value = characterData.name;
+      if (!data || data.length === 0) {
+        notiBody.innerHTML = '<div style="padding:16px; color:#888; text-align:center;">알림이 없습니다.</div>';
+        badge.classList.add('hidden');
+        return;
+      }
+
+      const unreadCount = data.filter(n => !n.is_read).length;
+      if (unreadCount > 0) {
+        badge.innerText = unreadCount;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+
+      data.forEach(n => {
+        const item = document.createElement('div');
+        item.className = `noti-item ${n.is_read ? '' : 'unread'}`;
+        item.innerHTML = `
+          ${getAvatarHtml(n.sender_avatar, 32)}
+          <div class="noti-content">
+            <div><b>${n.sender_name}</b>님이 ${n.message}</div>
+            <div class="noti-time">${new Date(n.created_at).toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'})}</div>
+          </div>
+        `;
+        notiBody.appendChild(item);
+      });
     }
 
-    async function uploadProfileAvatar() {
-      const fileInput = document.getElementById('avatar-file-input');
-      const file = fileInput.files[0];
-      if (!file) return alert('업로드할 이미지 파일을 선택해주세요.');
+    async function toggleNotiDropdown(e) {
+      e.stopPropagation();
+      const menu = document.getElementById('noti-dropdown-menu');
+      menu.classList.toggle('hidden');
 
-      try {
-        showToast('이미지 변환 및 업로드 중...');
-
-        const resizedBlob = await resizeImage(file, 150, 150);
-        const filePath = `avatars/${currentUserId}.webp`;
-
-        const { error: uploadErr } = await supabaseClient
-          .storage
-          .from('community-assets')
-          .upload(filePath, resizedBlob, {
-            contentType: 'image/webp',
-            upsert: true
-          });
-
-        if (uploadErr) return alert('스토리지 업로드 실패: ' + uploadErr.message);
-
-        const { data } = supabaseClient
-          .storage
-          .from('community-assets')
-          .getPublicUrl(filePath);
-
-        const newAvatarUrl = `${data.publicUrl}?t=${new Date().getTime()}`;
-
+      if (!menu.classList.contains('hidden')) {
         await supabaseClient
-          .from('characters')
-          .update({ avatar_url: newAvatarUrl })
+          .from('notifications')
+          .update({ is_read: true })
           .eq('user_id', currentUserId);
-
-        characterData.avatar_url = newAvatarUrl;
-        document.getElementById('side-avatar-area').innerHTML = getAvatarHtml(newAvatarUrl, 44);
-        renderProfileView();
-
-        fileInput.value = '';
-        showToast('프로필 사진이 변경되었습니다!');
-      } catch (err) {
-        console.error(err);
-        alert('프로필 이미지 처리 중 오류가 발생했습니다.');
+        document.getElementById('noti-badge-count').classList.add('hidden');
       }
     }
 
-    async function resetToDefaultAvatar() {
-      if (!confirm('프로필 사진을 기본 이미지로 변경하시겠습니까?')) return;
-
-      const { error } = await supabaseClient
-        .from('characters')
-        .update({ avatar_url: null })
-        .eq('user_id', currentUserId);
-
-      if (error) return alert('변경 실패: ' + error.message);
-
-      characterData.avatar_url = null;
-      document.getElementById('side-avatar-area').innerHTML = getAvatarHtml(null, 44);
-      renderProfileView();
-      showToast('기본 프로필 사진으로 변경되었습니다.');
+    async function createNotification(targetUserId, message) {
+      if (targetUserId === currentUserId) return; // 자기 자신에겐 알림 생성 안 함
+      await supabaseClient.from('notifications').insert([{
+        user_id: targetUserId,
+        sender_name: characterData.name,
+        sender_avatar: characterData.avatar_url,
+        message: message
+      }]);
     }
 
-    async function updateProfile() {
-      const newCharName = document.getElementById('edit-char-name').value.trim();
-      if (!newCharName) return alert('캐릭터 이름을 입력해주세요.');
+    /* ========================================================
+       댓글 & 멘션 기능 로직
+       ======================================================== */
+    async function loadComments(postId) {
+      const { data } = await supabaseClient
+        .from('comments')
+        .select('*, characters(avatar_url)')
+        .eq('post_id', postId)
+        .order('created_at', { ascending: true });
 
-      await supabaseClient.from('characters').update({
-        name: newCharName
-      }).eq('user_id', currentUserId);
+      const container = document.getElementById(`comments-list-${postId}`);
+      if (!container) return;
+      container.innerHTML = '';
 
-      characterData.name = newCharName;
+      if (!data) return;
 
-      document.getElementById('side-char-name').innerText = `${newCharName} (@${currentUserNickname})`;
-      renderProfileView();
-      showToast('프로필이 저장되었습니다.');
+      data.forEach(c => {
+        const isReply = !!c.parent_id;
+        const avatarHtml = getAvatarHtml(c.characters?.avatar_url, 24);
+
+        const el = document.createElement('div');
+        el.className = `comment-item ${isReply ? 'reply' : ''}`;
+        el.innerHTML = `
+          <div class="comment-header">
+            <div>
+              ${avatarHtml}
+              <span class="comment-author" onclick="openProfileModal('${c.user_id}')">${c.author_name}</span>
+            </div>
+            <div class="comment-actions">
+              <span class="comment-action-btn" onclick="setReplyTarget('${postId}', '${c.id}', '${c.author_name}')">답글</span>
+              ${c.user_id === currentUserId || currentUsername === ADMIN_USERNAME ? `
+                <span class="comment-action-btn" onclick="deleteComment('${postId}', '${c.id}')">삭제</span>
+              ` : ''}
+            </div>
+          </div>
+          <div style="color:#ccc; font-size:0.85rem; padding-left:28px;">${c.content}</div>
+        `;
+        container.appendChild(el);
+      });
     }
 
-    async function submitNotice() {
-      const content = document.getElementById('notice-input').value.trim();
+    function handleCommentInput(e, postId) {
+      const input = e.target;
+      const val = input.value;
+      const dropdown = document.getElementById(`mention-dropdown-${postId}`);
+
+      if (val.endsWith('@')) {
+        dropdown.innerHTML = '';
+        allCharactersList.forEach(c => {
+          const item = document.createElement('div');
+          item.className = 'mention-item';
+          item.innerHTML = `${getAvatarHtml(c.avatar_url, 20)} <span>${c.name}</span>`;
+          item.onclick = () => {
+            input.value = val + c.name + ' ';
+            dropdown.classList.add('hidden');
+            input.focus();
+          };
+          dropdown.appendChild(item);
+        });
+        dropdown.classList.remove('hidden');
+      } else if (!val.includes('@')) {
+        dropdown.classList.add('hidden');
+      }
+    }
+
+    function setReplyTarget(postId, commentId, authorName) {
+      const input = document.getElementById(`comment-input-${postId}`);
+      input.dataset.parentId = commentId;
+      input.placeholder = `@${authorName} 님에게 답글 작성 중...`;
+      input.focus();
+    }
+
+    async function submitComment(postId, postUserId) {
+      const input = document.getElementById(`comment-input-${postId}`);
+      const content = input.value.trim();
+      const parentId = input.dataset.parentId || null;
+
       if (!content) return;
 
-      await supabaseClient.from('posts').insert([{
+      const { data: newComment } = await supabaseClient.from('comments').insert([{
+        post_id: postId,
         user_id: currentUserId,
-        author_name: `운영진 (@낙화)`,
+        author_name: `${characterData.name}`,
         content: content,
-        visibility: 'public',
-        is_notice: true
-      }]);
+        parent_id: parentId
+      }]).select().single();
 
-      document.getElementById('notice-input').value = '';
-      showToast('공지사항이 등록되었습니다.');
-      loadNotices();
+      // 게시글 작성자에게 댓글 알림
+      await createNotification(postUserId, `내 글에 댓글을 남겼습니다: "${content.substring(0, 15)}..."`);
+
+      // `@멘션`된 사람 탐지하여 알림
+      allCharactersList.forEach(async c => {
+        if (content.includes(`@${c.name}`)) {
+          await createNotification(c.user_id, `댓글에서 ${characterData.name}님을 언급했습니다.`);
+        }
+      });
+
+      input.value = '';
+      delete input.dataset.parentId;
+      input.placeholder = '댓글을 입력하세요. (@로 언급)';
+      document.getElementById(`mention-dropdown-${postId}`).classList.add('hidden');
+
+      loadComments(postId);
+      showToast('댓글이 등록되었습니다.');
     }
 
+    async function deleteComment(postId, commentId) {
+      if (!confirm('댓글을 삭제하시겠습니까?')) return;
+      await supabaseClient.from('comments').delete().eq('id', commentId);
+      loadComments(postId);
+      showToast('댓글이 삭제되었습니다.');
+    }
+
+    /* ========================================================
+       피드 및 공지사항 로드
+       ======================================================== */
     async function loadNotices() {
       const { data } = await supabaseClient
         .from('posts')
@@ -1007,27 +1225,21 @@
             </div>
           </div>
           <div class="post-content">${p.content}</div>
+          
+          <div class="comments-section">
+            <div id="comments-list-${p.id}"></div>
+            <div class="comment-input-box">
+              <div id="mention-dropdown-${p.id}" class="mention-dropdown hidden"></div>
+              <div style="display:flex; gap:6px; margin-top:6px;">
+                <input type="text" id="comment-input-${p.id}" placeholder="댓글을 입력하세요. (@로 언급)" oninput="handleCommentInput(event, '${p.id}')">
+                <button type="button" onclick="submitComment('${p.id}', '${p.user_id}')" style="width:70px; margin-top:0; font-size:0.85rem;">등록</button>
+              </div>
+            </div>
+          </div>
         `;
         feed.appendChild(item);
+        loadComments(p.id);
       });
-    }
-
-    async function submitPost() {
-      const content = document.getElementById('post-input').value.trim();
-      const visibility = document.getElementById('post-visibility').value;
-      if (!content) return;
-
-      await supabaseClient.from('posts').insert([{
-        user_id: currentUserId,
-        author_name: `${characterData.name} (@${currentUserNickname})`,
-        content: content,
-        visibility: visibility,
-        is_notice: false
-      }]);
-
-      document.getElementById('post-input').value = '';
-      showToast('이야기가 등록되었습니다.');
-      loadPosts();
     }
 
     async function loadPosts() {
@@ -1072,20 +1284,64 @@
             </div>
           </div>
           <div class="post-content">${p.content}</div>
+
+          <div class="comments-section">
+            <div id="comments-list-${p.id}"></div>
+            <div class="comment-input-box">
+              <div id="mention-dropdown-${p.id}" class="mention-dropdown hidden"></div>
+              <div style="display:flex; gap:6px; margin-top:6px;">
+                <input type="text" id="comment-input-${p.id}" placeholder="댓글을 입력하세요. (@로 언급)" oninput="handleCommentInput(event, '${p.id}')">
+                <button type="button" onclick="submitComment('${p.id}', '${p.user_id}')" style="width:70px; margin-top:0; font-size:0.85rem;">등록</button>
+              </div>
+            </div>
+          </div>
         `;
         feed.appendChild(item);
+        loadComments(p.id);
       });
     }
 
-    // 더보기 메뉴 토글 함수
+    async function submitNotice() {
+      const content = document.getElementById('notice-input').value.trim();
+      if (!content) return;
+
+      await supabaseClient.from('posts').insert([{
+        user_id: currentUserId,
+        author_name: `운영진 (@낙화)`,
+        content: content,
+        visibility: 'public',
+        is_notice: true
+      }]);
+
+      document.getElementById('notice-input').value = '';
+      showToast('공지사항이 등록되었습니다.');
+      loadNotices();
+    }
+
+    async function submitPost() {
+      const content = document.getElementById('post-input').value.trim();
+      const visibility = document.getElementById('post-visibility').value;
+      if (!content) return;
+
+      await supabaseClient.from('posts').insert([{
+        user_id: currentUserId,
+        author_name: `${characterData.name} (@${currentUserNickname})`,
+        content: content,
+        visibility: visibility,
+        is_notice: false
+      }]);
+
+      document.getElementById('post-input').value = '';
+      showToast('이야기가 등록되었습니다.');
+      loadPosts();
+    }
+
     function toggleMoreMenu(event, postId) {
       event.stopPropagation();
       const targetMenu = document.getElementById(`dropdown-${postId}`);
-      
       document.querySelectorAll('.post-dropdown-menu').forEach(menu => {
         if (menu !== targetMenu) menu.classList.add('hidden');
       });
-
       targetMenu.classList.toggle('hidden');
     }
 
@@ -1093,7 +1349,6 @@
       return str.replace(/`/g, '\\`').replace(/\$/g, '\\$');
     }
 
-    // 글 수정 모달 열기
     function openEditPostModal(postId, content) {
       editingPostId = postId;
       document.getElementById('edit-post-content').value = content;
@@ -1106,53 +1361,95 @@
       document.getElementById('edit-post-modal').classList.add('hidden');
     }
 
-    // 수정된 글 저장
     async function saveEditedPost() {
       if (!editingPostId) return;
       const content = document.getElementById('edit-post-content').value.trim();
       if (!content) return alert('내용을 입력하세요.');
 
-      const { error } = await supabaseClient
-        .from('posts')
-        .update({ content: content })
-        .eq('id', editingPostId);
-
-      if (error) {
-        alert('글 수정 오류: ' + error.message);
-        return;
-      }
-
+      await supabaseClient.from('posts').update({ content: content }).eq('id', editingPostId);
       showToast('글이 수정되었습니다.');
       closeEditPostModal();
       loadNotices();
       loadPosts();
     }
 
-    // 글 삭제
     async function deletePost(postId) {
       if (!confirm('정말 이 게시글을 삭제하시겠습니까?')) return;
-
-      const { error } = await supabaseClient
-        .from('posts')
-        .delete()
-        .eq('id', postId);
-
-      if (error) {
-        alert('글 삭제 오류: ' + error.message);
-        return;
-      }
-
+      await supabaseClient.from('posts').delete().eq('id', postId);
       showToast('글이 삭제되었습니다.');
       loadNotices();
       loadPosts();
     }
 
+    function renderProfileView() {
+      document.getElementById('profile-char-name-display').innerText = `${characterData.name} (@${currentUserNickname})`;
+      document.getElementById('profile-role').innerText = characterData.role;
+      document.getElementById('profile-avatar-preview-area').innerHTML = getAvatarHtml(characterData.avatar_url, 70);
+
+      document.getElementById('profile-wisdom').innerText = characterData.wisdom;
+      document.getElementById('profile-willpower').innerText = characterData.willpower;
+      document.getElementById('profile-divine').innerText = characterData.divine;
+      document.getElementById('profile-affinity').innerText = characterData.affinity;
+
+      document.getElementById('edit-char-name').value = characterData.name;
+    }
+
+    async function uploadProfileAvatar() {
+      const fileInput = document.getElementById('avatar-file-input');
+      const file = fileInput.files[0];
+      if (!file) return alert('업로드할 이미지 파일을 선택해주세요.');
+
+      try {
+        showToast('이미지 변환 및 업로드 중...');
+
+        const resizedBlob = await resizeImage(file, 150, 150);
+        const filePath = `avatars/${currentUserId}.webp`;
+
+        await supabaseClient.storage.from('community-assets').upload(filePath, resizedBlob, {
+          contentType: 'image/webp',
+          upsert: true
+        });
+
+        const { data } = supabaseClient.storage.from('community-assets').getPublicUrl(filePath);
+        const newAvatarUrl = `${data.publicUrl}?t=${new Date().getTime()}`;
+
+        await supabaseClient.from('characters').update({ avatar_url: newAvatarUrl }).eq('user_id', currentUserId);
+
+        characterData.avatar_url = newAvatarUrl;
+        document.getElementById('side-avatar-area').innerHTML = getAvatarHtml(newAvatarUrl, 44);
+        renderProfileView();
+
+        fileInput.value = '';
+        showToast('프로필 사진이 변경되었습니다!');
+      } catch (err) {
+        alert('프로필 이미지 처리 중 오류가 발생했습니다.');
+      }
+    }
+
+    async function resetToDefaultAvatar() {
+      if (!confirm('프로필 사진을 기본 이미지로 변경하시겠습니까?')) return;
+
+      await supabaseClient.from('characters').update({ avatar_url: null }).eq('user_id', currentUserId);
+      characterData.avatar_url = null;
+      document.getElementById('side-avatar-area').innerHTML = getAvatarHtml(null, 44);
+      renderProfileView();
+      showToast('기본 프로필 사진으로 변경되었습니다.');
+    }
+
+    async function updateProfile() {
+      const newCharName = document.getElementById('edit-char-name').value.trim();
+      if (!newCharName) return alert('캐릭터 이름을 입력해주세요.');
+
+      await supabaseClient.from('characters').update({ name: newCharName }).eq('user_id', currentUserId);
+      characterData.name = newCharName;
+
+      document.getElementById('side-char-name').innerText = `${newCharName} (@${currentUserNickname})`;
+      renderProfileView();
+      showToast('프로필이 저장되었습니다.');
+    }
+
     async function openProfileModal(userId) {
-      const { data } = await supabaseClient
-        .from('characters')
-        .select('*')
-        .eq('user_id', userId)
-        .maybeSingle();
+      const { data } = await supabaseClient.from('characters').select('*').eq('user_id', userId).maybeSingle();
 
       if (!data) return alert('캐릭터 정보를 찾을 수 없습니다.');
 
