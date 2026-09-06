@@ -86,6 +86,32 @@
       align-items: center;
       margin-bottom: 14px;
       font-size: 0.95rem;
+      position: relative;
+    }
+
+    /* === 스탯 Hover 툴팁 스타일 === */
+    .stat-label {
+      position: relative;
+      cursor: help;
+      text-decoration: underline dotted #888;
+    }
+
+    .stat-label:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: 0;
+      bottom: 125%;
+      background-color: #333;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      white-space: pre-line;
+      width: 220px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      border: 1px solid #555;
+      z-index: 10;
+      font-weight: normal;
     }
 
     .stat-btn {
@@ -276,7 +302,12 @@
       </div>
 
       <div class="form-group">
-        <label>캐릭터 이름 (신규가입 시):</label>
+        <label>계정 닉네임 (본닉 - 신규가입 시):</label>
+        <input type="text" id="user-nickname" placeholder="예: 낙화">
+      </div>
+
+      <div class="form-group">
+        <label>캐릭터 이름 (RP용 - 신규가입 시):</label>
         <input type="text" id="char-name" placeholder="예: 아마릴리스 클로토">
       </div>
 
@@ -300,33 +331,33 @@
       <p style="margin-bottom: 12px; color: #aaa;">남은 포인트: <span id="setup-pts" style="color: #ffc107; font-weight: bold;">0</span></p>
 
       <div class="warning-box">
-        ⚠️ 초기 스탯은 저장 후 수정이 불가능합니다!
+        ⚠️ 초기 스탯은 저장 후 수정이 불가능합니다! (스탯 이름 위에 마우스를 올리면 효과를 볼 수 있습니다)
       </div>
 
       <div style="margin-bottom: 20px;">
         <div class="stat-row">
-          <span>지혜 (Wisdom): <b id="setup-wisdom">1</b></span>
+          <span class="stat-label" data-tooltip="지혜 (Wisdom)&#10;학식과 분석력, 상황 판단력 및 마법적 지식을 지칭합니다.">지혜 (Wisdom): <b id="setup-wisdom">1</b></span>
           <div>
             <button type="button" class="stat-btn" onclick="adjustStat('wisdom', -1)">-</button>
             <button type="button" class="stat-btn" onclick="adjustStat('wisdom', 1)">+</button>
           </div>
         </div>
         <div class="stat-row">
-          <span>의지 (Willpower): <b id="setup-willpower">1</b></span>
+          <span class="stat-label" data-tooltip="의지 (Willpower)&#10;정신적 저항력, 정신집중 및 시련에 굴하지 않는 정신력입니다.">의지 (Willpower): <b id="setup-willpower">1</b></span>
           <div>
             <button type="button" class="stat-btn" onclick="adjustStat('willpower', -1)">-</button>
             <button type="button" class="stat-btn" onclick="adjustStat('willpower', 1)">+</button>
           </div>
         </div>
         <div class="stat-row">
-          <span>가호 (Divine): <b id="setup-divine">1</b></span>
+          <span class="stat-label" data-tooltip="가호 (Divine)&#10;행운과 영적인 보호, 신성한 기적 및 위기 극복 능력을 의미합니다.">가호 (Divine): <b id="setup-divine">1</b></span>
           <div>
             <button type="button" class="stat-btn" onclick="adjustStat('divine', -1)">-</button>
             <button type="button" class="stat-btn" onclick="adjustStat('divine', 1)">+</button>
           </div>
         </div>
         <div class="stat-row">
-          <span>교감 (Affinity): <b id="setup-affinity">1</b></span>
+          <span class="stat-label" data-tooltip="교감 (Affinity)&#10;타인과의 공감대, 대화 능력, 영물 또는 존재들과의 소통 능력입니다.">교감 (Affinity): <b id="setup-affinity">1</b></span>
           <div>
             <button type="button" class="stat-btn" onclick="adjustStat('affinity', -1)">-</button>
             <button type="button" class="stat-btn" onclick="adjustStat('affinity', 1)">+</button>
@@ -387,8 +418,13 @@
             <p style="color: #aaa; margin-bottom: 16px;">직급: <span id="profile-role" style="color:#fff;">-</span></p>
             
             <hr style="border-color: #333; margin-bottom: 16px;">
-            <p style="margin-bottom: 6px;"><b>스탯 현황</b></p>
-            <p style="font-size: 0.9rem; color: #ccc;">지혜: <b id="profile-wisdom">0</b> | 의지: <b id="profile-willpower">0</b> | 가호: <b id="profile-divine">0</b> | 교감: <b id="profile-affinity">0</b></p>
+            <p style="margin-bottom: 6px;"><b>스탯 현황</b> (마우스를 올리면 효과 표시)</p>
+            <p style="font-size: 0.9rem; color: #ccc;">
+              <span class="stat-label" data-tooltip="지혜: 학식과 분석력, 마법적 지식">지혜: <b id="profile-wisdom">0</b></span> | 
+              <span class="stat-label" data-tooltip="의지: 정신적 저항력, 정신집중력">의지: <b id="profile-willpower">0</b></span> | 
+              <span class="stat-label" data-tooltip="가호: 행운과 영적 보호, 위기 극복">가호: <b id="profile-divine">0</b></span> | 
+              <span class="stat-label" data-tooltip="교감: 타인과의 공감대, 영물 소통">교감: <b id="profile-affinity">0</b></span>
+            </p>
             
             <hr style="border-color: #333; margin: 16px 0;">
             <p style="margin-bottom: 8px;"><b>캐릭터 이름 수정</b></p>
@@ -429,8 +465,14 @@
       
       <div style="background-color: #2a2a2a; padding: 12px; border-radius: 6px; margin-bottom: 16px; font-size: 0.85rem;">
         <p style="color: #ffc107; font-weight: bold; margin-bottom: 6px;">스탯 정보</p>
-        <p>지혜: <span id="modal-wisdom">0</span> | 의지: <span id="modal-willpower">0</span></p>
-        <p>가호: <span id="modal-divine">0</span> | 교감: <span id="modal-affinity">0</span></p>
+        <p>
+          <span class="stat-label" data-tooltip="지혜: 학식과 분석력, 마법적 지식">지혜: <span id="modal-wisdom">0</span></span> | 
+          <span class="stat-label" data-tooltip="의지: 정신적 저항력, 정신집중력">의지: <span id="modal-willpower">0</span></span>
+        </p>
+        <p style="margin-top: 4px;">
+          <span class="stat-label" data-tooltip="가호: 행운과 영적 보호, 위기 극복">가호: <span id="modal-divine">0</span></span> | 
+          <span class="stat-label" data-tooltip="교감: 타인과의 공감대, 영물 소통">교감: <span id="modal-affinity">0</span></span>
+        </p>
       </div>
     </div>
   </div>
@@ -446,6 +488,7 @@
 
     let currentUserId = null;
     let currentUsername = null;
+    let currentUserNickname = '';
     let characterData = null;
 
     const ROLE_CONFIG = {
@@ -464,6 +507,7 @@
     async function handleAuth() {
       const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value.trim();
+      const userNickname = document.getElementById('user-nickname').value.trim();
       const charName = document.getElementById('char-name').value.trim();
       const roleKey = document.getElementById('role-select').value;
       const errBox = document.getElementById('auth-error');
@@ -479,11 +523,18 @@
 
       // 2. 로그인 실패 시 (회원가입 진행)
       if (error) {
-        if (!charName) {
-          return alert('계정이 없습니다. 신규 가입을 원하시면 캐릭터 이름을 입력해주세요.');
+        if (!userNickname || !charName) {
+          return alert('신규 가입을 원하시면 계정 닉네임과 캐릭터 이름을 모두 입력해주세요.');
         }
 
-        const signUp = await supabaseClient.auth.signUp({ email, password });
+        const signUp = await supabaseClient.auth.signUp({ 
+          email, 
+          password,
+          options: {
+            data: { user_nickname: userNickname }
+          }
+        });
+
         if (signUp.error) return alert('회원가입 실패: ' + signUp.error.message);
 
         data = signUp.data;
@@ -505,6 +556,7 @@
       }
 
       currentUserId = data.user.id;
+      currentUserNickname = data.user.user_metadata?.user_nickname || username;
       loadFlow();
     }
 
@@ -586,7 +638,7 @@
 
     function enterCommunity() {
       document.getElementById('main-community-section').classList.remove('hidden');
-      document.getElementById('side-char-name').innerText = characterData.name;
+      document.getElementById('side-char-name').innerText = `${characterData.name} (@${currentUserNickname})`;
       document.getElementById('side-char-role').innerText = characterData.role;
 
       if (currentUsername === ADMIN_USERNAME) {
@@ -615,7 +667,7 @@
     }
 
     function renderProfileView() {
-      document.getElementById('profile-char-name-display').innerText = characterData.name;
+      document.getElementById('profile-char-name-display').innerText = `${characterData.name} (@${currentUserNickname})`;
       document.getElementById('profile-role').innerText = characterData.role;
       document.getElementById('profile-wisdom').innerText = characterData.wisdom;
       document.getElementById('profile-willpower').innerText = characterData.willpower;
@@ -636,7 +688,7 @@
 
       characterData.name = newCharName;
 
-      document.getElementById('side-char-name').innerText = newCharName;
+      document.getElementById('side-char-name').innerText = `${newCharName} (@${currentUserNickname})`;
       renderProfileView();
       showToast('프로필이 저장되었습니다.');
     }
@@ -647,7 +699,7 @@
 
       await supabaseClient.from('posts').insert([{
         user_id: currentUserId,
-        author_name: '운영진',
+        author_name: `운영진 (@${currentUserNickname})`,
         content: content,
         visibility: 'public',
         is_notice: true
@@ -696,7 +748,7 @@
 
       await supabaseClient.from('posts').insert([{
         user_id: currentUserId,
-        author_name: characterData.name,
+        author_name: `${characterData.name} (@${currentUserNickname})`,
         content: content,
         visibility: visibility,
         is_notice: false
@@ -739,7 +791,10 @@
       const { data } = await supabaseClient.from('characters').select('*').eq('user_id', userId).maybeSingle();
       if (!data) return showToast('프로필 정보를 불러올 수 없습니다.');
 
-      document.getElementById('modal-char-name').innerText = data.name;
+      const { data: userData } = await supabaseClient.auth.admin?.getUserById(userId) || {};
+      const targetNick = userData?.user?.user_metadata?.user_nickname || '사용자';
+
+      document.getElementById('modal-char-name').innerText = `${data.name} (@${targetNick})`;
       document.getElementById('modal-role').innerText = data.role;
       document.getElementById('modal-wisdom').innerText = data.wisdom;
       document.getElementById('modal-willpower').innerText = data.willpower;
