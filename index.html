@@ -24,7 +24,8 @@
       padding: 20px;
     }
 
-    .card {
+    /* 1. 로그인/가입 전 전용 카드 레이아웃 */
+    .auth-card {
       background-color: #1e1e1e;
       border: 1px solid #333;
       border-radius: 12px;
@@ -34,7 +35,7 @@
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
     }
 
-    /* 게임 레이아웃 (로그인 후 확장) */
+    /* 2. 로그인 후 게임 화면 레이아웃 (사이드바 포함) */
     .game-container {
       display: flex;
       gap: 20px;
@@ -355,8 +356,8 @@
 </head>
 <body>
 
-  <!-- 1. 로그인 세션 (초기 화면) -->
-  <div id="auth-section" class="card">
+  <!-- 1. 로그인/가입 전용 화면 (초기 화면: 중앙 카드만 노출) -->
+  <div id="auth-section" class="auth-card">
     <h1>[달에서.] 테스트 접속</h1>
     <div class="form-group">
       <input type="text" id="username" placeholder="아이디 입력" autocomplete="off">
@@ -379,7 +380,7 @@
     <div id="auth-error" class="error-msg"></div>
   </div>
 
-  <!-- 2. 게임 메인 화면 (로그인 성공 시 표시) -->
+  <!-- 2. 로그인 성공 후 나타나는 게임 메인 화면 (좌측 콘텐츠 + 우측 사이드바) -->
   <div id="game-section" class="game-container hidden">
     
     <!-- 좌측 메인 화면 영역 -->
@@ -754,7 +755,6 @@
       .eq('user_id', currentUserId);
 
     if (error) {
-      // 외래키 설정이 없을 시 수동 조인용 2차 쿼리 예외 처리
       const { data: rawFriends } = await supabaseClient.from('friends').select('*').eq('user_id', currentUserId);
       if (!rawFriends || rawFriends.length === 0) {
         friendsList = [];
@@ -789,7 +789,7 @@
       const row = document.createElement('div');
       row.className = 'post-box';
       row.style.display = 'flex';
-      row.style.justifySpaceBetween = 'space-between';
+      row.style.justifyContent = 'space-between';
       row.style.alignItems = 'center';
 
       row.innerHTML = `
@@ -919,23 +919,13 @@
     const myCloseFriendIds = friendsList.filter(f => f.is_close_friend).map(f => f.friend_id);
 
     const visiblePosts = posts.filter(post => {
-      // 1. 내가 쓴 글은 무조건 표시
       if (post.user_id === currentUserId) return true;
-      
-      // 2. 전체 공개
       if (post.visibility === 'public') return true;
-
-      // 3. 친구 공개 (작성자가 내 친구인지 확인)
       if (post.visibility === 'friends' && myFriendIds.includes(post.user_id)) return true;
-
-      // 4. 편한친구 공개 (작성자 기준 편한친구 관계)
       if (post.visibility === 'close_friends' && myCloseFriendIds.includes(post.user_id)) return true;
-
-      // 5. 특정인물 지정 공개
       if (post.visibility === 'target_select' && Array.isArray(post.target_user_ids)) {
         return post.target_user_ids.includes(currentUserId);
       }
-
       return false;
     });
 
