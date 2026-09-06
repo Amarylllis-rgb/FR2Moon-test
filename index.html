@@ -499,7 +499,7 @@
 
   <div id="toast">알림</div>
 
-  <script>
+  <script[cite: 3]>
     const SUPABASE_URL = 'https://ussdpozmngczyrabcgun.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_NHt6pA_nGOl4zDKgUTntfA_LGioJewy';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -1101,7 +1101,6 @@
       showToast(`'${targetChar.name}' 님이 친구로 추가되었습니다.`);
       document.getElementById('friend-search-name').value = '';
       
-      // ✨ 수정된 부분: 친구 추가 직후 곧바로 화면 렌더링 함수를 재호출하여 목록이 실시간으로 갱신되도록 처리
       await loadFriends();
     }
 
