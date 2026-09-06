@@ -293,7 +293,7 @@
         <label>계정 닉네임 (본닉):</label>
         <div class="input-with-btn">
           <input type="text" id="user-nickname" placeholder="예: 낙화 (2글자 이상)" oninput="resetNicknameCheck()">
-          <button class="sub-btn" onclick="checkNicknameAvailability()">중복 확인</button>
+          <button class="sub-btn" type="button" onclick="checkNicknameAvailability()">중복 확인</button>
         </div>
         <p id="nickname-check-msg" style="font-size: 0.8rem; margin-top: 4px;"></p>
       </div>
@@ -311,7 +311,7 @@
           <option value="teacher">교사 (15pt / 상한 7)</option>
         </select>
       </div>
-      <button onclick="handleAuth()">접속 / 가입</button>
+      <button type="button" onclick="handleAuth()">접속 / 가입</button>
       <div id="auth-error" class="error-msg"></div>
     </div>
   </div>
@@ -330,34 +330,34 @@
         <div class="stat-row">
           <span>지혜 (Wisdom): <b id="setup-wisdom">1</b></span>
           <div>
-            <button class="stat-btn" onclick="adjustStat('wisdom', -1)">-</button>
-            <button class="stat-btn" onclick="adjustStat('wisdom', 1)">+</button>
+            <button type="button" class="stat-btn" onclick="adjustStat('wisdom', -1)">-</button>
+            <button type="button" class="stat-btn" onclick="adjustStat('wisdom', 1)">+</button>
           </div>
         </div>
         <div class="stat-row">
           <span>의지 (Willpower): <b id="setup-willpower">1</b></span>
           <div>
-            <button class="stat-btn" onclick="adjustStat('willpower', -1)">-</button>
-            <button class="stat-btn" onclick="adjustStat('willpower', 1)">+</button>
+            <button type="button" class="stat-btn" onclick="adjustStat('willpower', -1)">-</button>
+            <button type="button" class="stat-btn" onclick="adjustStat('willpower', 1)">+</button>
           </div>
         </div>
         <div class="stat-row">
           <span>가호 (Divine): <b id="setup-divine">1</b></span>
           <div>
-            <button class="stat-btn" onclick="adjustStat('divine', -1)">-</button>
-            <button class="stat-btn" onclick="adjustStat('divine', 1)">+</button>
+            <button type="button" class="stat-btn" onclick="adjustStat('divine', -1)">-</button>
+            <button type="button" class="stat-btn" onclick="adjustStat('divine', 1)">+</button>
           </div>
         </div>
         <div class="stat-row">
           <span>교감 (Affinity): <b id="setup-affinity">1</b></span>
           <div>
-            <button class="stat-btn" onclick="adjustStat('affinity', -1)">-</button>
-            <button class="stat-btn" onclick="adjustStat('affinity', 1)">+</button>
+            <button type="button" class="stat-btn" onclick="adjustStat('affinity', -1)">-</button>
+            <button type="button" class="stat-btn" onclick="adjustStat('affinity', 1)">+</button>
           </div>
         </div>
       </div>
 
-      <button style="background-color: #2e7d32;" onclick="saveInitialStats()">스탯 확정 및 커뮤니티 입장</button>
+      <button type="button" style="background-color: #2e7d32;" onclick="saveInitialStats()">스탯 확정 및 커뮤니티 입장</button>
     </div>
   </div>
 
@@ -366,10 +366,10 @@
     <header class="app-header">
       <div class="logo">🌙 달에서.</div>
       <div class="nav-tabs">
-        <button class="nav-btn active" id="btn-tab-notice" onclick="switchMainTab('notice')">공지사항</button>
-        <button class="nav-btn" id="btn-tab-story" onclick="switchMainTab('story')">커뮤니티</button>
-        <button class="nav-btn" id="btn-tab-profile" onclick="switchMainTab('profile')">내 프로필</button>
-        <button class="nav-btn" id="btn-tab-friends" onclick="switchMainTab('friends')">친구 관리</button>
+        <button type="button" class="nav-btn active" id="btn-tab-notice" onclick="switchMainTab('notice')">공지사항</button>
+        <button type="button" class="nav-btn" id="btn-tab-story" onclick="switchMainTab('story')">커뮤니티</button>
+        <button type="button" class="nav-btn" id="btn-tab-profile" onclick="switchMainTab('profile')">내 프로필</button>
+        <button type="button" class="nav-btn" id="btn-tab-friends" onclick="switchMainTab('friends')">친구 관리</button>
       </div>
     </header>
 
@@ -382,7 +382,7 @@
             <p style="color: #ffc107; font-weight: bold; margin-bottom: 8px;">📢 운영 공지사항 작성 (관리자)</p>
             <textarea id="notice-input" placeholder="전체 공지사항 내용을 입력하세요..."></textarea>
             <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
-              <button onclick="submitNotice()" style="width: 110px; margin-top: 0; background-color: #d32f2f;">공지 등록</button>
+              <button type="button" onclick="submitNotice()" style="width: 110px; margin-top: 0; background-color: #d32f2f;">공지 등록</button>
             </div>
           </div>
           <div id="notice-feed"></div>
@@ -397,7 +397,7 @@
                 <option value="public">전체공개</option>
                 <option value="friends">친구공개</option>
               </select>
-              <button onclick="submitPost()" style="width: 90px; margin-top: 0;">올리기</button>
+              <button type="button" onclick="submitPost()" style="width: 90px; margin-top: 0;">올리기</button>
             </div>
           </div>
           <div id="posts-feed"></div>
@@ -420,7 +420,7 @@
             
             <p style="margin-bottom: 8px;"><b>캐릭터 자기소개 / 설정</b></p>
             <textarea id="edit-bio" placeholder="캐릭터의 성격, 외양, 프로필 설정을 입력하세요..."></textarea>
-            <button onclick="updateProfile()" style="background-color: #2e7d32; margin-top: 12px;">프로필 저장</button>
+            <button type="button" onclick="updateProfile()" style="background-color: #2e7d32; margin-top: 12px;">프로필 저장</button>
           </div>
         </div>
 
@@ -429,7 +429,7 @@
           <div class="post-box">
             <div style="display: flex; gap: 8px;">
               <input type="text" id="friend-search-name" placeholder="친구 캐릭터 이름 또는 계정 닉네임 검색">
-              <button onclick="addFriendByName()" style="width: 90px; margin-top: 0;">추가</button>
+              <button type="button" onclick="addFriendByName()" style="width: 90px; margin-top: 0;">추가</button>
             </div>
           </div>
           <div id="friend-list"></div>
@@ -450,7 +450,7 @@
   <!-- 프로필 모달 (팝업) -->
   <div id="profile-modal" class="modal-overlay hidden">
     <div class="modal-card">
-      <button class="modal-close" onclick="closeProfileModal()">✕</button>
+      <button type="button" class="modal-close" onclick="closeProfileModal()">✕</button>
       <h2 id="modal-char-name" style="color: #ffc107; margin-bottom: 2px;">-</h2>
       <p id="modal-user-nickname" style="color: #888; font-size: 0.85rem; margin-bottom: 12px;">-</p>
       <p style="font-size: 0.9rem; color: #aaa; margin-bottom: 16px;">직급: <span id="modal-role" style="color:#fff;">-</span></p>
@@ -522,18 +522,30 @@
         return false;
       }
 
-      const { data } = await supabaseClient.from('characters').select('id').eq('user_nickname', userNickname).maybeSingle();
+      try {
+        const { data, error } = await supabaseClient.from('characters').select('id').eq('user_nickname', userNickname).maybeSingle();
 
-      if (data) {
-        msg.style.color = '#ff6b6b';
-        msg.innerText = '이미 사용 중인 닉네임입니다.';
+        if (error) {
+          console.error(error);
+          msg.style.color = '#ff6b6b';
+          msg.innerText = '닉네임 확인 중 오류가 발생했습니다.';
+          return false;
+        }
+
+        if (data) {
+          msg.style.color = '#ff6b6b';
+          msg.innerText = '이미 사용 중인 닉네임입니다.';
+          return false;
+        } else {
+          msg.style.color = '#4caf50';
+          msg.innerText = '사용 가능한 닉네임입니다.';
+          isNicknameChecked = true;
+          checkedNicknameValue = userNickname;
+          return true;
+        }
+      } catch (err) {
+        console.error(err);
         return false;
-      } else {
-        msg.style.color = '#4caf50';
-        msg.innerText = '사용 가능한 닉네임입니다.';
-        isNicknameChecked = true;
-        checkedNicknameValue = userNickname;
-        return true;
       }
     }
 
@@ -543,6 +555,8 @@
       const userNickname = document.getElementById('user-nickname').value.trim();
       const charName = document.getElementById('char-name').value.trim();
       const roleKey = document.getElementById('role-select').value;
+      const errBox = document.getElementById('auth-error');
+      errBox.innerText = '';
 
       if (!username || !password) return alert('아이디와 비밀번호를 입력해주세요.');
 
@@ -561,7 +575,7 @@
 
         data = signUp.data;
         const roleInfo = ROLE_CONFIG[roleKey];
-        await supabaseClient.from('characters').insert([{
+        const { error: insertErr } = await supabaseClient.from('characters').insert([{
           user_id: data.user.id,
           user_nickname: userNickname,
           name: charName,
@@ -570,6 +584,12 @@
           available_points: roleInfo.pts,
           bio: ''
         }]);
+
+        if (insertErr) {
+          console.error(insertErr);
+          errBox.innerText = '캐릭터 정보 생성 실패: ' + insertErr.message;
+          return;
+        }
       }
 
       currentUserId = data.user.id;
@@ -577,16 +597,49 @@
     }
 
     async function loadFlow() {
-      const { data } = await supabaseClient.from('characters').select('*').eq('user_id', currentUserId).single();
-      characterData = data;
+      try {
+        const { data, error } = await supabaseClient.from('characters').select('*').eq('user_id', currentUserId).maybeSingle();
+        
+        if (error) {
+          console.error(error);
+          document.getElementById('auth-error').innerText = '캐릭터 정보를 불러오지 못했습니다: ' + error.message;
+          return;
+        }
 
-      document.getElementById('auth-section').classList.add('hidden');
+        if (!data) {
+          const userNickname = document.getElementById('user-nickname').value.trim() || currentUsername;
+          const charName = document.getElementById('char-name').value.trim() || currentUsername;
+          
+          const { data: newChar, error: createErr } = await supabaseClient.from('characters').insert([{
+            user_id: currentUserId,
+            user_nickname: userNickname,
+            name: charName,
+            role: '일반 학생',
+            wisdom: 1, willpower: 1, divine: 1, affinity: 1,
+            available_points: 10,
+            bio: ''
+          }]).select().single();
 
-      if (characterData.available_points > 0) {
-        renderSetupView();
-        document.getElementById('character-setup-section').classList.remove('hidden');
-      } else {
-        enterCommunity();
+          if (createErr) {
+            document.getElementById('auth-error').innerText = '기본 캐릭터 생성 오류: ' + createErr.message;
+            return;
+          }
+          characterData = newChar;
+        } else {
+          characterData = data;
+        }
+
+        document.getElementById('auth-section').classList.add('hidden');
+
+        if (characterData.available_points > 0) {
+          renderSetupView();
+          document.getElementById('character-setup-section').classList.remove('hidden');
+        } else {
+          enterCommunity();
+        }
+      } catch (err) {
+        console.error(err);
+        document.getElementById('auth-error').innerText = '시스템 오류가 발생했습니다.';
       }
     }
 
@@ -782,9 +835,8 @@
       });
     }
 
-    /* === 프로필 모달 (팝업) 로직 === */
     async function openProfileModal(userId) {
-      const { data } = await supabaseClient.from('characters').select('*').eq('user_id', userId).single();
+      const { data } = await supabaseClient.from('characters').select('*').eq('user_id', userId).maybeSingle();
       if (!data) return showToast('프로필 정보를 불러올 수 없습니다.');
 
       document.getElementById('modal-char-name').innerText = data.name;
