@@ -324,7 +324,7 @@
 
       <div class="form-group">
         <label>직급 선택 (신규가입 시):</label>
-        <select id="role-select">
+        <select id="role-select" onchange="onRoleChange()">
           <option value="student">일반 학생 (10pt / 상한 5)</option>
           <option value="council">학생회장 (12pt / 상한 6)</option>
           <option value="teacher">교사 (15pt / 상한 7)</option>
@@ -341,7 +341,7 @@
       <p style="margin-bottom: 12px; color: #aaa;">남은 포인트: <span id="setup-pts" style="color: #ffc107; font-weight: bold;">0</span></p>
 
       <div class="warning-box">
-        ⚠️ 초기 스탯은 저장 후 수정이 불가능합니다!
+        ⚠️ 초기 스탯은 저장 후 수정이 불가능합니다! (직급별 스탯 상한 적용)
       </div>
 
       <div style="margin-bottom: 20px;">
@@ -507,8 +507,7 @@
     const ADMIN_USERNAME = 'admin';
     const FORBIDDEN_WORDS = ['admin', '낙화', '달에서', '운영자', '관리자', 'master'];
     
-    // Base64 인코딩된 기본 SVG 실루엣 아바타 (따옴표 깨짐 방지)
-    const DEFAULT_AVATAR_SVG = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzg4ODg4OCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSI+PHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTAgM2MxLjY2IDAgMyAxLjM0IDMgM3MtMS4zNCAzLTMgMy0zLTEuMzQtMy0zIDEuMzQtMyAzLTN6bTAgMTQuMmMtMi41IDAtNC43MS0xLjI4LTYtMy4yMi4wMy0xLjk5IDQtMy4wOCA2LTMuMDggMS45OSAwIDUuOTcgMS4wOSA2IDMuMDgtMS4yOSAxLjk0LTMuNCAzLjIyLTYgMy4yMnoiLz48L3N2Zz4=';
+    const DEFAULT_AVATAR_SVG = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzg4ODg4OCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSI+PHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDExcy40OCAxMCAxMCAxMCAxMC00LjQ4IDEwLTEwUzE3LjUyIDIgMTIgMnptMCAzYzEuNjYgMCAzIDEuMzQgMyAzcy0xLjM0IDMtMyAzLTMtMS4zNC0zLTMgMS4zNC0zIDMtM3ptMCAxNC4yYy0yLjUgMC00LjcxLTEuMjstNi0zLjIyLjAzLTEuOTkgNC0zLjA4IDYtMy4wOCAxLjk5IDAgNS45NyAxLjA5IDYgMy4wOC0xLjI5IDEuOTQtMy40IDMuMjItNiAzLjIyekoiLz48L3N2Zz4=';
 
     let currentUserId = null;
     let currentUsername = null;
@@ -568,6 +567,12 @@
         }
       }
       return true;
+    }
+
+    function onRoleChange() {
+      const roleKey = document.getElementById('role-select').value;
+      const config = ROLE_CONFIG[roleKey];
+      showToast(`선택 직급: ${config.name} (초기 지급 포인트: ${config.pts}pt, 스탯 상한: ${config.max})`);
     }
 
     async function checkNicknameDuplicate() {
@@ -675,13 +680,15 @@
 
         if (!data) {
           const charName = document.getElementById('char-name').value.trim() || currentUsername;
+          const roleKey = document.getElementById('role-select').value;
+          const roleInfo = ROLE_CONFIG[roleKey];
           
           const { data: newChar, error: createErr } = await supabaseClient.from('characters').insert([{
             user_id: currentUserId,
             name: charName,
-            role: '일반 학생',
+            role: roleInfo.name,
             wisdom: 1, willpower: 1, divine: 1, affinity: 1,
-            available_points: 10,
+            available_points: roleInfo.pts,
             avatar_url: null
           }]).select().single();
 
@@ -717,8 +724,18 @@
       document.getElementById('setup-affinity').innerText = characterData.affinity;
     }
 
+    function getMaxStatLimit() {
+      if (characterData.role === '학생회장') return ROLE_CONFIG.council.max;
+      if (characterData.role === '교사') return ROLE_CONFIG.teacher.max;
+      return ROLE_CONFIG.student.max;
+    }
+
     function adjustStat(stat, val) {
-      if (val > 0 && characterData.available_points <= 0) return showToast('포인트가 부족합니다.');
+      const maxLimit = getMaxStatLimit();
+      if (val > 0) {
+        if (characterData.available_points <= 0) return showToast('포인트가 부족합니다.');
+        if (characterData[stat] >= maxLimit) return showToast(`직급별 스탯 상한선(${maxLimit})에 도달했습니다.`);
+      }
       if (val < 0 && characterData[stat] <= 1) return;
 
       characterData[stat] += val;
@@ -932,6 +949,14 @@
     }
 
     async function loadPosts() {
+      const { data: friendRows } = await supabaseClient
+        .from('friends')
+        .select('friend_id')
+        .eq('user_id', currentUserId);
+      
+      const friendIds = friendRows ? friendRows.map(f => f.friend_id) : [];
+      friendIds.push(currentUserId);
+
       const { data } = await supabaseClient
         .from('posts')
         .select('*, characters(avatar_url)')
@@ -946,15 +971,29 @@
         return;
       }
 
-      data.forEach(p => {
+      const filteredData = data.filter(p => {
+        if (p.visibility === 'friends') {
+          return friendIds.includes(p.user_id);
+        }
+        return true;
+      });
+
+      if (filteredData.length === 0) {
+        feed.innerHTML = '<p style="color: #888; text-align: center; padding: 20px;">표시할 수 있는 커뮤니티 글이 없습니다.</p>';
+        return;
+      }
+
+      filteredData.forEach(p => {
         const avatarUrl = p.characters?.avatar_url;
         const avatarHtml = getAvatarHtml(avatarUrl, 28);
+        const visibilityBadge = p.visibility === 'friends' ? '<span style="color:#ffc107; font-size:0.75rem; margin-right:6px;">[친구공개]</span>' : '';
 
         const item = document.createElement('div');
         item.className = 'post-box';
         item.innerHTML = `
           <div class="post-header">
             <div class="author-wrapper">
+              ${visibilityBadge}
               ${avatarHtml}
               <span class="post-author" style="margin-left: 6px;" onclick="openProfileModal('${p.user_id}')">${p.author_name}</span>
             </div>
@@ -986,25 +1025,97 @@
     }
 
     async function loadFriends() {
-      const { data } = await supabaseClient.from('friends').select('*').eq('user_id', currentUserId);
+      const { data: friendsData } = await supabaseClient
+        .from('friends')
+        .select('friend_id')
+        .eq('user_id', currentUserId);
+
       const listDiv = document.getElementById('friend-list');
-      listDiv.innerHTML = (data && data.length) ? '' : '<p style="color: #888;">친구 목록이 비어있습니다.</p>';
+      
+      if (!friendsData || friendsData.length === 0) {
+        listDiv.innerHTML = '<p style="color: #888; text-align: center; padding: 20px;">친구 목록이 비어있습니다.</p>';
+        return;
+      }
+
+      const friendIds = friendsData.map(f => f.friend_id);
+      const { data: charData } = await supabaseClient
+        .from('characters')
+        .select('*')
+        .in('user_id', friendIds);
+
+      listDiv.innerHTML = '';
+      if (!charData || charData.length === 0) {
+        listDiv.innerHTML = '<p style="color: #888; text-align: center; padding: 20px;">등록된 친구의 캐릭터 정보가 없습니다.</p>';
+        return;
+      }
+
+      charData.forEach(c => {
+        const item = document.createElement('div');
+        item.className = 'post-box';
+        item.style.display = 'flex';
+        item.style.justifyContent = 'space-between';
+        item.style.alignItems = 'center';
+        item.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 10px;">
+            ${getAvatarHtml(c.avatar_url, 36)}
+            <div>
+              <p style="font-weight: bold; color: #ffc107; cursor: pointer;" onclick="openProfileModal('${c.user_id}')">${c.name}</p>
+              <p style="size: 0.8rem; color: #aaa;">직급: ${c.role}</p>
+            </div>
+          </div>
+          <button type="button" onclick="removeFriend('${c.user_id}')" style="width: auto; padding: 6px 12px; background-color: #d32f2f; margin-top: 0; font-size: 0.8rem;">친구 끊기</button>
+        `;
+        listDiv.appendChild(item);
+      });
     }
 
     async function addFriendByName() {
       const queryName = document.getElementById('friend-search-name').value.trim();
       if (!queryName) return;
 
+      if (queryName === characterData.name) {
+        return alert('자기 자신을 친구로 추가할 수 없습니다.');
+      }
+
       const { data: targetChar } = await supabaseClient.from('characters')
-        .select('user_id')
+        .select('user_id, name')
         .eq('name', queryName)
         .maybeSingle();
 
-      if (!targetChar) return showToast('캐릭터를 찾을 수 없습니다.');
+      if (!targetChar) return showToast('해당 이름의 캐릭터를 찾을 수 없습니다.');
 
-      await supabaseClient.from('friends').insert([{ user_id: currentUserId, friend_id: targetChar.user_id }]);
-      showToast('친구가 추가되었습니다.');
+      const { data: existing } = await supabaseClient.from('friends')
+        .select('*')
+        .eq('user_id', currentUserId)
+        .eq('friend_id', targetChar.user_id)
+        .maybeSingle();
+
+      if (existing) return showToast('이미 친구로 등록된 캐릭터입니다.');
+
+      const { error } = await supabaseClient.from('friends').insert([
+        { user_id: currentUserId, friend_id: targetChar.user_id }
+      ]);
+
+      if (error) return alert('친구 추가 실패: ' + error.message);
+
+      showToast(`'${targetChar.name}' 님이 친구로 추가되었습니다.`);
       document.getElementById('friend-search-name').value = '';
+      
+      // ✨ 수정된 부분: 친구 추가 직후 곧바로 화면 렌더링 함수를 재호출하여 목록이 실시간으로 갱신되도록 처리
+      await loadFriends();
+    }
+
+    async function removeFriend(friendUserId) {
+      if (!confirm('정말 이 친구와의 관계를 정리하시겠습니까?')) return;
+
+      const { error } = await supabaseClient.from('friends')
+        .delete()
+        .eq('user_id', currentUserId)
+        .eq('friend_id', friendUserId);
+
+      if (error) return alert('친구 삭제 실패: ' + error.message);
+
+      showToast('친구 목록에서 삭제되었습니다.');
       loadFriends();
     }
   </script>
