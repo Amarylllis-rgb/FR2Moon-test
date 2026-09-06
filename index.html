@@ -349,6 +349,7 @@
     #toast.success { background-color: #2e7d32; border-color: #388e3c; }
     #toast.warning { background-color: #e65100; border-color: #f57c00; }
 
+    /* 중요: 다른 flex/grid 속성에 덮어씌워지지 않도록 !important 추가 */
     .hidden {
       display: none !important;
     }
@@ -490,7 +491,7 @@
 
     </div>
 
-    <!-- 우측 메뉴 버튼 사이드바 -->
+    <!-- 우측 메뉴 버튼 사이드바 (game-section 내부에 포함되어 숨김 처리됨) -->
     <div class="sidebar">
       <button class="sidebar-btn active" id="menu-btn-character" onclick="switchTab('character')">캐릭터</button>
       <button class="sidebar-btn" id="menu-btn-story" onclick="switchTab('story')">스토리</button>
