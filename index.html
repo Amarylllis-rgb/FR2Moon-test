@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>[달에서.] TRPG 테스트</title>
+  <title>[달에서.] TRPG & 스토리 커뮤니티</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
@@ -34,6 +34,54 @@
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
     }
 
+    /* 게임 레이아웃 (로그인 후 확장) */
+    .game-container {
+      display: flex;
+      gap: 20px;
+      width: 100%;
+      max-width: 960px;
+    }
+
+    .main-screen {
+      flex: 1;
+      background-color: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 24px;
+      min-height: 520px;
+    }
+
+    .sidebar {
+      width: 200px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .sidebar-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 8px;
+      border: none;
+      background-color: #2e3a59;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      text-align: center;
+      margin-top: 0;
+    }
+
+    .sidebar-btn:hover {
+      background-color: #3b4d7a;
+    }
+
+    .sidebar-btn.active {
+      background-color: #4b6cb7;
+      border: 1px solid #6b8dd6;
+    }
+
     h1 {
       font-size: 1.5rem;
       margin-bottom: 20px;
@@ -52,7 +100,7 @@
       color: #aaa;
     }
 
-    input, select {
+    input, select, textarea {
       width: 100%;
       padding: 10px 12px;
       border-radius: 6px;
@@ -63,7 +111,12 @@
       outline: none;
     }
 
-    input:focus, select:focus {
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    input:focus, select:focus, textarea:focus {
       border-color: #4b6cb7;
     }
 
@@ -142,7 +195,6 @@
       background-color: #505050;
     }
 
-    /* === 경고 박스 스타일 === */
     .warning-box {
       background-color: rgba(255, 152, 0, 0.1);
       border: 1px solid #ff9800;
@@ -164,7 +216,64 @@
       word-break: break-all;
     }
 
-    /* === 툴팁 CSS 스타일 === */
+    /* === 스토리 / 커뮤니티 전용 CSS === */
+    .post-box {
+      background-color: #2a2a2a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+      color: #aaa;
+    }
+
+    .post-author {
+      font-weight: bold;
+      color: #ffc107;
+    }
+
+    .post-visibility-badge {
+      background-color: #3a3a3a;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+    }
+
+    .post-content {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: #eee;
+      white-space: pre-wrap;
+    }
+
+    .friend-chip-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .friend-chip {
+      background-color: #3a3a3a;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .friend-chip.selected {
+      background-color: #2e7d32;
+      color: #fff;
+    }
+
+    /* === 툴팁 CSS === */
     .tooltip {
       position: relative;
       display: inline-block;
@@ -246,122 +355,150 @@
 </head>
 <body>
 
-  <div class="card">
-    <!-- 1. 로그인 / 회원가입 세션 -->
-    <div id="auth-section">
-      <h1>[달에서.] 테스트 접속</h1>
-      <div class="form-group">
-        <input type="text" id="username" placeholder="아이디 입력" autocomplete="off">
-      </div>
-      <div class="form-group">
-        <input type="password" id="password" placeholder="비밀번호 (6자리 이상)">
-      </div>
-      <div class="form-group">
-        <input type="text" id="char-name" placeholder="캐릭터 이름 입력">
-      </div>
-      <div class="form-group">
-        <label>직급 선택:</label>
-        <select id="role-select">
-          <option value="student">일반 학생 (초기 10pt / 스탯 상한 5)</option>
-          <option value="council">학생회장 (초기 12pt / 스탯 상한 6)</option>
-          <option value="teacher">교사 (초기 15pt / 스탯 상한 7)</option>
-        </select>
-      </div>
-      <button onclick="handleAuth()">시작하기 (접속/가입)</button>
-      <div id="auth-error" class="error-msg"></div>
+  <!-- 1. 로그인 세션 (초기 화면) -->
+  <div id="auth-section" class="card">
+    <h1>[달에서.] 테스트 접속</h1>
+    <div class="form-group">
+      <input type="text" id="username" placeholder="아이디 입력" autocomplete="off">
     </div>
-
-    <!-- 2. 캐릭터 스탯 관리 세션 -->
-    <div id="character-section" class="hidden">
-      <h1 id="display-username">캐릭터 이름</h1>
-      <p style="margin-bottom: 6px; color: #aaa;">직급: <span id="display-role" style="color: #fff;">-</span></p>
-      
-      <!-- 포인트 잔여 / 저장 완료 안내 -->
-      <p id="points-container" style="margin-bottom: 8px; color: #aaa;">
-        남은 포인트: <span id="available-pts" style="color: #ffc107; font-weight: bold;">0</span>
-      </p>
-      <p id="completed-notice" class="hidden" style="margin-bottom: 12px; color: #4caf50; font-size: 0.9rem;">
-        ✔ 스탯 설정이 완료된 캐릭터입니다.
-      </p>
-
-      <!-- 스탯 미확정 시 표시되는 경고 문구 -->
-      <div id="stat-warning-box" class="warning-box">
-        <span>⚠️</span>
-        <div>초기 스탯은 저장 이후 <b>수정이 불가능</b>합니다. 신중하게 분배해 주세요!</div>
-      </div>
-      
-      <div class="stat-list">
-        <!-- 지혜 -->
-        <div class="stat-row">
-          <div>
-            <span class="tooltip">
-              지혜 (Wisdom)
-              <span class="tooltiptext">지식, 추리력, 마법 주문 이해도 및 통찰력</span>
-            </span>
-            : <span id="wisdom-val">1</span>
-          </div>
-          <div class="btn-controls stat-ctrl">
-            <button class="stat-btn" onclick="decreaseStat('wisdom')">-</button>
-            <button class="stat-btn" onclick="increaseStat('wisdom')">+</button>
-          </div>
-        </div>
-
-        <!-- 의지 -->
-        <div class="stat-row">
-          <div>
-            <span class="tooltip">
-              의지 (Willpower)
-              <span class="tooltiptext">정신력, 멘탈 저항, 집중력 및 위기 극복 능력</span>
-            </span>
-            : <span id="willpower-val">1</span>
-          </div>
-          <div class="btn-controls stat-ctrl">
-            <button class="stat-btn" onclick="decreaseStat('willpower')">-</button>
-            <button class="stat-btn" onclick="increaseStat('willpower')">+</button>
-          </div>
-        </div>
-
-        <!-- 가호 -->
-        <div class="stat-row">
-          <div>
-            <span class="tooltip">
-              가호 (Divine)
-              <span class="tooltiptext">운, 신성한 보호, 기적 발동 및 치명적 위기 회피</span>
-            </span>
-            : <span id="divine-val">1</span>
-          </div>
-          <div class="btn-controls stat-ctrl">
-            <button class="stat-btn" onclick="decreaseStat('divine')">-</button>
-            <button class="stat-btn" onclick="increaseStat('divine')">+</button>
-          </div>
-        </div>
-
-        <!-- 교감 -->
-        <div class="stat-row">
-          <div>
-            <span class="tooltip">
-              교감 (Affinity)
-              <span class="tooltiptext">타인과의 소통, 사역마/정령 교감, 설득 및 매력</span>
-            </span>
-            : <span id="affinity-val">1</span>
-          </div>
-          <div class="btn-controls stat-ctrl">
-            <button class="stat-btn" onclick="decreaseStat('affinity')">-</button>
-            <button class="stat-btn" onclick="increaseStat('affinity')">+</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 하단 조작 버튼 그룹 -->
-      <div id="action-btn-group" class="btn-group">
-        <button class="reset-btn" onclick="resetStats()">초기화</button>
-        <button class="save-btn" onclick="saveStats()">스탯 저장하기</button>
-      </div>
-      <div id="stat-error" class="error-msg"></div>
+    <div class="form-group">
+      <input type="password" id="password" placeholder="비밀번호 (6자리 이상)">
     </div>
+    <div class="form-group">
+      <input type="text" id="char-name" placeholder="캐릭터 이름 입력">
+    </div>
+    <div class="form-group">
+      <label>직급 선택:</label>
+      <select id="role-select">
+        <option value="student">일반 학생 (초기 10pt / 스탯 상한 5)</option>
+        <option value="council">학생회장 (초기 12pt / 스탯 상한 6)</option>
+        <option value="teacher">교사 (초기 15pt / 스탯 상한 7)</option>
+      </select>
+    </div>
+    <button onclick="handleAuth()">시작하기 (접속/가입)</button>
+    <div id="auth-error" class="error-msg"></div>
   </div>
 
-  <!-- 토스트 알림 영역 -->
+  <!-- 2. 게임 메인 화면 (로그인 성공 시 표시) -->
+  <div id="game-section" class="game-container hidden">
+    
+    <!-- 좌측 메인 화면 영역 -->
+    <div class="main-screen">
+
+      <!-- 탭 A: 캐릭터 스탯 세션 -->
+      <div id="tab-character">
+        <h1 id="display-username">캐릭터 이름</h1>
+        <p style="margin-bottom: 6px; color: #aaa;">직급: <span id="display-role" style="color: #fff;">-</span></p>
+        
+        <p id="points-container" style="margin-bottom: 8px; color: #aaa;">
+          남은 포인트: <span id="available-pts" style="color: #ffc107; font-weight: bold;">0</span>
+        </p>
+        <p id="completed-notice" class="hidden" style="margin-bottom: 12px; color: #4caf50; font-size: 0.9rem;">
+          ✔ 스탯 설정이 완료된 캐릭터입니다.
+        </p>
+
+        <div id="stat-warning-box" class="warning-box">
+          <span>⚠️</span>
+          <div>초기 스탯은 저장 이후 <b>수정이 불가능</b>합니다. 신중하게 분배해 주세요!</div>
+        </div>
+        
+        <div class="stat-list">
+          <div class="stat-row">
+            <div>
+              <span class="tooltip">지혜 (Wisdom)<span class="tooltiptext">지식, 추리력, 마법 주문 이해도 및 통찰력</span></span> : <span id="wisdom-val">1</span>
+            </div>
+            <div class="btn-controls stat-ctrl">
+              <button class="stat-btn" onclick="decreaseStat('wisdom')">-</button>
+              <button class="stat-btn" onclick="increaseStat('wisdom')">+</button>
+            </div>
+          </div>
+          <div class="stat-row">
+            <div>
+              <span class="tooltip">의지 (Willpower)<span class="tooltiptext">정신력, 멘탈 저항, 집중력 및 위기 극복 능력</span></span> : <span id="willpower-val">1</span>
+            </div>
+            <div class="btn-controls stat-ctrl">
+              <button class="stat-btn" onclick="decreaseStat('willpower')">-</button>
+              <button class="stat-btn" onclick="increaseStat('willpower')">+</button>
+            </div>
+          </div>
+          <div class="stat-row">
+            <div>
+              <span class="tooltip">가호 (Divine)<span class="tooltiptext">운, 신성한 보호, 기적 발동 및 치명적 위기 회피</span></span> : <span id="divine-val">1</span>
+            </div>
+            <div class="btn-controls stat-ctrl">
+              <button class="stat-btn" onclick="decreaseStat('divine')">-</button>
+              <button class="stat-btn" onclick="increaseStat('divine')">+</button>
+            </div>
+          </div>
+          <div class="stat-row">
+            <div>
+              <span class="tooltip">교감 (Affinity)<span class="tooltiptext">타인과의 소통, 사역마/정령 교감, 설득 및 매력</span></span> : <span id="affinity-val">1</span>
+            </div>
+            <div class="btn-controls stat-ctrl">
+              <button class="stat-btn" onclick="decreaseStat('affinity')">-</button>
+              <button class="stat-btn" onclick="increaseStat('affinity')">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="action-btn-group" class="btn-group">
+          <button class="reset-btn" onclick="resetStats()">초기화</button>
+          <button class="save-btn" onclick="saveStats()">스탯 저장하기</button>
+        </div>
+        <div id="stat-error" class="error-msg"></div>
+      </div>
+
+      <!-- 탭 B: 커뮤니티 / 스토리 세션 -->
+      <div id="tab-story" class="hidden">
+        <h1>달의 스토리 (커뮤니티)</h1>
+        
+        <!-- 글 작성 양식 -->
+        <div style="background: #252525; padding: 14px; border-radius: 8px; margin-bottom: 20px;">
+          <textarea id="post-input" placeholder="이야기를 자유롭게 남겨보세요..."></textarea>
+          
+          <div style="display: flex; gap: 10px; margin-top: 10px; align-items: center;">
+            <select id="post-visibility" onchange="toggleTargetSelector()" style="width: 150px;">
+              <option value="public">전체공개</option>
+              <option value="friends">친구공개</option>
+              <option value="close_friends">편한친구 공개</option>
+              <option value="target_select">특정인물 지정</option>
+            </select>
+            <button onclick="submitPost()" style="margin-top: 0; width: 100px;">작성</button>
+          </div>
+
+          <!-- 특정인물 선택기 (특정인물 지정 시 표시) -->
+          <div id="target-selector" class="hidden" style="margin-top: 10px;">
+            <p style="font-size: 0.8rem; color: #aaa;">글을 함께 볼 친구를 선택하세요:</p>
+            <div id="target-friend-chips" class="friend-chip-group"></div>
+          </div>
+        </div>
+
+        <!-- 작성된 게시글 목록 -->
+        <div id="posts-feed"></div>
+      </div>
+
+      <!-- 탭 C: 친구 관리 세션 -->
+      <div id="tab-friends" class="hidden">
+        <h1>친구 관리</h1>
+        <div class="form-group" style="display: flex; gap: 8px;">
+          <input type="text" id="friend-search-name" placeholder="친구 캐릭터 이름 검색">
+          <button onclick="addFriendByName()" style="width: 100px; margin-top: 0;">추가</button>
+        </div>
+        <div id="friend-list" style="margin-top: 16px;"></div>
+      </div>
+
+    </div>
+
+    <!-- 우측 메뉴 버튼 사이드바 -->
+    <div class="sidebar">
+      <button class="sidebar-btn active" id="menu-btn-character" onclick="switchTab('character')">캐릭터</button>
+      <button class="sidebar-btn" id="menu-btn-story" onclick="switchTab('story')">스토리</button>
+      <button class="sidebar-btn" id="menu-btn-friends" onclick="switchTab('friends')">친구 관리</button>
+    </div>
+
+  </div>
+
+  <!-- 토스트 알림 -->
   <div id="toast">알림 메시지</div>
 
   <script>
@@ -374,42 +511,53 @@
   let currentUserId = null;
   let characterData = null;
   let initialCharacterData = null;
+  let friendsList = [];
+  let selectedTargetUserIds = [];
 
-  // 직급별 기본 설정
   const ROLE_CONFIG = {
     student: { name: '일반 학생', pts: 10, maxStat: 5 },
     council: { name: '학생회장', pts: 12, maxStat: 6 },
     teacher: { name: '교사', pts: 15, maxStat: 7 }
   };
 
-  // 직급명 또는 Key를 가져와 해당 직급의 maxStat을 찾는 헬퍼 함수
   function getMaxStatForRole(roleStr) {
     if (!roleStr) return 5;
     const cleanRole = roleStr.toString().trim();
-    
     for (const key in ROLE_CONFIG) {
       if (key === cleanRole || ROLE_CONFIG[key].name === cleanRole) {
         return ROLE_CONFIG[key].maxStat;
       }
     }
-    return 5; // 기본값
+    return 5;
   }
 
-  // 토스트 알림 표시 함수
   let toastTimeout = null;
   function showToast(message, type = 'success') {
     const toast = document.getElementById('toast');
     toast.innerText = message;
     toast.className = `show ${type}`;
-
     if (toastTimeout) clearTimeout(toastTimeout);
-    
-    toastTimeout = setTimeout(() => {
-      toast.className = '';
-    }, 3000);
+    toastTimeout = setTimeout(() => { toast.className = ''; }, 3000);
   }
 
-  // 가입 및 접속 처리
+  // 탭 전환 시스템
+  function switchTab(tabName) {
+    document.querySelectorAll('.sidebar-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById('tab-character').classList.add('hidden');
+    document.getElementById('tab-story').classList.add('hidden');
+    document.getElementById('tab-friends').classList.add('hidden');
+
+    document.getElementById(`menu-btn-${tabName}`).classList.add('active');
+    document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+
+    if (tabName === 'story') {
+      loadFriendsList().then(() => loadPostsFeed());
+    } else if (tabName === 'friends') {
+      loadFriendsList().then(() => renderFriendsView());
+    }
+  }
+
+  // 가입 및 로그인
   async function handleAuth() {
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
@@ -418,7 +566,6 @@
     const errorDiv = document.getElementById('auth-error');
 
     errorDiv.innerText = '';
-
     if (!username || !password) {
       errorDiv.innerText = '아이디와 비밀번호를 입력해 주세요.';
       return;
@@ -426,13 +573,11 @@
 
     const fakeEmail = `${username}@lunar-academy.trpg`;
 
-    // 1. 로그인 시도
     let { data, error } = await supabaseClient.auth.signInWithPassword({
       email: fakeEmail,
       password: password
     });
 
-    // 2. 로그인 실패 시 회원가입 시도
     if (error) {
       if (!charName) {
         errorDiv.innerText = '신규 회원가입 시 캐릭터 이름을 입력해야 합니다.';
@@ -450,17 +595,13 @@
       }
 
       data = signUpRes.data;
-
       const roleInfo = ROLE_CONFIG[roleKey];
       const { error: insertError } = await supabaseClient.from('characters').insert([
         {
           user_id: data.user.id,
           name: charName,
           role: roleInfo.name,
-          wisdom: 1,
-          willpower: 1,
-          divine: 1,
-          affinity: 1,
+          wisdom: 1, willpower: 1, divine: 1, affinity: 1,
           available_points: roleInfo.pts
         }
       ]);
@@ -475,63 +616,43 @@
     loadCharacterData();
   }
 
-  // 캐릭터 데이터 로드 (수정 및 통합 완료)
+  // 캐릭터 정보 데이터 불러오기
   async function loadCharacterData() {
     const { data, error } = await supabaseClient
       .from('characters')
       .select('*')
       .eq('user_id', currentUserId)
-      .maybeSingle(); // single() 대신 maybeSingle()을 사용하여 데이터가 없어도 에러 없이 null 반환
+      .maybeSingle();
 
     if (error) {
       document.getElementById('auth-error').innerText = '데이터 로드 에러: ' + error.message;
       return;
     }
 
-    // 로그인에는 성공했지만 캐릭터 데이터가 DB에서 지워진 경우 (자동 재등록 처리)
     if (!data) {
       const charName = document.getElementById('char-name').value.trim();
       const roleKey = document.getElementById('role-select').value;
-
       if (!charName) {
-        document.getElementById('auth-error').innerText = '캐릭터 데이터가 존재하지 않습니다. [캐릭터 이름]을 입력 후 다시 시작하기를 누르면 새로 생성됩니다.';
+        document.getElementById('auth-error').innerText = '캐릭터 이름 입력 후 접속해주세요.';
         return;
       }
 
       const roleInfo = ROLE_CONFIG[roleKey];
-      const { error: insertError } = await supabaseClient.from('characters').insert([
-        {
-          user_id: currentUserId,
-          name: charName,
-          role: roleInfo.name,
-          wisdom: 1,
-          willpower: 1,
-          divine: 1,
-          affinity: 1,
-          available_points: roleInfo.pts
-        }
-      ]);
-
-      if (insertError) {
-        document.getElementById('auth-error').innerText = '캐릭터 생성 실패: ' + insertError.message;
-        return;
-      }
-
-      // 새로 생성 후 재로드
+      await supabaseClient.from('characters').insert([{
+        user_id: currentUserId, name: charName, role: roleInfo.name,
+        wisdom: 1, willpower: 1, divine: 1, affinity: 1, available_points: roleInfo.pts
+      }]);
       return loadCharacterData();
     }
 
-    // 정상적으로 데이터를 불러온 경우
     characterData = data;
     initialCharacterData = JSON.parse(JSON.stringify(data));
 
     updateUI();
-
     document.getElementById('auth-section').classList.add('hidden');
-    document.getElementById('character-section').classList.remove('hidden');
+    document.getElementById('game-section').classList.remove('hidden');
   }
 
-  // 화면 UI 업데이트 함수
   function updateUI() {
     document.getElementById('display-username').innerText = characterData.name;
     const roleMap = { student: '일반 학생', council: '학생회장', teacher: '교사' };
@@ -544,7 +665,6 @@
     document.getElementById('divine-val').innerText = characterData.divine;
     document.getElementById('affinity-val').innerText = characterData.affinity;
 
-    // 이미 저장이 끝난 캐릭터(남은 포인트가 0)인지 확인하여 UI 전환
     const isCompleted = characterData.available_points === 0 && initialCharacterData.available_points === 0;
 
     const ctrlBtns = document.querySelectorAll('.stat-ctrl');
@@ -554,14 +674,12 @@
     const warningBox = document.getElementById('stat-warning-box');
 
     if (isCompleted) {
-      // 저장이 이미 완료된 상태: 버튼 및 경고창 감추기
       ctrlBtns.forEach(btn => btn.classList.add('hidden'));
       actionGroup.classList.add('hidden');
       pointsContainer.classList.add('hidden');
       warningBox.classList.add('hidden');
       completedNotice.classList.remove('hidden');
     } else {
-      // 스탯 분배 중인 상태: 버튼 및 경고창 보여주기
       ctrlBtns.forEach(btn => btn.classList.remove('hidden'));
       actionGroup.classList.remove('hidden');
       pointsContainer.classList.remove('hidden');
@@ -570,58 +688,43 @@
     }
   }
 
-  // 스탯 증가 처리 (상한선 제한 적용)
   function increaseStat(statName) {
     if (characterData.available_points <= 0) {
       showToast('사용 가능한 포인트가 없습니다.', 'warning');
       return;
     }
-
     const maxLimit = getMaxStatForRole(characterData.role);
     if (characterData[statName] >= maxLimit) {
       showToast(`${characterData.role}의 최대 스탯 상한선은 ${maxLimit}입니다.`, 'warning');
       return;
     }
-
     characterData[statName] += 1;
     characterData.available_points -= 1;
     updateUI();
   }
 
-  // 스탯 감소 처리 (-)
   function decreaseStat(statName) {
     const minLimit = initialCharacterData[statName];
     if (characterData[statName] <= minLimit) {
       showToast(`스탯은 최소 ${minLimit} 미만으로 내릴 수 없습니다.`, 'warning');
       return;
     }
-
     characterData[statName] -= 1;
     characterData.available_points += 1;
     updateUI();
   }
 
-  // 스탯 초기화 버튼
   function resetStats() {
     characterData = JSON.parse(JSON.stringify(initialCharacterData));
     updateUI();
     showToast('스탯 상태가 초기화되었습니다.', 'warning');
   }
 
-  // DB에 스탯 저장하기
   async function saveStats() {
     const errorDiv = document.getElementById('stat-error');
     errorDiv.innerText = '';
 
-    if (characterData.available_points > 0) {
-      if (!confirm(`남은 포인트가 ${characterData.available_points}pt 있습니다. 저장 후에는 수정할 수 없습니다. 정말 확정하시겠습니까?`)) {
-        return;
-      }
-    } else {
-      if (!confirm('스탯을 저장한 후에는 다시 변경할 수 없습니다. 이대로 확정하시겠습니까?')) {
-        return;
-      }
-    }
+    if (!confirm('스탯을 저장한 후에는 변경할 수 없습니다. 확정하시겠습니까?')) return;
 
     const { error } = await supabaseClient
       .from('characters')
@@ -641,6 +744,230 @@
       updateUI();
       showToast('스탯이 최종 저장되었습니다!', 'success');
     }
+  }
+
+  // ================= 친구 관련 기능 =================
+  async function loadFriendsList() {
+    const { data, error } = await supabaseClient
+      .from('friends')
+      .select('*, friend_char:characters!friends_friend_id_fkey(name, user_id)')
+      .eq('user_id', currentUserId);
+
+    if (error) {
+      // 외래키 설정이 없을 시 수동 조인용 2차 쿼리 예외 처리
+      const { data: rawFriends } = await supabaseClient.from('friends').select('*').eq('user_id', currentUserId);
+      if (!rawFriends || rawFriends.length === 0) {
+        friendsList = [];
+        return;
+      }
+      const friendUserIds = rawFriends.map(f => f.friend_id);
+      const { data: chars } = await supabaseClient.from('characters').select('name, user_id').in('user_id', friendUserIds);
+      
+      friendsList = rawFriends.map(f => {
+        const c = chars.find(item => item.user_id === f.friend_id);
+        return { ...f, friend_name: c ? c.name : '알수없음' };
+      });
+      return;
+    }
+
+    friendsList = data.map(f => ({
+      ...f,
+      friend_name: f.friend_char ? f.friend_char.name : '알수없음'
+    }));
+  }
+
+  function renderFriendsView() {
+    const listDiv = document.getElementById('friend-list');
+    listDiv.innerHTML = '';
+
+    if (friendsList.length === 0) {
+      listDiv.innerHTML = '<p style="color: #888;">등록된 친구가 없습니다.</p>';
+      return;
+    }
+
+    friendsList.forEach(f => {
+      const row = document.createElement('div');
+      row.className = 'post-box';
+      row.style.display = 'flex';
+      row.style.justifySpaceBetween = 'space-between';
+      row.style.alignItems = 'center';
+
+      row.innerHTML = `
+        <div>
+          <span style="font-weight: bold; color: #fff;">${f.friend_name}</span>
+          ${f.is_close_friend ? '<span style="color: #4caf50; font-size: 0.8rem; margin-left: 6px;">[편한친구]</span>' : ''}
+        </div>
+        <button onclick="toggleCloseFriend('${f.id}', ${!f.is_close_friend})" style="width: auto; padding: 6px 12px; margin-top: 0; font-size: 0.8rem;">
+          ${f.is_close_friend ? '편한친구 해제' : '편한친구 지정'}
+        </button>
+      `;
+      listDiv.appendChild(row);
+    });
+  }
+
+  async function addFriendByName() {
+    const targetName = document.getElementById('friend-search-name').value.trim();
+    if (!targetName) return;
+
+    const { data: targetChar } = await supabaseClient
+      .from('characters')
+      .select('user_id')
+      .eq('name', targetName)
+      .maybeSingle();
+
+    if (!targetChar) {
+      showToast('해당 캐릭터를 찾을 수 없습니다.', 'warning');
+      return;
+    }
+
+    if (targetChar.user_id === currentUserId) {
+      showToast('자기 자신은 친구로 등록할 수 없습니다.', 'warning');
+      return;
+    }
+
+    await supabaseClient.from('friends').insert([{
+      user_id: currentUserId,
+      friend_id: targetChar.user_id
+    }]);
+
+    showToast(`${targetName}님을 친구로 추가했습니다.`, 'success');
+    document.getElementById('friend-search-name').value = '';
+    loadFriendsList().then(() => renderFriendsView());
+  }
+
+  async function toggleCloseFriend(recordId, isClose) {
+    await supabaseClient.from('friends').update({ is_close_friend: isClose }).eq('id', recordId);
+    showToast(isClose ? '편한 친구로 지정되었습니다.' : '편한 친구 설정이 해제되었습니다.');
+    loadFriendsList().then(() => renderFriendsView());
+  }
+
+  // ================= 스토리(커뮤니티) 관련 기능 =================
+  function toggleTargetSelector() {
+    const visibility = document.getElementById('post-visibility').value;
+    const selectorBox = document.getElementById('target-selector');
+
+    if (visibility === 'target_select') {
+      selectorBox.classList.remove('hidden');
+      renderTargetFriendChips();
+    } else {
+      selectorBox.classList.add('hidden');
+    }
+  }
+
+  function renderTargetFriendChips() {
+    const chipContainer = document.getElementById('target-friend-chips');
+    chipContainer.innerHTML = '';
+    selectedTargetUserIds = [];
+
+    friendsList.forEach(f => {
+      const chip = document.createElement('div');
+      chip.className = 'friend-chip';
+      chip.innerText = f.friend_name;
+      chip.onclick = () => {
+        if (selectedTargetUserIds.includes(f.friend_id)) {
+          selectedTargetUserIds = selectedTargetUserIds.filter(id => id !== f.friend_id);
+          chip.classList.remove('selected');
+        } else {
+          selectedTargetUserIds.push(f.friend_id);
+          chip.classList.add('selected');
+        }
+      };
+      chipContainer.appendChild(chip);
+    });
+  }
+
+  async function submitPost() {
+    const content = document.getElementById('post-input').value.trim();
+    const visibility = document.getElementById('post-visibility').value;
+
+    if (!content) {
+      showToast('내용을 입력해 주세요.', 'warning');
+      return;
+    }
+
+    const postPayload = {
+      user_id: currentUserId,
+      author_name: characterData.name,
+      content: content,
+      visibility: visibility,
+      target_user_ids: visibility === 'target_select' ? selectedTargetUserIds : []
+    };
+
+    const { error } = await supabaseClient.from('posts').insert([postPayload]);
+
+    if (error) {
+      showToast('작성 실패: ' + error.message, 'warning');
+    } else {
+      showToast('게시글이 공유되었습니다!', 'success');
+      document.getElementById('post-input').value = '';
+      loadPostsFeed();
+    }
+  }
+
+  async function loadPostsFeed() {
+    const { data: posts, error } = await supabaseClient
+      .from('posts')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) return;
+
+    const feedDiv = document.getElementById('posts-feed');
+    feedDiv.innerHTML = '';
+
+    const myFriendIds = friendsList.map(f => f.friend_id);
+    const myCloseFriendIds = friendsList.filter(f => f.is_close_friend).map(f => f.friend_id);
+
+    const visiblePosts = posts.filter(post => {
+      // 1. 내가 쓴 글은 무조건 표시
+      if (post.user_id === currentUserId) return true;
+      
+      // 2. 전체 공개
+      if (post.visibility === 'public') return true;
+
+      // 3. 친구 공개 (작성자가 내 친구인지 확인)
+      if (post.visibility === 'friends' && myFriendIds.includes(post.user_id)) return true;
+
+      // 4. 편한친구 공개 (작성자 기준 편한친구 관계)
+      if (post.visibility === 'close_friends' && myCloseFriendIds.includes(post.user_id)) return true;
+
+      // 5. 특정인물 지정 공개
+      if (post.visibility === 'target_select' && Array.isArray(post.target_user_ids)) {
+        return post.target_user_ids.includes(currentUserId);
+      }
+
+      return false;
+    });
+
+    if (visiblePosts.length === 0) {
+      feedDiv.innerHTML = '<p style="color: #888; text-align: center; padding: 20px;">표시할 스토리 글이 없습니다.</p>';
+      return;
+    }
+
+    const badgeMap = {
+      public: '전체공개',
+      friends: '친구공개',
+      close_friends: '편한친구',
+      target_select: '지정공개'
+    };
+
+    visiblePosts.forEach(post => {
+      const card = document.createElement('div');
+      card.className = 'post-box';
+      const createdTime = new Date(post.created_at).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+      card.innerHTML = `
+        <div class="post-header">
+          <div>
+            <span class="post-author">${post.author_name}</span>
+            <span style="font-size: 0.75rem; margin-left: 8px;">${createdTime}</span>
+          </div>
+          <span class="post-visibility-badge">${badgeMap[post.visibility] || '공개'}</span>
+        </div>
+        <div class="post-content">${post.content}</div>
+      `;
+      feedDiv.appendChild(card);
+    });
   }
 
   document.querySelectorAll('.tooltip').forEach(elem => {
