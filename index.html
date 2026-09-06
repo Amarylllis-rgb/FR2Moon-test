@@ -216,9 +216,15 @@
     .post-header {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       margin-bottom: 10px;
       font-size: 0.85rem;
       color: #aaa;
+    }
+
+    .author-wrapper {
+      display: inline-flex;
+      align-items: center;
     }
 
     .post-author {
@@ -268,6 +274,23 @@
       cursor: pointer; width: auto; margin-top: 0;
     }
     .modal-close:hover { color: #fff; }
+
+    /* === 프로필 관련 스타일 === */
+    .profile-preview-container {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .profile-avatar-img {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      object-fit: cover;
+      background-color: #2a2a2a;
+      border: 2px solid #444;
+    }
 
     #toast {
       position: fixed;
@@ -417,8 +440,25 @@
         <!-- 내 프로필 탭 -->
         <div id="tab-profile-content" class="hidden">
           <div class="post-box">
-            <h2 id="profile-char-name-display" style="margin-bottom: 4px;">-</h2>
-            <p style="color: #aaa; margin-bottom: 16px;">직급: <span id="profile-role" style="color:#fff;">-</span></p>
+            <div class="profile-preview-container">
+              <div id="profile-avatar-preview-area">
+                <!-- 내 프로필 큰 사진 출력 영역 -->
+              </div>
+              <div>
+                <h2 id="profile-char-name-display" style="margin-bottom: 4px;">-</h2>
+                <p style="color: #aaa;">직급: <span id="profile-role" style="color:#fff;">-</span></p>
+              </div>
+            </div>
+
+            <!-- 프로필 사진 관리 영역 추가 -->
+            <div style="background-color: #2a2a2a; padding: 14px; border-radius: 8px; margin-bottom: 16px;">
+              <p style="font-size: 0.9rem; font-weight: bold; margin-bottom: 8px; color: #ffc107;">프로필 사진 변경</p>
+              <input type="file" id="avatar-file-input" accept="image/*" style="margin-bottom: 8px; font-size: 0.85rem;">
+              <div style="display: flex; gap: 8px;">
+                <button type="button" onclick="uploadProfileAvatar()" style="background-color: #3b5998; margin-top: 0; font-size: 0.85rem;">사진 업로드</button>
+                <button type="button" onclick="resetToDefaultAvatar()" style="background-color: #555; margin-top: 0; font-size: 0.85rem;">기본 이미지로 변경</button>
+              </div>
+            </div>
             
             <hr style="border-color: #333; margin-bottom: 16px;">
             <p style="margin-bottom: 6px;"><b>스탯 현황</b> (마우스를 올리면 효과 표시)</p>
@@ -451,9 +491,14 @@
       </div>
 
       <div class="side-panel">
-        <div class="panel-card">
-          <h3 id="side-char-name" style="color: #ffc107; margin-bottom: 4px;">-</h3>
-          <p id="side-char-role" style="font-size: 0.85rem; color: #aaa;">-</p>
+        <div class="panel-card" style="display: flex; align-items: center; gap: 12px;">
+          <div id="side-avatar-area">
+            <!-- 사이드바 프로필 이미지 -->
+          </div>
+          <div>
+            <h3 id="side-char-name" style="color: #ffc107; margin-bottom: 2px; font-size: 1rem;">-</h3>
+            <p id="side-char-role" style="font-size: 0.85rem; color: #aaa;">-</p>
+          </div>
         </div>
       </div>
     </div>
@@ -463,10 +508,17 @@
   <div id="profile-modal" class="modal-overlay hidden">
     <div class="modal-card">
       <button type="button" class="modal-close" onclick="closeProfileModal()">✕</button>
-      <h2 id="modal-char-name" style="color: #ffc107; margin-bottom: 2px;">-</h2>
-      <p style="font-size: 0.9rem; color: #aaa; margin-bottom: 16px;">직급: <span id="modal-role" style="color:#fff;">-</span></p>
+      <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
+        <div id="modal-avatar-area">
+          <!-- 모달 프로필 이미지 -->
+        </div>
+        <div>
+          <h2 id="modal-char-name" style="color: #ffc107; margin-bottom: 2px; font-size: 1.1rem;">-</h2>
+          <p style="font-size: 0.85rem; color: #aaa;">직급: <span id="modal-role" style="color:#fff;">-</span></p>
+        </div>
+      </div>
       
-      <div style="background-color: #2a2a2a; padding: 12px; border-radius: 6px; margin-bottom: 16px; font-size: 0.85rem;">
+      <div style="background-color: #2a2a2a; padding: 12px; border-radius: 6px; font-size: 0.85rem;">
         <p style="color: #ffc107; font-weight: bold; margin-bottom: 6px;">스탯 정보</p>
         <p>
           <span class="stat-label" data-tooltip="지혜: 학식과 분석력, 마법적 지식">지혜: <span id="modal-wisdom">0</span></span> | 
@@ -489,6 +541,9 @@
 
     const ADMIN_USERNAME = 'admin';
     const FORBIDDEN_WORDS = ['admin', '낙화', '달에서', '운영자', '관리자', 'master'];
+    
+    // 기본 SVG 실루엣 아바타 (네트워크 요청 없는 회색 사용자 아이콘)
+    const DEFAULT_AVATAR_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23888888" width="100%" height="100%"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>`;
 
     let currentUserId = null;
     let currentUsername = null;
@@ -507,6 +562,41 @@
       t.innerText = msg;
       t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    // [헬퍼] 아바타 HTML 생성 함수 (오류 시 기본 이미지 자동 대처)
+    function getAvatarHtml(avatarUrl, size = 28) {
+      const src = avatarUrl && avatarUrl.trim() !== '' ? avatarUrl : DEFAULT_AVATAR_SVG;
+      return `<img src="${src}" 
+                   alt="profile" 
+                   style="width:${size}px; height:${size}px; border-radius:50%; object-fit:cover; vertical-align:middle; background:#2a2a2a; border:1px solid #444;"
+                   onerror="this.onerror=null; this.src='${DEFAULT_AVATAR_SVG}';">`;
+    }
+
+    // [헬퍼] 클라이언트 단 이미지 압축 및 리사이징 (150x150 WebP, 30KB 이하)
+    function resizeImage(file, maxWidth = 150, maxHeight = 150) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+          const img = new Image();
+          img.src = event.target.result;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = maxWidth;
+            canvas.height = maxHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, maxWidth, maxHeight);
+            
+            canvas.toBlob((blob) => {
+              if (blob) resolve(blob);
+              else reject(new Error('이미지 압축에 실패했습니다.'));
+            }, 'image/webp', 0.8);
+          };
+          img.onerror = (err) => reject(err);
+        };
+        reader.onerror = (err) => reject(err);
+      });
     }
 
     // 닉네임 유효성 및 금지어 검사
@@ -537,7 +627,6 @@
         return alert(`'${targetNick}'은(는) 예약어 및 사용금지어가 포함되어 지정할 수 없습니다.`);
       }
 
-      // 게시글 저자의 author_name 내 (@닉네임) 패턴 검색을 통해 중복을 간이 식별
       const { data } = await supabaseClient
         .from('posts')
         .select('author_name')
@@ -572,10 +661,8 @@
         userNickname = '낙화';
       }
       
-      // 1. 로그인 시도
       let { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
-      // 2. 로그인 실패 시 (신규 가입 처리)
       if (error) {
         const finalNickname = userNickname || (isSystemAdmin ? '낙화' : username);
 
@@ -602,7 +689,8 @@
           name: finalCharName,
           role: roleInfo.name,
           wisdom: 1, willpower: 1, divine: 1, affinity: 1,
-          available_points: roleInfo.pts
+          available_points: roleInfo.pts,
+          avatar_url: null
         }]);
 
         if (insertErr) {
@@ -635,7 +723,8 @@
             name: charName,
             role: '일반 학생',
             wisdom: 1, willpower: 1, divine: 1, affinity: 1,
-            available_points: 10
+            available_points: 10,
+            avatar_url: null
           }]).select().single();
 
           if (createErr) {
@@ -697,6 +786,7 @@
       document.getElementById('main-community-section').classList.remove('hidden');
       document.getElementById('side-char-name').innerText = `${characterData.name} (@${currentUserNickname})`;
       document.getElementById('side-char-role').innerText = characterData.role;
+      document.getElementById('side-avatar-area').innerHTML = getAvatarHtml(characterData.avatar_url, 44);
 
       if (currentUsername === ADMIN_USERNAME) {
         document.getElementById('notice-write-box').classList.remove('hidden');
@@ -726,12 +816,81 @@
     function renderProfileView() {
       document.getElementById('profile-char-name-display').innerText = `${characterData.name} (@${currentUserNickname})`;
       document.getElementById('profile-role').innerText = characterData.role;
+      document.getElementById('profile-avatar-preview-area').innerHTML = getAvatarHtml(characterData.avatar_url, 70);
+
       document.getElementById('profile-wisdom').innerText = characterData.wisdom;
       document.getElementById('profile-willpower').innerText = characterData.willpower;
       document.getElementById('profile-divine').innerText = characterData.divine;
       document.getElementById('profile-affinity').innerText = characterData.affinity;
 
       document.getElementById('edit-char-name').value = characterData.name;
+    }
+
+    // 프로필 이미지 업로드 처리 함수
+    async function uploadProfileAvatar() {
+      const fileInput = document.getElementById('avatar-file-input');
+      const file = fileInput.files[0];
+      if (!file) return alert('업로드할 이미지 파일을 선택해주세요.');
+
+      try {
+        showToast('이미지 변환 및 업로드 중...');
+
+        // 1. 150x150 WebP 로 클라이언트 리사이징
+        const resizedBlob = await resizeImage(file, 150, 150);
+        const filePath = `avatars/${currentUserId}.webp`;
+
+        // 2. Supabase Storage 에 업로드 (upsert: true)
+        const { error: uploadErr } = await supabaseClient
+          .storage
+          .from('community-assets')
+          .upload(filePath, resizedBlob, {
+            contentType: 'image/webp',
+            upsert: true
+          });
+
+        if (uploadErr) return alert('스토리지 업로드 실패: ' + uploadErr.message);
+
+        // 3. 퍼블릭 URL 가져오기 (캐시 방지 파라미터 적용)
+        const { data } = supabaseClient
+          .storage
+          .from('community-assets')
+          .getPublicUrl(filePath);
+
+        const newAvatarUrl = `${data.publicUrl}?t=${new Date().getTime()}`;
+
+        // 4. DB characters 테이블에 avatar_url 업데이트
+        await supabaseClient
+          .from('characters')
+          .update({ avatar_url: newAvatarUrl })
+          .eq('user_id', currentUserId);
+
+        characterData.avatar_url = newAvatarUrl;
+        document.getElementById('side-avatar-area').innerHTML = getAvatarHtml(newAvatarUrl, 44);
+        renderProfileView();
+
+        fileInput.value = '';
+        showToast('프로필 사진이 변경되었습니다!');
+      } catch (err) {
+        console.error(err);
+        alert('프로필 이미지 처리 중 오류가 발생했습니다.');
+      }
+    }
+
+    // 기본 프로필 이미지로 초기화 함수
+    async function resetToDefaultAvatar() {
+      if (!confirm('프로필 사진을 기본 이미지로 변경하시겠습니까?')) return;
+
+      const { error } = await supabaseClient
+        .from('characters')
+        .update({ avatar_url: null })
+        .eq('user_id', currentUserId);
+
+      if (error) return alert('변경 실패: ' + error.message);
+
+      characterData.avatar_url = null;
+      document.getElementById('side-avatar-area').innerHTML = getAvatarHtml(null, 44);
+      renderProfileView();
+      showToast('기본 프로필 사진으로 변경되었습니다.');
     }
 
     async function updateProfile() {
@@ -757,6 +916,7 @@
       await supabaseClient.from('posts').insert([{
         user_id: currentUserId,
         author_name: `운영진 (@낙화)`,
+        avatar_url: characterData.avatar_url,
         content: content,
         visibility: 'public',
         is_notice: true
@@ -768,8 +928,10 @@
     }
 
     async function loadNotices() {
-      const { data } = await supabaseClient.from('posts')
-        .select('*')
+      // posts 테이블 조회 시 저자의 최신 avatar_url 연동을 위해 characters 조인
+      const { data } = await supabaseClient
+        .from('posts')
+        .select('*, characters(avatar_url)')
         .eq('is_notice', true)
         .order('created_at', { ascending: false });
 
@@ -782,13 +944,17 @@
       }
 
       data.forEach(p => {
+        const avatarUrl = p.characters?.avatar_url || p.avatar_url;
+        const avatarHtml = getAvatarHtml(avatarUrl, 28);
+
         const item = document.createElement('div');
         item.className = 'post-box';
         item.innerHTML = `
           <div class="post-header">
-            <div>
+            <div class="author-wrapper">
               <span class="notice-badge">공지</span>
-              <span class="post-author" onclick="openProfileModal('${p.user_id}')">${p.author_name}</span>
+              ${avatarHtml}
+              <span class="post-author" style="margin-left: 6px;" onclick="openProfileModal('${p.user_id}')">${p.author_name}</span>
             </div>
             <span>${new Date(p.created_at).toLocaleDateString('ko-KR')}</span>
           </div>
@@ -806,6 +972,7 @@
       await supabaseClient.from('posts').insert([{
         user_id: currentUserId,
         author_name: `${characterData.name} (@${currentUserNickname})`,
+        avatar_url: characterData.avatar_url,
         content: content,
         visibility: visibility,
         is_notice: false
@@ -817,8 +984,9 @@
     }
 
     async function loadPosts() {
-      const { data } = await supabaseClient.from('posts')
-        .select('*')
+      const { data } = await supabaseClient
+        .from('posts')
+        .select('*, characters(avatar_url)')
         .or('is_notice.eq.false,is_notice.is.null')
         .order('created_at', { ascending: false });
 
@@ -831,11 +999,17 @@
       }
 
       data.forEach(p => {
+        const avatarUrl = p.characters?.avatar_url || p.avatar_url;
+        const avatarHtml = getAvatarHtml(avatarUrl, 28);
+
         const item = document.createElement('div');
         item.className = 'post-box';
         item.innerHTML = `
           <div class="post-header">
-            <span class="post-author" onclick="openProfileModal('${p.user_id}')">${p.author_name}</span>
+            <div class="author-wrapper">
+              ${avatarHtml}
+              <span class="post-author" style="margin-left: 6px;" onclick="openProfileModal('${p.user_id}')">${p.author_name}</span>
+            </div>
             <span>${new Date(p.created_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</span>
           </div>
           <div class="post-content">${p.content}</div>
@@ -848,10 +1022,10 @@
       const { data } = await supabaseClient.from('characters').select('*').eq('user_id', userId).maybeSingle();
       if (!data) return showToast('프로필 정보를 불러올 수 없습니다.');
 
-      const { data: userData } = await supabaseClient.auth.admin?.getUserById(userId) || {};
-      const targetNick = userData?.user?.user_metadata?.user_nickname || '낙화';
+      const targetNick = data.name;
 
-      document.getElementById('modal-char-name').innerText = `${data.name} (@${targetNick})`;
+      document.getElementById('modal-avatar-area').innerHTML = getAvatarHtml(data.avatar_url, 54);
+      document.getElementById('modal-char-name').innerText = `${data.name}`;
       document.getElementById('modal-role').innerText = data.role;
       document.getElementById('modal-wisdom').innerText = data.wisdom;
       document.getElementById('modal-willpower').innerText = data.willpower;
