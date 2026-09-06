@@ -21,7 +21,6 @@
 
     .hidden { display: none !important; }
 
-    /* === 1. 초기 중앙 카드 === */
     .center-wrapper {
       display: flex;
       justify-content: center;
@@ -89,7 +88,6 @@
       position: relative;
     }
 
-    /* === 스탯 Hover 툴팁 스타일 === */
     .stat-label {
       position: relative;
       cursor: help;
@@ -134,7 +132,6 @@
 
     .error-msg { color: #ff6b6b; font-size: 0.85rem; margin-top: 10px; }
 
-    /* === 2. 커뮤니티 레이아웃 === */
     .app-header {
       position: sticky;
       top: 0;
@@ -244,7 +241,6 @@
     }
     .post-content { font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; }
 
-    /* === 3. 모달 (프로필 팝업) 스타일 === */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -275,7 +271,6 @@
     }
     .modal-close:hover { color: #fff; }
 
-    /* === 프로필 관련 스타일 === */
     .profile-preview-container {
       display: flex;
       align-items: center;
@@ -302,7 +297,6 @@
 </head>
 <body>
 
-  <!-- STEP 1: 접속 / 회원가입 -->
   <div id="auth-section" class="center-wrapper">
     <div class="card">
       <h1>[달에서.] 접속하기</h1>
@@ -341,14 +335,13 @@
     </div>
   </div>
 
-  <!-- STEP 2: 최초 캐릭터 스탯 설정 -->
   <div id="character-setup-section" class="center-wrapper hidden">
     <div class="card">
       <h1 id="setup-char-name">캐릭터 스탯 설정</h1>
       <p style="margin-bottom: 12px; color: #aaa;">남은 포인트: <span id="setup-pts" style="color: #ffc107; font-weight: bold;">0</span></p>
 
       <div class="warning-box">
-        ⚠️ 초기 스탯은 저장 후 수정이 불가능합니다! (스탯 이름 위에 마우스를 올리면 효과를 볼 수 있습니다)
+        ⚠️ 초기 스탯은 저장 후 수정이 불가능합니다!
       </div>
 
       <div style="margin-bottom: 20px;">
@@ -386,7 +379,6 @@
     </div>
   </div>
 
-  <!-- STEP 3: 메인 커뮤니티 -->
   <div id="main-community-section" class="hidden">
     <header class="app-header">
       <div class="logo">🌙 달에서.</div>
@@ -401,7 +393,6 @@
     <div class="main-layout">
       <div class="feed-container">
         
-        <!-- 공지사항 탭 -->
         <div id="tab-notice-content">
           <div id="notice-write-box" class="post-box hidden">
             <p style="color: #ffc107; font-weight: bold; margin-bottom: 8px;">📢 운영 공지사항 작성 (관리자)</p>
@@ -413,7 +404,6 @@
           <div id="notice-feed"></div>
         </div>
 
-        <!-- 커뮤니티 탭 -->
         <div id="tab-story-content" class="hidden">
           <div class="post-box">
             <textarea id="post-input" placeholder="오늘 어떤 일이 있었나요? 이야기를 남겨보세요..."></textarea>
@@ -428,7 +418,6 @@
           <div id="posts-feed"></div>
         </div>
 
-        <!-- 내 프로필 탭 -->
         <div id="tab-profile-content" class="hidden">
           <div class="post-box">
             <div class="profile-preview-container">
@@ -439,7 +428,6 @@
               </div>
             </div>
 
-            <!-- 프로필 사진 관리 영역 -->
             <div style="background-color: #2a2a2a; padding: 14px; border-radius: 8px; margin-bottom: 16px;">
               <p style="font-size: 0.9rem; font-weight: bold; margin-bottom: 8px; color: #ffc107;">프로필 사진 변경</p>
               <input type="file" id="avatar-file-input" accept="image/*" style="margin-bottom: 8px; font-size: 0.85rem;">
@@ -450,12 +438,12 @@
             </div>
             
             <hr style="border-color: #333; margin-bottom: 16px;">
-            <p style="margin-bottom: 6px;"><b>스탯 현황</b> (마우스를 올리면 효과 표시)</p>
+            <p style="margin-bottom: 6px;"><b>스탯 현황</b></p>
             <p style="font-size: 0.9rem; color: #ccc;">
-              <span class="stat-label" data-tooltip="지혜: 학식과 분석력, 마법적 지식">지혜: <b id="profile-wisdom">0</b></span> | 
-              <span class="stat-label" data-tooltip="의지: 정신적 저항력, 정신집중력">의지: <b id="profile-willpower">0</b></span> | 
-              <span class="stat-label" data-tooltip="가호: 행운과 영적 보호, 위기 극복">가호: <b id="profile-divine">0</b></span> | 
-              <span class="stat-label" data-tooltip="교감: 타인과의 공감대, 영물 소통">교감: <b id="profile-affinity">0</b></span>
+              지혜: <b id="profile-wisdom">0</b> | 
+              의지: <b id="profile-willpower">0</b> | 
+              가호: <b id="profile-divine">0</b> | 
+              교감: <b id="profile-affinity">0</b>
             </p>
             
             <hr style="border-color: #333; margin: 16px 0;">
@@ -466,7 +454,6 @@
           </div>
         </div>
 
-        <!-- 친구 관리 탭 -->
         <div id="tab-friends-content" class="hidden">
           <div class="post-box">
             <div style="display: flex; gap: 8px;">
@@ -491,7 +478,6 @@
     </div>
   </div>
 
-  <!-- 프로필 모달 (팝업) -->
   <div id="profile-modal" class="modal-overlay hidden">
     <div class="modal-card">
       <button type="button" class="modal-close" onclick="closeProfileModal()">✕</button>
@@ -505,14 +491,8 @@
       
       <div style="background-color: #2a2a2a; padding: 12px; border-radius: 6px; font-size: 0.85rem;">
         <p style="color: #ffc107; font-weight: bold; margin-bottom: 6px;">스탯 정보</p>
-        <p>
-          <span class="stat-label" data-tooltip="지혜: 학식과 분석력, 마법적 지식">지혜: <span id="modal-wisdom">0</span></span> | 
-          <span class="stat-label" data-tooltip="의지: 정신적 저항력, 정신집중력">의지: <span id="modal-willpower">0</span></span>
-        </p>
-        <p style="margin-top: 4px;">
-          <span class="stat-label" data-tooltip="가호: 행운과 영적 보호, 위기 극복">가호: <span id="modal-divine">0</span></span> | 
-          <span class="stat-label" data-tooltip="교감: 타인과의 공감대, 영물 소통">교감: <span id="modal-affinity">0</span></span>
-        </p>
+        <p>지혜: <span id="modal-wisdom">0</span> | 의지: <span id="modal-willpower">0</span></p>
+        <p style="margin-top: 4px;">가호: <span id="modal-divine">0</span> | 교감: <span id="modal-affinity">0</span></p>
       </div>
     </div>
   </div>
@@ -527,8 +507,8 @@
     const ADMIN_USERNAME = 'admin';
     const FORBIDDEN_WORDS = ['admin', '낙화', '달에서', '운영자', '관리자', 'master'];
     
-    // 기본 SVG 실루엣 아바타
-    const DEFAULT_AVATAR_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23888888" width="100%" height="100%"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>`;
+    // Base64 인코딩된 기본 SVG 실루엣 아바타 (따옴표 깨짐 방지)
+    const DEFAULT_AVATAR_SVG = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzg4ODg4OCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSI+PHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTAgM2MxLjY2IDAgMyAxLjM0IDMgM3MtMS4zNCAzLTMgMy0zLTEuMzQtMy0zIDEuMzQtMyAzLTN6bTAgMTQuMmMtMi41IDAtNC43MS0xLjI4LTYtMy4yMi4wMy0xLjk5IDQtMy4wOCA2LTMuMDggMS45OSAwIDUuOTcgMS4wOSA2IDMuMDgtMS4yOSAxLjk0LTMuNCAzLjIyLTYgMy4yMnoiLz48L3N2Zz4=';
 
     let currentUserId = null;
     let currentUsername = null;
@@ -549,16 +529,11 @@
       setTimeout(() => t.classList.remove('show'), 2500);
     }
 
-    // [헬퍼] 아바타 HTML 생성 함수 (오류 발생 시 기본 SVG 자동 로드)
     function getAvatarHtml(avatarUrl, size = 28) {
       const src = avatarUrl && avatarUrl.trim() !== '' ? avatarUrl : DEFAULT_AVATAR_SVG;
-      return `<img src="${src}" 
-                   alt="profile" 
-                   style="width:${size}px; height:${size}px; border-radius:50%; object-fit:cover; vertical-align:middle; background:#2a2a2a; border:1px solid #444;"
-                   onerror="this.onerror=null; this.src='${DEFAULT_AVATAR_SVG}';">`;
+      return `<img src="${src}" alt="profile" style="width:${size}px; height:${size}px; border-radius:50%; object-fit:cover; vertical-align:middle; background:#2a2a2a; border:1px solid #444;" onerror="this.onerror=null; this.src='${DEFAULT_AVATAR_SVG}';">`;
     }
 
-    // [헬퍼] 클라이언트 단 이미지 압축 및 리사이징 (150x150 WebP)
     function resizeImage(file, maxWidth = 150, maxHeight = 150) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -809,7 +784,6 @@
       document.getElementById('edit-char-name').value = characterData.name;
     }
 
-    // 프로필 이미지 업로드 처리 함수
     async function uploadProfileAvatar() {
       const fileInput = document.getElementById('avatar-file-input');
       const file = fileInput.files[0];
@@ -818,11 +792,9 @@
       try {
         showToast('이미지 변환 및 업로드 중...');
 
-        // 1. WebP 포맷으로 압축 리사이징
         const resizedBlob = await resizeImage(file, 150, 150);
         const filePath = `avatars/${currentUserId}.webp`;
 
-        // 2. Supabase Storage 에 업로드
         const { error: uploadErr } = await supabaseClient
           .storage
           .from('community-assets')
@@ -833,7 +805,6 @@
 
         if (uploadErr) return alert('스토리지 업로드 실패: ' + uploadErr.message);
 
-        // 3. 퍼블릭 URL 가져오기 (캐시 방지 타임스탬프 부여)
         const { data } = supabaseClient
           .storage
           .from('community-assets')
@@ -841,7 +812,6 @@
 
         const newAvatarUrl = `${data.publicUrl}?t=${new Date().getTime()}`;
 
-        // 4. DB 테이블 업데이트
         await supabaseClient
           .from('characters')
           .update({ avatar_url: newAvatarUrl })
@@ -859,7 +829,6 @@
       }
     }
 
-    // 기본 프로필 이미지 초기화
     async function resetToDefaultAvatar() {
       if (!confirm('프로필 사진을 기본 이미지로 변경하시겠습니까?')) return;
 
@@ -878,7 +847,6 @@
 
     async function updateProfile() {
       const newCharName = document.getElementById('edit-char-name').value.trim();
-
       if (!newCharName) return alert('캐릭터 이름을 입력해주세요.');
 
       await supabaseClient.from('characters').update({
@@ -899,7 +867,6 @@
       await supabaseClient.from('posts').insert([{
         user_id: currentUserId,
         author_name: `운영진 (@낙화)`,
-        avatar_url: characterData.avatar_url,
         content: content,
         visibility: 'public',
         is_notice: true
@@ -926,7 +893,7 @@
       }
 
       data.forEach(p => {
-        const avatarUrl = p.characters?.avatar_url || p.avatar_url;
+        const avatarUrl = p.characters?.avatar_url;
         const avatarHtml = getAvatarHtml(avatarUrl, 28);
 
         const item = document.createElement('div');
@@ -954,7 +921,6 @@
       await supabaseClient.from('posts').insert([{
         user_id: currentUserId,
         author_name: `${characterData.name} (@${currentUserNickname})`,
-        avatar_url: characterData.avatar_url,
         content: content,
         visibility: visibility,
         is_notice: false
@@ -981,7 +947,7 @@
       }
 
       data.forEach(p => {
-        const avatarUrl = p.characters?.avatar_url || p.avatar_url;
+        const avatarUrl = p.characters?.avatar_url;
         const avatarHtml = getAvatarHtml(avatarUrl, 28);
 
         const item = document.createElement('div');
