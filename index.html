@@ -349,7 +349,7 @@
     #toast.success { background-color: #2e7d32; border-color: #388e3c; }
     #toast.warning { background-color: #e65100; border-color: #f57c00; }
 
-    /* 중요: 다른 flex/grid 속성에 덮어씌워지지 않도록 !important 추가 */
+    /* 화면 숨김 처리 전용 */
     .hidden {
       display: none !important;
     }
@@ -357,7 +357,7 @@
 </head>
 <body>
 
-  <!-- 1. 로그인/가입 전용 화면 (초기 화면: 중앙 카드만 노출) -->
+  <!-- 1. 로그인/가입 전용 화면 (최초 접속 시 이 카드만 표시됨) -->
   <div id="auth-section" class="auth-card">
     <h1>[달에서.] 테스트 접속</h1>
     <div class="form-group">
@@ -381,10 +381,10 @@
     <div id="auth-error" class="error-msg"></div>
   </div>
 
-  <!-- 2. 로그인 성공 후 나타나는 게임 메인 화면 (좌측 콘텐츠 + 우측 사이드바) -->
+  <!-- 2. 로그인 성공 시 노출되는 메인 게임 화면 -->
   <div id="game-section" class="game-container hidden">
     
-    <!-- 좌측 메인 화면 영역 -->
+    <!-- 메인 화면 영역 -->
     <div class="main-screen">
 
       <!-- 탭 A: 캐릭터 스탯 세션 -->
@@ -454,7 +454,6 @@
       <div id="tab-story" class="hidden">
         <h1>달의 스토리 (커뮤니티)</h1>
         
-        <!-- 글 작성 양식 -->
         <div style="background: #252525; padding: 14px; border-radius: 8px; margin-bottom: 20px;">
           <textarea id="post-input" placeholder="이야기를 자유롭게 남겨보세요..."></textarea>
           
@@ -468,14 +467,12 @@
             <button onclick="submitPost()" style="margin-top: 0; width: 100px;">작성</button>
           </div>
 
-          <!-- 특정인물 선택기 (특정인물 지정 시 표시) -->
           <div id="target-selector" class="hidden" style="margin-top: 10px;">
             <p style="font-size: 0.8rem; color: #aaa;">글을 함께 볼 친구를 선택하세요:</p>
             <div id="target-friend-chips" class="friend-chip-group"></div>
           </div>
         </div>
 
-        <!-- 작성된 게시글 목록 -->
         <div id="posts-feed"></div>
       </div>
 
@@ -491,7 +488,7 @@
 
     </div>
 
-    <!-- 우측 메뉴 버튼 사이드바 (game-section 내부에 포함되어 숨김 처리됨) -->
+    <!-- 우측 메뉴 버튼 사이드바 -->
     <div class="sidebar">
       <button class="sidebar-btn active" id="menu-btn-character" onclick="switchTab('character')">캐릭터</button>
       <button class="sidebar-btn" id="menu-btn-story" onclick="switchTab('story')">스토리</button>
@@ -504,7 +501,6 @@
   <div id="toast">알림 메시지</div>
 
   <script>
-  // Supabase 연동 설정
   const SUPABASE_URL = 'https://ussdpozmngczyrabcgun.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_NHt6pA_nGOl4zDKgUTntfA_LGioJewy';
   
@@ -542,7 +538,6 @@
     toastTimeout = setTimeout(() => { toast.className = ''; }, 3000);
   }
 
-  // 탭 전환 시스템
   function switchTab(tabName) {
     document.querySelectorAll('.sidebar-btn').forEach(btn => btn.classList.remove('active'));
     document.getElementById('tab-character').classList.add('hidden');
@@ -559,7 +554,7 @@
     }
   }
 
-  // 가입 및 로그인
+  // 인증 처리 (접속 또는 신규 생성)
   async function handleAuth() {
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
@@ -615,11 +610,13 @@
     }
 
     currentUserId = data.user.id;
-    loadCharacterData();
+    await loadCharacterData();
   }
 
-  // 캐릭터 정보 데이터 불러오기
+  // 캐릭터 데이터 로드 및 UI 표시 처리
   async function loadCharacterData() {
+    if (!currentUserId) return;
+
     const { data, error } = await supabaseClient
       .from('characters')
       .select('*')
@@ -651,11 +648,15 @@
     initialCharacterData = JSON.parse(JSON.stringify(data));
 
     updateUI();
+
+    // 로그인 성공 검증 후 화면 스위칭
     document.getElementById('auth-section').classList.add('hidden');
     document.getElementById('game-section').classList.remove('hidden');
   }
 
   function updateUI() {
+    if (!characterData) return;
+
     document.getElementById('display-username').innerText = characterData.name;
     const roleMap = { student: '일반 학생', council: '학생회장', teacher: '교사' };
     const cleanRole = (characterData.role || '').toString().trim().toLowerCase();
@@ -748,7 +749,7 @@
     }
   }
 
-  // ================= 친구 관련 기능 =================
+  // ================= 친구 기능 =================
   async function loadFriendsList() {
     const { data, error } = await supabaseClient
       .from('friends')
@@ -842,7 +843,7 @@
     loadFriendsList().then(() => renderFriendsView());
   }
 
-  // ================= 스토리(커뮤니티) 관련 기능 =================
+  // ================= 스토리(커뮤니티) 기능 =================
   function toggleTargetSelector() {
     const visibility = document.getElementById('post-visibility').value;
     const selectorBox = document.getElementById('target-selector');
