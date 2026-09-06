@@ -149,6 +149,7 @@
       font-size: 1.2rem;
       font-weight: 800;
       color: #ffc107;
+      cursor: pointer;
     }
 
     .nav-tabs {
@@ -239,7 +240,52 @@
       border-radius: 4px;
       margin-right: 6px;
     }
-    .post-content { font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; }
+    .post-content { font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; margin-bottom: 12px; }
+
+    .post-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      border-top: 1px solid #2a2a2a;
+      padding-top: 8px;
+      font-size: 0.85rem;
+    }
+
+    .post-action-btn {
+      background: none;
+      border: none;
+      color: #888;
+      cursor: pointer;
+      width: auto;
+      margin-top: 0;
+      padding: 2px 6px;
+    }
+    .post-action-btn:hover { color: #ffc107; }
+
+    .comments-section {
+      margin-top: 12px;
+      border-top: 1px dashed #333;
+      padding-top: 12px;
+    }
+
+    .comment-item {
+      background-color: #161616;
+      border: 1px solid #282828;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+    }
+
+    .reply-item {
+      background-color: #111111;
+      border: 1px solid #222;
+      border-radius: 6px;
+      padding: 8px;
+      margin-top: 6px;
+      margin-left: 20px;
+      font-size: 0.82rem;
+    }
 
     .modal-overlay {
       position: fixed;
@@ -381,7 +427,7 @@
 
   <div id="main-community-section" class="hidden">
     <header class="app-header">
-      <div class="logo">🌙 달에서.</div>
+      <div class="logo" onclick="switchMainTab('story')">🌙 달에서.</div>
       <div class="nav-tabs">
         <button type="button" class="nav-btn active" id="btn-tab-notice" onclick="switchMainTab('notice')">공지사항</button>
         <button type="button" class="nav-btn" id="btn-tab-story" onclick="switchMainTab('story')">커뮤니티</button>
@@ -497,6 +543,16 @@
     </div>
   </div>
 
+  <!-- 글 수정 모달 -->
+  <div id="edit-post-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <button type="button" class="modal-close" onclick="closeEditPostModal()">✕</button>
+      <h2 style="font-size: 1.1rem; margin-bottom: 12px; color: #ffc107;">글 수정하기</h2>
+      <textarea id="edit-post-content" style="min-height: 120px; margin-bottom: 12px;"></textarea>
+      <button type="button" onclick="saveEditedPost()" style="background-color: #2e7d32; margin-top: 0;">수정 완료</button>
+    </div>
+  </div>
+
   <div id="toast">알림</div>
 
   <script>
@@ -507,13 +563,14 @@
     const ADMIN_USERNAME = 'admin';
     const FORBIDDEN_WORDS = ['admin', '낙화', '달에서', '운영자', '관리자', 'master'];
     
-    const DEFAULT_AVATAR_SVG = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzg4ODg4OCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSI+PHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDExcy40OCAxMCAxMCAxMCAxMC00LjQ4IDEwLTEwUzE3LjUyIDIgMTIgMnptMCAzYzEuNjYgMCAzIDEuMzQgMyAzcy0xLjM0IDMtMyAzLTMtMS4zNC0zLTMgMS4zNC0zIDMtM3ptMCAxNC4yYy0yLjUgMC00LjcxLTEuMjstNi0zLjIyLjAzLTEuOTkgNC0zLjA4IDYtMy4wOCAxLjk5IDAgNS45NyAxLjA5IDYgMy4wOC0xLjI5IDEuOTQtMy40IDMuMjItNiAzLjIyekoiLz48L3N2Zz4=';
+    const DEFAULT_AVATAR_SVG = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzg4ODg4OCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSI+PHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDExcy40OCAxMCAxMCAxMCAxMC00LjQ4IDEwLTEwUzE3LjUyIDIgMTIgMnptMCAzYzEuNjYgMCAzIDEuMzQgMyAzcy0xLjM0IDMtMyAzLTMtMS4zNC0zLTMgMS4zNC0zIDMtM3ptMCAxNC4yYy0yLjUgMC00LjcxLTEuMjstNi0zLjIyLjAzLTEuOTkgNC0zLjA4IDYtMy4wOCAxLjk5IDAgNS45NyAxLjA5IDYgMy4wOC0xLjI5IDEuOTQtMy40IDMuMjItNi ===';
 
     let currentUserId = null;
     let currentUsername = null;
     let currentUserNickname = '';
     let characterData = null;
     let isNicknameChecked = false;
+    let editingPostId = null;
 
     const ROLE_CONFIG = {
       student: { name: '일반 학생', pts: 10, max: 5 },
@@ -909,25 +966,10 @@
         return;
       }
 
-      data.forEach(p => {
-        const avatarUrl = p.characters?.avatar_url;
-        const avatarHtml = getAvatarHtml(avatarUrl, 28);
-
-        const item = document.createElement('div');
-        item.className = 'post-box';
-        item.innerHTML = `
-          <div class="post-header">
-            <div class="author-wrapper">
-              <span class="notice-badge">공지</span>
-              ${avatarHtml}
-              <span class="post-author" style="margin-left: 6px;" onclick="openProfileModal('${p.user_id}')">${p.author_name}</span>
-            </div>
-            <span>${new Date(p.created_at).toLocaleDateString('ko-KR')}</span>
-          </div>
-          <div class="post-content">${p.content}</div>
-        `;
+      for (const p of data) {
+        const item = await createPostElement(p, true);
         feed.appendChild(item);
-      });
+      }
     }
 
     async function submitPost() {
@@ -983,26 +1025,210 @@
         return;
       }
 
-      filteredData.forEach(p => {
-        const avatarUrl = p.characters?.avatar_url;
-        const avatarHtml = getAvatarHtml(avatarUrl, 28);
-        const visibilityBadge = p.visibility === 'friends' ? '<span style="color:#ffc107; font-size:0.75rem; margin-right:6px;">[친구공개]</span>' : '';
-
-        const item = document.createElement('div');
-        item.className = 'post-box';
-        item.innerHTML = `
-          <div class="post-header">
-            <div class="author-wrapper">
-              ${visibilityBadge}
-              ${avatarHtml}
-              <span class="post-author" style="margin-left: 6px;" onclick="openProfileModal('${p.user_id}')">${p.author_name}</span>
-            </div>
-            <span>${new Date(p.created_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</span>
-          </div>
-          <div class="post-content">${p.content}</div>
-        `;
+      for (const p of filteredData) {
+        const item = await createPostElement(p, false);
         feed.appendChild(item);
+      }
+    }
+
+    async function createPostElement(p, isNotice = false) {
+      const avatarUrl = p.characters?.avatar_url;
+      const avatarHtml = getAvatarHtml(avatarUrl, 28);
+      const visibilityBadge = p.visibility === 'friends' ? '<span style="color:#ffc107; font-size:0.75rem; margin-right:6px;">[친구공개]</span>' : '';
+      const noticeBadge = isNotice ? '<span class="notice-badge">공지</span>' : '';
+
+      const isMyPost = p.user_id === currentUserId;
+      const canManageNotice = isNotice && currentUsername === ADMIN_USERNAME;
+
+      const item = document.createElement('div');
+      item.className = 'post-box';
+      item.innerHTML = `
+        <div class="post-header">
+          <div class="author-wrapper">
+            ${noticeBadge}
+            ${visibilityBadge}
+            ${avatarHtml}
+            <span class="post-author" style="margin-left: 6px;" onclick="openProfileModal('${p.user_id}')">${p.author_name}</span>
+          </div>
+          <span>${new Date(p.created_at).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+        </div>
+        <div class="post-content" id="post-content-${p.id}">${escapeHtml(p.content)}</div>
+        
+        ${(isMyPost || canManageNotice) ? `
+          <div class="post-actions">
+            ${isMyPost ? `<button class="post-action-btn" onclick="openEditPostModal('${p.id}', \`${encodeURIComponent(p.content)}\`)">수정</button>` : ''}
+            <button class="post-action-btn" onclick="deletePost('${p.id}', ${isNotice})">삭제</button>
+          </div>
+        ` : ''}
+
+        <div class="comments-section" id="comments-container-${p.id}">
+          <div id="comment-list-${p.id}"></div>
+          <div style="display: flex; gap: 6px; margin-top: 8px;">
+            <input type="text" id="comment-input-${p.id}" placeholder="댓글을 남겨주세요..." style="font-size: 0.85rem; padding: 6px 10px;">
+            <button type="button" onclick="submitComment('${p.id}')" style="width: 70px; margin-top: 0; padding: 6px; font-size: 0.85rem;">등록</button>
+          </div>
+        </div>
+      `;
+
+      loadComments(p.id);
+      return item;
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    async function deletePost(postId, isNotice) {
+      if (!confirm('정말 이 글을 삭제하시겠습니까?')) return;
+      const { error } = await supabaseClient.from('posts').delete().eq('id', postId);
+      if (error) return alert('삭제 실패: ' + error.message);
+      showToast('글이 삭제되었습니다.');
+      if (isNotice) loadNotices();
+      else loadPosts();
+    }
+
+    function openEditPostModal(postId, encodedContent) {
+      editingPostId = postId;
+      document.getElementById('edit-post-content').value = decodeURIComponent(encodedContent);
+      document.getElementById('edit-post-modal').classList.remove('hidden');
+    }
+
+    function closeEditPostModal() {
+      editingPostId = null;
+      document.getElementById('edit-post-modal').classList.add('hidden');
+    }
+
+    async function saveEditedPost() {
+      const newContent = document.getElementById('edit-post-content').value.trim();
+      if (!newContent) return alert('내용을 입력해주세요.');
+
+      const { error } = await supabaseClient.from('posts').update({ content: newContent }).eq('id', editingPostId);
+      if (error) return alert('수정 실패: ' + error.message);
+
+      showToast('글이 수정되었습니다.');
+      closeEditPostModal();
+      
+      const activeTab = document.getElementById('tab-notice-content').classList.contains('hidden') ? 'story' : 'notice';
+      if (activeTab === 'notice') loadNotices();
+      else loadPosts();
+    }
+
+    async function loadComments(postId) {
+      const { data } = await supabaseClient
+        .from('comments')
+        .select('*, characters(avatar_url)')
+        .eq('post_id', postId)
+        .order('created_at', { ascending: true });
+
+      const listDiv = document.getElementById(`comment-list-${postId}`);
+      if (!listDiv) return;
+      listDiv.innerHTML = '';
+
+      if (!data || data.length === 0) return;
+
+      const commentMap = {};
+      const rootComments = [];
+
+      data.forEach(c => {
+        c.replies = [];
+        commentMap[c.id] = c;
       });
+
+      data.forEach(c => {
+        if (c.parent_id && commentMap[c.parent_id]) {
+          commentMap[c.parent_id].replies.push(c);
+        } else {
+          rootComments.push(c);
+        }
+      });
+
+      rootComments.forEach(c => {
+        listDiv.appendChild(createCommentElement(c, postId));
+      });
+    }
+
+    function createCommentElement(c, postId, isReply = false) {
+      const div = document.createElement('div');
+      div.className = isReply ? 'reply-item' : 'comment-item';
+      const avatarHtml = getAvatarHtml(c.characters?.avatar_url, 22);
+      const isMyComment = c.user_id === currentUserId;
+
+      div.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+            ${avatarHtml}
+            <span style="font-weight: bold; color: #ffc107; cursor: pointer;" onclick="openProfileModal('${c.user_id}')">${c.author_name}</span>
+            <span style="font-size: 0.75rem; color: #888;">${new Date(c.created_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</span>
+          </div>
+          <div>
+            ${!isReply ? `<button class="post-action-btn" onclick="toggleReplyBox('${c.id}')" style="font-size:0.75rem;">답글</button>` : ''}
+            ${isMyComment ? `<button class="post-action-btn" onclick="deleteComment('${c.id}', '${postId}')" style="font-size:0.75rem; color:#ff6b6b;">삭제</button>` : ''}
+          </div>
+        </div>
+        <div style="word-break: break-all; margin-left: 28px;">${escapeHtml(c.content)}</div>
+
+        ${!isReply ? `
+          <div id="reply-box-${c.id}" class="hidden" style="margin-top: 8px; margin-left: 28px; display: flex; gap: 6px;">
+            <input type="text" id="reply-input-${c.id}" placeholder="답글을 남겨주세요..." style="font-size: 0.8rem; padding: 4px 8px;">
+            <button type="button" onclick="submitReply('${postId}', '${c.id}')" style="width: 60px; margin-top: 0; padding: 4px; font-size: 0.8rem;">등록</button>
+          </div>
+        ` : ''}
+      `;
+
+      if (c.replies && c.replies.length > 0) {
+        c.replies.forEach(r => {
+          div.appendChild(createCommentElement(r, postId, true));
+        });
+      }
+
+      return div;
+    }
+
+    async function submitComment(postId) {
+      const input = document.getElementById(`comment-input-${postId}`);
+      const content = input.value.trim();
+      if (!content) return;
+
+      const { error } = await supabaseClient.from('comments').insert([{
+        post_id: postId,
+        user_id: currentUserId,
+        author_name: `${characterData.name} (@${currentUserNickname})`,
+        content: content,
+        parent_id: null
+      }]);
+
+      if (error) return alert('댓글 등록 실패: ' + error.message);
+      input.value = '';
+      loadComments(postId);
+    }
+
+    function toggleReplyBox(commentId) {
+      const box = document.getElementById(`reply-box-${commentId}`);
+      box.classList.toggle('hidden');
+    }
+
+    async function submitReply(postId, parentId) {
+      const input = document.getElementById(`reply-input-${parentId}`);
+      const content = input.value.trim();
+      if (!content) return;
+
+      const { error } = await supabaseClient.from('comments').insert([{
+        post_id: postId,
+        user_id: currentUserId,
+        author_name: `${characterData.name} (@${currentUserNickname})`,
+        content: content,
+        parent_id: parentId
+      }]);
+
+      if (error) return alert('답글 등록 실패: ' + error.message);
+      loadComments(postId);
+    }
+
+    async function deleteComment(commentId, postId) {
+      if (!confirm('댓글을 삭제하시겠습니까?')) return;
+      const { error } = await supabaseClient.from('comments').delete().eq('id', commentId);
+      if (error) return alert('삭제 실패: ' + error.message);
+      loadComments(postId);
     }
 
     async function openProfileModal(userId) {
@@ -1120,4 +1346,3 @@
   </script>
 </body>
 </html>
-```[cite: 4]
