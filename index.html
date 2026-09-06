@@ -50,11 +50,6 @@
     .form-group { margin-bottom: 16px; }
     label { display: block; font-size: 0.9rem; margin-bottom: 6px; color: #aaa; }
 
-    .input-with-btn {
-      display: flex;
-      gap: 8px;
-    }
-
     input, select, textarea {
       width: 100%;
       padding: 10px 12px;
@@ -84,15 +79,6 @@
     }
 
     button:hover { background-color: #4c70ba; }
-
-    .sub-btn {
-      width: 110px;
-      margin-top: 0;
-      font-size: 0.85rem;
-      background-color: #444;
-      white-space: nowrap;
-    }
-    .sub-btn:hover { background-color: #555; }
 
     .stat-row {
       display: flex;
@@ -216,12 +202,6 @@
     }
     .post-author:hover { text-decoration: underline; }
 
-    .user-tag {
-      font-size: 0.8rem;
-      color: #888;
-      margin-left: 4px;
-    }
-
     .notice-badge {
       background-color: #e53935;
       color: #fff;
@@ -286,21 +266,18 @@
   <div id="auth-section" class="center-wrapper">
     <div class="card">
       <h1>[달에서.] 접속하기</h1>
-      <div class="form-group"><input type="text" id="username" placeholder="아이디 입력" oninput="resetNicknameCheck()"></div>
-      <div class="form-group"><input type="password" id="password" placeholder="비밀번호"></div>
-      
       <div class="form-group">
-        <label>계정 닉네임 (본닉 - 신규가입 시):</label>
-        <div class="input-with-btn">
-          <input type="text" id="user-nickname" placeholder="예: 낙화 (2글자 이상)" oninput="resetNicknameCheck()">
-          <button class="sub-btn" type="button" onclick="checkNicknameAvailability()">중복 확인</button>
-        </div>
-        <p id="nickname-check-msg" style="font-size: 0.8rem; margin-top: 4px;"></p>
+        <label>아이디:</label>
+        <input type="text" id="username" placeholder="아이디 입력">
+      </div>
+      <div class="form-group">
+        <label>비밀번호:</label>
+        <input type="password" id="password" placeholder="비밀번호 입력">
       </div>
 
       <div class="form-group">
-        <label>캐릭터 이름 (RP용 - 신규가입 시):</label>
-        <input type="text" id="char-name" placeholder="예: 아델하이트 루벤">
+        <label>캐릭터 이름 (신규가입 시):</label>
+        <input type="text" id="char-name" placeholder="예: 아마릴리스 클로토">
       </div>
 
       <div class="form-group">
@@ -407,7 +384,6 @@
         <div id="tab-profile-content" class="hidden">
           <div class="post-box">
             <h2 id="profile-char-name-display" style="margin-bottom: 4px;">-</h2>
-            <p style="color: #888; font-size: 0.9rem; margin-bottom: 12px;">계정 닉네임: <b id="profile-user-nickname" style="color:#ffc107;">-</b></p>
             <p style="color: #aaa; margin-bottom: 16px;">직급: <span id="profile-role" style="color:#fff;">-</span></p>
             
             <hr style="border-color: #333; margin-bottom: 16px;">
@@ -418,8 +394,6 @@
             <p style="margin-bottom: 8px;"><b>캐릭터 이름 수정</b></p>
             <input type="text" id="edit-char-name" placeholder="캐릭터 이름" style="margin-bottom: 12px;">
             
-            <p style="margin-bottom: 8px;"><b>캐릭터 자기소개 / 설정</b></p>
-            <textarea id="edit-bio" placeholder="캐릭터의 성격, 외양, 프로필 설정을 입력하세요..."></textarea>
             <button type="button" onclick="updateProfile()" style="background-color: #2e7d32; margin-top: 12px;">프로필 저장</button>
           </div>
         </div>
@@ -428,7 +402,7 @@
         <div id="tab-friends-content" class="hidden">
           <div class="post-box">
             <div style="display: flex; gap: 8px;">
-              <input type="text" id="friend-search-name" placeholder="친구 캐릭터 이름 또는 계정 닉네임 검색">
+              <input type="text" id="friend-search-name" placeholder="친구 캐릭터 이름 검색">
               <button type="button" onclick="addFriendByName()" style="width: 90px; margin-top: 0;">추가</button>
             </div>
           </div>
@@ -440,7 +414,6 @@
       <div class="side-panel">
         <div class="panel-card">
           <h3 id="side-char-name" style="color: #ffc107; margin-bottom: 4px;">-</h3>
-          <p id="side-user-nickname" style="font-size: 0.8rem; color: #888; margin-bottom: 8px;">-</p>
           <p id="side-char-role" style="font-size: 0.85rem; color: #aaa;">-</p>
         </div>
       </div>
@@ -452,7 +425,6 @@
     <div class="modal-card">
       <button type="button" class="modal-close" onclick="closeProfileModal()">✕</button>
       <h2 id="modal-char-name" style="color: #ffc107; margin-bottom: 2px;">-</h2>
-      <p id="modal-user-nickname" style="color: #888; font-size: 0.85rem; margin-bottom: 12px;">-</p>
       <p style="font-size: 0.9rem; color: #aaa; margin-bottom: 16px;">직급: <span id="modal-role" style="color:#fff;">-</span></p>
       
       <div style="background-color: #2a2a2a; padding: 12px; border-radius: 6px; margin-bottom: 16px; font-size: 0.85rem;">
@@ -460,9 +432,6 @@
         <p>지혜: <span id="modal-wisdom">0</span> | 의지: <span id="modal-willpower">0</span></p>
         <p>가호: <span id="modal-divine">0</span> | 교감: <span id="modal-affinity">0</span></p>
       </div>
-
-      <p style="font-size: 0.85rem; color: #aaa; margin-bottom: 6px;">캐릭터 소개</p>
-      <div id="modal-bio" style="background-color: #2a2a2a; padding: 12px; border-radius: 6px; font-size: 0.9rem; line-height: 1.4; min-height: 60px; white-space: pre-wrap;">-</div>
     </div>
   </div>
 
@@ -474,13 +443,10 @@
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const ADMIN_USERNAME = 'admin';
-    const FORBIDDEN_WORDS = ['admin', 'administrator', '관리자', '운영자', 'sysop', 'system'];
 
     let currentUserId = null;
     let currentUsername = null;
     let characterData = null;
-    let isNicknameChecked = false;
-    let checkedNicknameValue = '';
 
     const ROLE_CONFIG = {
       student: { name: '일반 학생', pts: 10, max: 5 },
@@ -495,64 +461,9 @@
       setTimeout(() => t.classList.remove('show'), 2500);
     }
 
-    function resetNicknameCheck() {
-      isNicknameChecked = false;
-      checkedNicknameValue = '';
-      const msg = document.getElementById('nickname-check-msg');
-      if (msg) msg.innerText = '';
-    }
-
-    async function checkNicknameAvailability() {
-      const username = document.getElementById('username').value.trim();
-      const userNickname = document.getElementById('user-nickname').value.trim();
-      const msg = document.getElementById('nickname-check-msg');
-
-      if (!userNickname) {
-        msg.style.color = '#ff6b6b';
-        msg.innerText = '계정 닉네임을 입력해주세요.';
-        return false;
-      }
-
-      const lowerNick = userNickname.toLowerCase();
-      const isForbidden = FORBIDDEN_WORDS.some(word => lowerNick.includes(word));
-
-      if (isForbidden && username !== ADMIN_USERNAME) {
-        msg.style.color = '#ff6b6b';
-        msg.innerText = '사용할 수 없는 키워드가 포함되어 있습니다.';
-        return false;
-      }
-
-      try {
-        const { data, error } = await supabaseClient.from('characters').select('id').eq('user_nickname', userNickname).maybeSingle();
-
-        if (error) {
-          console.error(error);
-          msg.style.color = '#ff6b6b';
-          msg.innerText = '닉네임 확인 중 오류가 발생했습니다.';
-          return false;
-        }
-
-        if (data) {
-          msg.style.color = '#ff6b6b';
-          msg.innerText = '이미 사용 중인 닉네임입니다.';
-          return false;
-        } else {
-          msg.style.color = '#4caf50';
-          msg.innerText = '사용 가능한 닉네임입니다.';
-          isNicknameChecked = true;
-          checkedNicknameValue = userNickname;
-          return true;
-        }
-      } catch (err) {
-        console.error(err);
-        return false;
-      }
-    }
-
     async function handleAuth() {
       const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value.trim();
-      const userNickname = document.getElementById('user-nickname').value.trim();
       const charName = document.getElementById('char-name').value.trim();
       const roleKey = document.getElementById('role-select').value;
       const errBox = document.getElementById('auth-error');
@@ -566,13 +477,10 @@
       // 1. 로그인 시도
       let { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
-      // 2. 로그인 실패 시 (회원가입 절차 진행)
+      // 2. 로그인 실패 시 (회원가입 진행)
       if (error) {
-        if (!userNickname || !charName) {
-          return alert('계정이 없거나 로그인에 실패했습니다. 신규 가입을 원하시면 닉네임과 캐릭터 이름을 입력해주세요.');
-        }
-        if (!isNicknameChecked || checkedNicknameValue !== userNickname) {
-          return alert('계정 닉네임 중복 확인을 완료해주세요.');
+        if (!charName) {
+          return alert('계정이 없습니다. 신규 가입을 원하시면 캐릭터 이름을 입력해주세요.');
         }
 
         const signUp = await supabaseClient.auth.signUp({ email, password });
@@ -581,10 +489,8 @@
         data = signUp.data;
         const roleInfo = ROLE_CONFIG[roleKey];
         
-        // bio 필드 오휴 방지를 위해 bio 제외하여 생성
         const { error: insertErr } = await supabaseClient.from('characters').insert([{
           user_id: data.user.id,
-          user_nickname: userNickname,
           name: charName,
           role: roleInfo.name,
           wisdom: 1, willpower: 1, divine: 1, affinity: 1,
@@ -593,7 +499,7 @@
 
         if (insertErr) {
           console.error(insertErr);
-          errBox.innerText = '캐릭터 정보 생성 실패: ' + insertErr.message;
+          errBox.innerText = '캐릭터 생성 오류: ' + insertErr.message;
           return;
         }
       }
@@ -608,17 +514,15 @@
         
         if (error) {
           console.error(error);
-          document.getElementById('auth-error').innerText = '캐릭터 정보를 불러오지 못했습니다: ' + error.message;
+          document.getElementById('auth-error').innerText = '캐릭터 불러오기 오류: ' + error.message;
           return;
         }
 
         if (!data) {
-          const userNickname = document.getElementById('user-nickname').value.trim() || currentUsername;
           const charName = document.getElementById('char-name').value.trim() || currentUsername;
           
           const { data: newChar, error: createErr } = await supabaseClient.from('characters').insert([{
             user_id: currentUserId,
-            user_nickname: userNickname,
             name: charName,
             role: '일반 학생',
             wisdom: 1, willpower: 1, divine: 1, affinity: 1,
@@ -683,7 +587,6 @@
     function enterCommunity() {
       document.getElementById('main-community-section').classList.remove('hidden');
       document.getElementById('side-char-name').innerText = characterData.name;
-      document.getElementById('side-user-nickname').innerText = `@${characterData.user_nickname}`;
       document.getElementById('side-char-role').innerText = characterData.role;
 
       if (currentUsername === ADMIN_USERNAME) {
@@ -713,7 +616,6 @@
 
     function renderProfileView() {
       document.getElementById('profile-char-name-display').innerText = characterData.name;
-      document.getElementById('profile-user-nickname').innerText = `@${characterData.user_nickname}`;
       document.getElementById('profile-role').innerText = characterData.role;
       document.getElementById('profile-wisdom').innerText = characterData.wisdom;
       document.getElementById('profile-willpower').innerText = characterData.willpower;
@@ -721,22 +623,18 @@
       document.getElementById('profile-affinity').innerText = characterData.affinity;
 
       document.getElementById('edit-char-name').value = characterData.name;
-      document.getElementById('edit-bio').value = characterData.bio || '';
     }
 
     async function updateProfile() {
       const newCharName = document.getElementById('edit-char-name').value.trim();
-      const newBio = document.getElementById('edit-bio').value.trim();
 
       if (!newCharName) return alert('캐릭터 이름을 입력해주세요.');
 
       await supabaseClient.from('characters').update({
-        name: newCharName,
-        bio: newBio
+        name: newCharName
       }).eq('user_id', currentUserId);
 
       characterData.name = newCharName;
-      characterData.bio = newBio;
 
       document.getElementById('side-char-name').innerText = newCharName;
       renderProfileView();
@@ -750,7 +648,6 @@
       await supabaseClient.from('posts').insert([{
         user_id: currentUserId,
         author_name: '운영진',
-        author_nickname: characterData.user_nickname,
         content: content,
         visibility: 'public',
         is_notice: true
@@ -800,7 +697,6 @@
       await supabaseClient.from('posts').insert([{
         user_id: currentUserId,
         author_name: characterData.name,
-        author_nickname: characterData.user_nickname,
         content: content,
         visibility: visibility,
         is_notice: false
@@ -828,10 +724,9 @@
       data.forEach(p => {
         const item = document.createElement('div');
         item.className = 'post-box';
-        const userTag = p.author_nickname ? `<span class="user-tag">(@${p.author_nickname})</span>` : '';
         item.innerHTML = `
           <div class="post-header">
-            <span class="post-author" onclick="openProfileModal('${p.user_id}')">${p.author_name}${userTag}</span>
+            <span class="post-author" onclick="openProfileModal('${p.user_id}')">${p.author_name}</span>
             <span>${new Date(p.created_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</span>
           </div>
           <div class="post-content">${p.content}</div>
@@ -845,13 +740,11 @@
       if (!data) return showToast('프로필 정보를 불러올 수 없습니다.');
 
       document.getElementById('modal-char-name').innerText = data.name;
-      document.getElementById('modal-user-nickname').innerText = `@${data.user_nickname}`;
       document.getElementById('modal-role').innerText = data.role;
       document.getElementById('modal-wisdom').innerText = data.wisdom;
       document.getElementById('modal-willpower').innerText = data.willpower;
       document.getElementById('modal-divine').innerText = data.divine;
       document.getElementById('modal-affinity').innerText = data.affinity;
-      document.getElementById('modal-bio').innerText = data.bio || '작성된 자기소개가 없습니다.';
 
       document.getElementById('profile-modal').classList.remove('hidden');
     }
@@ -872,10 +765,10 @@
 
       const { data: targetChar } = await supabaseClient.from('characters')
         .select('user_id')
-        .or(`name.eq.${queryName},user_nickname.eq.${queryName}`)
+        .eq('name', queryName)
         .maybeSingle();
 
-      if (!targetChar) return showToast('캐릭터 또는 사용자를 찾을 수 없습니다.');
+      if (!targetChar) return showToast('캐릭터를 찾을 수 없습니다.');
 
       await supabaseClient.from('friends').insert([{ user_id: currentUserId, friend_id: targetChar.user_id }]);
       showToast('친구가 추가되었습니다.');
