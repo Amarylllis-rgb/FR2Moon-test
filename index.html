@@ -287,10 +287,10 @@
     <div class="card">
       <h1>[달에서.] 접속하기</h1>
       <div class="form-group"><input type="text" id="username" placeholder="아이디 입력" oninput="resetNicknameCheck()"></div>
-      <div class="form-group"><input type="password" id="password" placeholder="비밀번호 (6자리 이상)"></div>
+      <div class="form-group"><input type="password" id="password" placeholder="비밀번호"></div>
       
       <div class="form-group">
-        <label>계정 닉네임 (본닉):</label>
+        <label>계정 닉네임 (본닉 - 신규가입 시):</label>
         <div class="input-with-btn">
           <input type="text" id="user-nickname" placeholder="예: 낙화 (2글자 이상)" oninput="resetNicknameCheck()">
           <button class="sub-btn" type="button" onclick="checkNicknameAvailability()">중복 확인</button>
@@ -299,12 +299,12 @@
       </div>
 
       <div class="form-group">
-        <label>캐릭터 이름 (RP용):</label>
+        <label>캐릭터 이름 (RP용 - 신규가입 시):</label>
         <input type="text" id="char-name" placeholder="예: 아델하이트 루벤">
       </div>
 
       <div class="form-group">
-        <label>직급 선택:</label>
+        <label>직급 선택 (신규가입 시):</label>
         <select id="role-select">
           <option value="student">일반 학생 (10pt / 상한 5)</option>
           <option value="council">학생회장 (12pt / 상한 6)</option>
@@ -562,27 +562,33 @@
 
       currentUsername = username;
       const email = `${username}@lunar-academy.trpg`;
+      
+      // 1. 로그인 시도
       let { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
+      // 2. 로그인 실패 시 (회원가입 절차 진행)
       if (error) {
-        if (!userNickname || !charName) return alert('회원가입을 위해 닉네임과 캐릭터 이름을 모두 입력해주세요.');
+        if (!userNickname || !charName) {
+          return alert('계정이 없거나 로그인에 실패했습니다. 신규 가입을 원하시면 닉네임과 캐릭터 이름을 입력해주세요.');
+        }
         if (!isNicknameChecked || checkedNicknameValue !== userNickname) {
           return alert('계정 닉네임 중복 확인을 완료해주세요.');
         }
 
         const signUp = await supabaseClient.auth.signUp({ email, password });
-        if (signUp.error) return alert(signUp.error.message);
+        if (signUp.error) return alert('회원가입 실패: ' + signUp.error.message);
 
         data = signUp.data;
         const roleInfo = ROLE_CONFIG[roleKey];
+        
+        // bio 필드 오휴 방지를 위해 bio 제외하여 생성
         const { error: insertErr } = await supabaseClient.from('characters').insert([{
           user_id: data.user.id,
           user_nickname: userNickname,
           name: charName,
           role: roleInfo.name,
           wisdom: 1, willpower: 1, divine: 1, affinity: 1,
-          available_points: roleInfo.pts,
-          bio: ''
+          available_points: roleInfo.pts
         }]);
 
         if (insertErr) {
@@ -616,8 +622,7 @@
             name: charName,
             role: '일반 학생',
             wisdom: 1, willpower: 1, divine: 1, affinity: 1,
-            available_points: 10,
-            bio: ''
+            available_points: 10
           }]).select().single();
 
           if (createErr) {
