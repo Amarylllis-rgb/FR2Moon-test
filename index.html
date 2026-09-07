@@ -35,7 +35,7 @@
       border-radius: 12px;
       padding: 28px;
       width: 100%;
-      max-width: 500px;
+      max-width: 520px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
     }
 
@@ -48,6 +48,11 @@
 
     .form-group { margin-bottom: 16px; }
     label { display: block; font-size: 0.9rem; margin-bottom: 6px; color: #aaa; }
+
+    .input-with-btn {
+      display: flex;
+      gap: 8px;
+    }
 
     input, select, textarea {
       width: 100%;
@@ -80,18 +85,29 @@
     button:hover { background-color: #4c70ba; }
     button:disabled { background-color: #444; color: #888; cursor: not-allowed; }
 
+    .btn-inline {
+      width: auto;
+      margin-top: 0;
+      padding: 0 14px;
+      white-space: nowrap;
+      font-size: 0.85rem;
+      background-color: #444;
+    }
+    .btn-inline:hover { background-color: #555; }
+
     .stat-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       font-size: 0.95rem;
     }
 
     .stat-label {
       position: relative;
       cursor: help;
-      text-decoration: underline dotted #888;
+      text-decoration: underline dotted #ffc107;
+      color: #fff;
     }
 
     .stat-label:hover::after {
@@ -99,15 +115,15 @@
       position: absolute;
       left: 0;
       bottom: 125%;
-      background-color: #333;
-      color: #fff;
+      background-color: #222;
+      color: #eee;
       padding: 8px 12px;
       border-radius: 6px;
       font-size: 0.8rem;
       white-space: pre-line;
-      width: 240px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-      border: 1px solid #555;
+      width: 250px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.7);
+      border: 1px solid #ffc107;
       z-index: 10;
       font-weight: normal;
     }
@@ -118,21 +134,24 @@
       border-radius: 4px;
       background-color: #3a3a3a;
       margin-top: 0;
+      color: #fff;
     }
 
-    .warning-box {
+    .info-box {
       background-color: rgba(255, 193, 7, 0.1);
       border: 1px solid #ffc107;
       border-radius: 6px;
       padding: 10px 12px;
-      margin-bottom: 16px;
+      margin-top: 8px;
       font-size: 0.85rem;
       color: #ffca28;
+      line-height: 1.4;
     }
 
-    .error-msg { color: #ff6b6b; font-size: 0.85rem; margin-top: 10px; }
+    .error-msg { color: #ff6b6b; font-size: 0.85rem; margin-top: 8px; }
+    .success-msg { color: #81c784; font-size: 0.85rem; margin-top: 8px; }
 
-    /* 헤더 및 레이아웃 */
+    /* 레이아웃 & 탭 스타일 */
     .app-header {
       position: sticky;
       top: 0;
@@ -146,19 +165,8 @@
       z-index: 100;
     }
 
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .logo {
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: #ffc107;
-      cursor: pointer;
-    }
-
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .logo { font-size: 1.2rem; font-weight: 800; color: #ffc107; cursor: pointer; }
     .nav-tabs { display: flex; gap: 4px; }
 
     .nav-btn {
@@ -180,24 +188,6 @@
       font-weight: bold;
     }
 
-    .noti-wrapper { position: relative; }
-
-    .noti-btn {
-      background: none; border: none; font-size: 1.3rem; color: #ccc; cursor: pointer; padding: 4px; width: auto; margin-top: 0;
-    }
-
-    .noti-badge {
-      position: absolute; top: 0; right: 0; background-color: #e53935; color: #fff; font-size: 0.65rem; padding: 2px 5px; border-radius: 10px; font-weight: bold;
-    }
-
-    .noti-dropdown {
-      position: absolute; right: 0; top: 45px; width: 320px; max-height: 400px; background-color: #252525; border: 1px solid #444; border-radius: 8px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6); overflow-y: auto; z-index: 200;
-    }
-
-    .noti-header { padding: 12px 16px; font-weight: bold; border-bottom: 1px solid #333; font-size: 0.9rem; color: #fff; background-color: #1e1e1e; }
-    .noti-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px 16px; border-bottom: 1px solid #333; font-size: 0.85rem; }
-    .noti-item.unread { background-color: #2c323f; }
-
     .main-layout {
       max-width: 1040px;
       margin: 24px auto;
@@ -215,108 +205,12 @@
       gap: 16px;
     }
 
-    .panel-card {
-      background-color: #1e1e1e;
-      border: 1px solid #333;
-      border-radius: 10px;
-      padding: 16px;
-    }
-
-    .post-box {
+    .panel-card, .post-box {
       background-color: #1e1e1e;
       border: 1px solid #333;
       border-radius: 10px;
       padding: 18px;
       margin-bottom: 16px;
-    }
-
-    /* TRPG 시스템 관련 전용 스타일 */
-    .stat-badge {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      font-weight: bold;
-      background-color: #2a2a2a;
-      border: 1px solid #444;
-      color: #ffc107;
-      margin-right: 4px;
-    }
-
-    .npc-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-
-    .npc-card {
-      background-color: #2a2a2a;
-      border: 1px solid #444;
-      border-radius: 8px;
-      padding: 12px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .npc-card:hover, .npc-card.active {
-      border-color: #ffc107;
-      background-color: #333;
-    }
-
-    .npc-avatar {
-      font-size: 2rem;
-      margin-bottom: 6px;
-    }
-
-    .shop-item-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #252525;
-      border: 1px solid #3b3b3b;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 8px;
-    }
-
-    .dice-result-box {
-      background-color: #1a1a2e;
-      border: 2px solid #4e54c8;
-      border-radius: 8px;
-      padding: 16px;
-      margin-top: 14px;
-      text-align: center;
-    }
-
-    .dice-roll-val {
-      font-size: 2rem;
-      font-weight: 800;
-      color: #ffc107;
-      margin: 8px 0;
-    }
-
-    .risk-card {
-      background-color: rgba(229, 57, 53, 0.15);
-      border: 1px solid #e53935;
-      color: #ff8a80;
-      padding: 10px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      margin-top: 8px;
-      text-align: left;
-    }
-
-    .success-card {
-      background-color: rgba(46, 125, 50, 0.15);
-      border: 1px solid #2e7d32;
-      color: #81c784;
-      padding: 10px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      margin-top: 8px;
-      text-align: left;
     }
 
     #toast {
@@ -338,7 +232,7 @@
 </head>
 <body>
 
-  <!-- 1. 접속 및 가입 화면 -->
+  <!-- STEP 1: 단순 로그인 / 접속 화면 -->
   <div id="auth-section" class="center-wrapper">
     <div class="card">
       <h1>[달에서.] 접속하기</h1>
@@ -351,58 +245,71 @@
         <input type="password" id="password" placeholder="비밀번호 입력">
       </div>
 
-      <div class="form-group">
-        <label>계정 닉네임 (본닉):</label>
-        <input type="text" id="user-nickname" placeholder="예: 구름">
-      </div>
-
-      <div class="form-group">
-        <label>캐릭터 이름 (RP용):</label>
-        <input type="text" id="char-name" placeholder="예: 아마릴리스 클로토">
-      </div>
-
-      <div class="form-group">
-        <label>태생(Origin) 선택:</label>
-        <select id="origin-select">
-          <option value="direct_ancient">직계 × 고대 (대성공: 18~20 / 리스크 완화)</option>
-          <option value="direct_new">직계 × 신세대 (대성공: 19~20 / 가호 특화)</option>
-          <option value="collateral_ancient">방계 × 고대 (대성공: 20 / 초기 골드 +200)</option>
-          <option value="collateral_new">방계 × 신세대 (대성공: 20 / 하루 1회 대실패 방어)</option>
-        </select>
-      </div>
-
-      <button type="button" onclick="handleAuth()">접속 / 가입</button>
+      <button type="button" onclick="handleLogin()">접속하기</button>
       <div id="auth-error" class="error-msg"></div>
     </div>
   </div>
 
-  <!-- 2. 초기 캐릭터 3대 스탯 설정 화면 -->
-  <div id="character-setup-section" class="center-wrapper hidden">
+  <!-- STEP 2: 신규 계정 캐릭터 생성 화면 -->
+  <div id="character-creation-section" class="center-wrapper hidden">
     <div class="card">
-      <h1 id="setup-char-name">캐릭터 근본 스탯 설정</h1>
-      <p style="margin-bottom: 12px; color: #aaa;">남은 투자 포인트: <span id="setup-pts" style="color: #ffc107; font-weight: bold;">7</span></p>
-
-      <div class="warning-box">
-        ⚠️ 3대 근본 스탯(방직, 재정, 단선)은 TRPG 주사위 판정의 핵심 보정치입니다.
+      <h1>캐릭터 생성</h1>
+      
+      <!-- 계정 닉네임 (중복확인 및 금지어) -->
+      <div class="form-group">
+        <label>계정 닉네임 (본닉):</label>
+        <div class="input-with-btn">
+          <input type="text" id="user-nickname" placeholder="예: 구름" oninput="resetNicknameCheck()">
+          <button type="button" class="btn-inline" onclick="checkNicknameDuplicate()">중복 확인</button>
+        </div>
+        <div id="nickname-msg" class="error-msg"></div>
       </div>
 
-      <div style="margin-bottom: 20px;">
+      <!-- 캐릭터 이름 (금지어) -->
+      <div class="form-group">
+        <label>캐릭터 이름 (RP용):</label>
+        <input type="text" id="char-name" placeholder="예: 아마릴리스 클로토">
+        <div id="char-name-msg" class="error-msg"></div>
+      </div>
+
+      <!-- 태생 설정: 신과의 연관성 & 살아온 세대 -->
+      <div class="form-group">
+        <label>태생 설정:</label>
+        <div style="display: flex; gap: 10px; margin-bottom: 8px;">
+          <select id="lineage-select" onchange="updateOriginInfo()">
+            <option value="direct">직계 (Direct)</option>
+            <option value="collateral">방계 (Collateral)</option>
+          </select>
+          <select id="generation-select" onchange="updateOriginInfo()">
+            <option value="old">구세대 (Old)</option>
+            <option value="new">신세대 (New)</option>
+          </select>
+        </div>
+        <div id="origin-desc" class="info-box">특성 설명이 표시됩니다.</div>
+      </div>
+
+      <!-- 스탯 포인트 분배 (총 5포인트) -->
+      <div class="form-group" style="margin-top: 20px;">
+        <label>스탯 분배 (남은 포인트: <b id="available-pts" style="color: #ffc107;">5</b>):</label>
+        
         <div class="stat-row">
-          <span class="stat-label" data-tooltip="방직 (Klotho)&#10;물리적 행위, 신체적 다룸, 창작, 연금 및 제작의 정밀함을 관장합니다.">紡織 - 방직 (Klotho): <b id="setup-klotho">1</b></span>
+          <span class="stat-label" data-tooltip="紡織 (Klotho)&#10;물리적 행위, 신체적 다룸, 창작, 연금 및 제작의 정밀함을 관장합니다.">紡織 (Klotho): <b id="stat-klotho">1</b></span>
           <div>
             <button type="button" class="stat-btn" onclick="adjustStat('klotho', -1)">-</button>
             <button type="button" class="stat-btn" onclick="adjustStat('klotho', 1)">+</button>
           </div>
         </div>
+
         <div class="stat-row">
-          <span class="stat-label" data-tooltip="재정 (Lachesis)&#10;가치 측정, NPC 흥정 및 감정, 마법 자원 배분, 상거래 수완을 관장합니다.">裁定 - 재정 (Lachesis): <b id="setup-lachesis">1</b></span>
+          <span class="stat-label" data-tooltip="裁定 (Lachesis)&#10;가치 측정, NPC 흥정 및 감정, 마법 자원 배분, 상거래 수완을 관장합니다.">裁定 (Lachesis): <b id="stat-lachesis">1</b></span>
           <div>
             <button type="button" class="stat-btn" onclick="adjustStat('lachesis', -1)">-</button>
             <button type="button" class="stat-btn" onclick="adjustStat('lachesis', 1)">+</button>
           </div>
         </div>
+
         <div class="stat-row">
-          <span class="stat-label" data-tooltip="단선 (Atropos)&#10;위기 회피, 결단력, 인연의 단절, 카룬 사냥 시의 결정타 및 인챈트를 관장합니다.">斷線 - 단선 (Atropos): <b id="setup-atropos">1</b></span>
+          <span class="stat-label" data-tooltip="斷線 (Atropos)&#10;위기 회피, 결단력, 인연의 단절, 사냥 결정타 및 인챈트를 관장합니다.">斷線 (Atropos): <b id="stat-atropos">1</b></span>
           <div>
             <button type="button" class="stat-btn" onclick="adjustStat('atropos', -1)">-</button>
             <button type="button" class="stat-btn" onclick="adjustStat('atropos', 1)">+</button>
@@ -410,40 +317,19 @@
         </div>
       </div>
 
-      <div class="form-group">
-        <label>주요 전공 권한 선택:</label>
-        <select id="passive-select">
-          <option value="fin_design">금전학/디자인학 (상점 흥정 및 감정 우대)</option>
-          <option value="karun_anatomy">카룬 해부학/성분분석학 (희귀 카룬 부산물 채집)</option>
-          <option value="material_proc">재료 가공학/포션학 (제작 시 부분성공 리스크 완화)</option>
-        </select>
-      </div>
-
-      <button type="button" style="background-color: #2e7d32;" onclick="saveInitialStats()">스탯 확정 및 아카데미 입장</button>
+      <button type="button" style="background-color: #2e7d32; margin-top: 16px;" onclick="submitCharacterCreation()">캐릭터 생성 완료</button>
+      <div id="creation-error" class="error-msg"></div>
     </div>
   </div>
 
-  <!-- 3. 메인 커뮤니티 & TRPG 시스템 화면 -->
+  <!-- STEP 3: 메인 애플리케이션 화면 -->
   <div id="main-community-section" class="hidden">
     <header class="app-header">
       <div class="logo">🌙 달에서.</div>
       <div class="header-right">
         <div class="nav-tabs">
-          <button type="button" class="nav-btn active" id="btn-tab-notice" onclick="switchMainTab('notice')">공지사항</button>
-          <button type="button" class="nav-btn" id="btn-tab-story" onclick="switchMainTab('story')">커뮤니티</button>
-          <button type="button" class="nav-btn" id="btn-tab-trpg" onclick="switchMainTab('trpg')">🎲 주사위&상점</button>
-          <button type="button" class="nav-btn" id="btn-tab-craft" onclick="switchMainTab('craft')">⚒️ 연금/제작</button>
+          <button type="button" class="nav-btn active" id="btn-tab-trpg" onclick="switchMainTab('trpg')">🎲 메인</button>
           <button type="button" class="nav-btn" id="btn-tab-profile" onclick="switchMainTab('profile')">내 프로필</button>
-        </div>
-
-        <div class="noti-wrapper">
-          <button type="button" class="noti-btn" onclick="toggleNotiDropdown(event)">
-            🔔<span id="noti-badge-count" class="noti-badge hidden">0</span>
-          </button>
-          <div id="noti-dropdown-menu" class="noti-dropdown hidden">
-            <div class="noti-header">최근 알림</div>
-            <div id="noti-list-body"></div>
-          </div>
         </div>
       </div>
     </header>
@@ -451,104 +337,10 @@
     <div class="main-layout">
       <div class="feed-container">
         
-        <!-- 공지사항 탭 -->
-        <div id="tab-notice-content">
-          <div id="notice-write-box" class="post-box hidden">
-            <p style="color: #ffc107; font-weight: bold; margin-bottom: 8px;">📢 운영 공지사항 작성 (관리자)</p>
-            <textarea id="notice-input" placeholder="전체 공지사항 내용을 입력하세요..."></textarea>
-            <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
-              <button type="button" onclick="submitNotice()" style="width: 110px; margin-top: 0; background-color: #d32f2f;">공지 등록</button>
-            </div>
-          </div>
-          <div id="notice-feed"></div>
-        </div>
-
-        <!-- 스토리 탭 -->
-        <div id="tab-story-content" class="hidden">
+        <div id="tab-trpg-content">
           <div class="post-box">
-            <textarea id="post-input" placeholder="오늘 어떤 일이 있었나요? 이야기를 남겨보세요..."></textarea>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-              <select id="post-visibility" style="width: 140px;">
-                <option value="public">전체공개</option>
-                <option value="friends">친구공개</option>
-              </select>
-              <button type="button" onclick="submitPost()" style="width: 90px; margin-top: 0;">올리기</button>
-            </div>
-          </div>
-          <div id="posts-feed"></div>
-        </div>
-
-        <!-- 🎲 TRPG 다이스 & NPC 상점 탭 -->
-        <div id="tab-trpg-content" class="hidden">
-          <div class="post-box">
-            <h2 style="color: #ffc107; font-size: 1.1rem; margin-bottom: 12px;">🏪 아카데미 교역소 (NPC 거래 및 다이스)</h2>
-            <p style="font-size: 0.85rem; color: #aaa; margin-bottom: 16px;">
-              NPC 상점에서 물품을 직접 구매하거나, <b>재정(Lachesis)</b> 스탯으로 흥정/감정 판정을 시도할 수 있습니다. (일일 흥정 제한 존재)
-            </p>
-
-            <div class="npc-grid">
-              <div class="npc-card active" id="npc-card-argon" onclick="selectNPC('argon')">
-                <div class="npc-avatar">🧙‍♂️</div>
-                <div style="font-weight: bold;">잡화상 아르곤</div>
-                <div style="font-size: 0.75rem; color: #888;">공식 보급상 (안정형)</div>
-              </div>
-              <div class="npc-card" id="npc-card-vane" onclick="selectNPC('vane')">
-                <div class="npc-avatar">🎭</div>
-                <div style="font-weight: bold;">밀매상 베인</div>
-                <div style="font-size: 0.75rem; color: #888;">카룬 암밀매상 (리스크형)</div>
-              </div>
-              <div class="npc-card" id="npc-card-elena" onclick="selectNPC('elena')">
-                <div class="npc-avatar">🔬</div>
-                <div style="font-weight: bold;">교관 엘레나</div>
-                <div style="font-size: 0.75rem; color: #888;">연금/제작 교관 (교환형)</div>
-              </div>
-              <div class="npc-card" id="npc-card-morpheus" onclick="selectNPC('morpheus')">
-                <div class="npc-avatar">🔮</div>
-                <div style="font-weight: bold;">점술사 몰페우스</div>
-                <div style="font-size: 0.75rem; color: #888;">운명 감정가 (미감정/유물)</div>
-              </div>
-            </div>
-
-            <div id="npc-dialogue-box" style="background-color: #252525; padding: 12px; border-radius: 6px; font-size: 0.9rem; margin-bottom: 16px; border-left: 3px solid #ffc107;">
-              "어서오게. 아카데미 공식 보급품은 언제나 정가에 안전하게 판매하고 있지."
-            </div>
-
-            <div id="shop-items-container"></div>
-
-            <div id="dice-result-panel" class="dice-result-box hidden">
-              <div style="font-size: 0.9rem; color: #aaa;" id="dice-action-title">판정 실행 중...</div>
-              <div class="dice-roll-val" id="dice-roll-number">1d20 = ?</div>
-              <div style="font-size: 1rem; font-weight: bold;" id="dice-outcome-text">-</div>
-              <div id="dice-card-effect"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ⚒️ 연금 및 제작 탭 -->
-        <div id="tab-craft-content" class="hidden">
-          <div class="post-box">
-            <h2 style="color: #ffc107; font-size: 1.1rem; margin-bottom: 12px;">⚒️ 카룬 연성진 (아이템 제작)</h2>
-            <p style="font-size: 0.85rem; color: #aaa; margin-bottom: 16px;">
-              <b>방직(Klotho)</b> 스탯 및 전공 권한을 소모해 아이템을 연성합니다. 부분 성공 시 리스크 카드가 발동할 수 있습니다.
-            </p>
-
-            <div class="shop-item-row">
-              <div>
-                <div style="font-weight: bold; color: #fff;">카룬의 가죽 갑옷</div>
-                <div style="font-size: 0.8rem; color: #aaa;">필요: 카룬 가죽 x2, 마력 결정 x1</div>
-              </div>
-              <button type="button" onclick="rollCrafting('karun_armor')" style="width: 110px; margin-top: 0; background-color: #2e7d32;">🎲 연성 (Klotho)</button>
-            </div>
-
-            <div class="shop-item-row">
-              <div>
-                <div style="font-weight: bold; color: #fff;">상급 마력 회복 포션</div>
-                <div style="font-size: 0.8rem; color: #aaa;">필요: 정제된 약초 x3, 카룬 독선 x1</div>
-              </div>
-              <button type="button" onclick="rollCrafting('mp_potion')" style="width: 110px; margin-top: 0; background-color: #2e7d32;">🎲 조제 (Klotho)</button>
-            </div>
-
-            <div id="craft-dice-result" class="dice-result-box hidden"></div>
+            <h2 style="color: #ffc107; font-size: 1.1rem; margin-bottom: 12px;">아카데미 입학을 환영합니다!</h2>
+            <p style="font-size: 0.9rem; color: #ccc;">성공적으로 캐릭터 생성을 마쳤습니다.</p>
           </div>
         </div>
 
@@ -556,23 +348,20 @@
         <div id="tab-profile-content" class="hidden">
           <div class="post-box">
             <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
-              <div id="profile-avatar-preview-area"></div>
+              <div id="profile-avatar-preview"></div>
               <div>
                 <h2 id="profile-char-name-display" style="margin-bottom: 4px;">-</h2>
                 <p style="color: #aaa; font-size: 0.85rem;">태생: <span id="profile-origin" style="color:#ffc107;">-</span></p>
-                <p style="color: #aaa; font-size: 0.85rem;">소지 골드: <span id="profile-gold" style="color:#81c784; font-weight:bold;">0</span> Gold</p>
+                <p style="color: #aaa; font-size: 0.85rem;">소지 골드: <span id="profile-gold" style="color:#81c784; font-weight:bold;">100</span> Gold</p>
               </div>
             </div>
 
             <hr style="border-color: #333; margin-bottom: 16px;">
-            <p style="margin-bottom: 6px;"><b>근본 3대 스탯 현황</b></p>
-            <p style="font-size: 0.9rem; color: #ccc;">
-              紡織(Klotho): <b id="profile-klotho">0</b> | 
-              裁定(Lachesis): <b id="profile-lachesis">0</b> | 
-              斷線(Atropos): <b id="profile-atropos">0</b>
-            </p>
-            <p style="font-size: 0.85rem; color: #aaa; margin-top: 6px;">
-              전공 패시브: <span id="profile-passive" style="color:#fff;">-</span>
+            <p style="margin-bottom: 8px; font-weight: bold; color: #fff;">근본 3대 스탯 현황</p>
+            <p style="font-size: 0.95rem; color: #ccc;">
+              紡織(Klotho): <b id="profile-klotho" style="color:#ffc107;">0</b> | 
+              裁定(Lachesis): <b id="profile-lachesis" style="color:#ffc107;">0</b> | 
+              斷線(Atropos): <b id="profile-atropos" style="color:#ffc107;">0</b>
             </p>
           </div>
         </div>
@@ -590,8 +379,7 @@
             </div>
           </div>
           <div style="background-color: #2a2a2a; padding: 10px; border-radius: 6px; font-size: 0.85rem;">
-            <div>💰 골드: <span id="side-gold" style="color:#81c784; font-weight:bold;">0</span> G</div>
-            <div style="margin-top: 4px;">🎲 흥정 가능 횟수: <span id="side-bargain-count" style="color:#ffc107;">3/3</span>회</div>
+            <div>💰 골드: <span id="side-gold" style="color:#81c784; font-weight:bold;">100</span> G</div>
           </div>
         </div>
       </div>
@@ -606,53 +394,43 @@
     const SUPABASE_KEY = 'sb_publishable_NHt6pA_nGOl4zDKgUTntfA_LGioJewy';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const ADMIN_USERNAME = 'admin';
-    const DEFAULT_AVATAR_SVG = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzg4ODg4OCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSI+PHBhdGggZD0iTTEyIDJDNi44OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTAgM2MxLjY2IDAgMyAxLjM0IDMgM3MtMS4zNCAzLTMgMy0zLTEuMzQtMy0zIDEuMzQtMyAzLTN6bTAgMTQuMmMtMi41IDAtNC43MS0xLjI4LTYtMy4yMi4wMy0xLjk5IDQtMy4wMDg2LTMuMDggMS45OSAwIDUuOTcgMS4wOSA2IDMu04LTEuMjkgMS45NCTMuNCAzLjIyLTYgMy4yMnoiLz48L3N2Zz4=';
+    const DEFAULT_AVATAR_SVG = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzg4ODg4OCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSI+PHBhdGggZD0iTTEyIDJDNi44OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTAgM2MxLjY2IDAgMyAxLjM0IDMgM3MtMS4zNCAzLTMgMy0zLTEuMzQtMy0z IDEuMzQtMyAzLTN6bTAgMTQuMmMtMi41IDAtNC43MS0xLjI4LTYtMy4yMi4wMy0xLjk5IDQtMy4wMDg2LTMu0C0xLjI5IDEuOTNCTTMuNCAzLjIyLTYgMy4yMnoiLz48L3N2Zz4=';
+
+    // 금지어 목록
+    const BANNED_WORDS = ['운영자', '관리자', 'admin', 'system', '시스탬', '어드민', '바보', '시발', '개새끼'];
+
+    // 태생 조합 특성 설명 데이터
+    const ORIGIN_COMBINATIONS = {
+      'direct_old': {
+        title: '직계 × 구세대 (Direct Old)',
+        desc: '신성과의 강력한 혈통적 연결과 고대의 오랜 지혜를 지녔습니다. [대성공 판정 범위 18~20 완화 / 리스크 감소]'
+      },
+      'direct_new': {
+        title: '직계 × 신세대 (Direct New)',
+        desc: '신의 가호를 직접적으로 계승받은 신시대의 인재입니다. [대성공 판정 범위 19~20 / 가호 효율 특화]'
+      },
+      'collateral_old': {
+        title: '방계 × 구세대 (Collateral Old)',
+        desc: '혈통의 정통성은 옅으나 가문의 가감 없는 축적된 부를 물려받았습니다. [초기 추가 골드 +200 지원 / 자산 특화]'
+      },
+      'collateral_new': {
+        title: '방계 × 신세대 (Collateral New)',
+        desc: '신성으로부터 가장 자유로우며 새로운 시대의 유연한 기치를 가집니다. [하루 1회 대실패(Natural 1) 무료 무효화]'
+      }
+    };
 
     let currentUserId = null;
     let currentUsername = null;
     let currentUserNickname = '';
+    let isNicknameChecked = false;
     let characterData = null;
-    let selectedNpcKey = 'argon';
 
-    const ORIGIN_CONFIG = {
-      direct_ancient: { name: '직계 × 고대', critMin: 18, desc: '대성공 범주 18~20' },
-      direct_new: { name: '직계 × 신세대', critMin: 19, desc: '대성공 범주 19~20' },
-      collateral_ancient: { name: '방계 × 고대', critMin: 20, desc: '초기 골드 +200' },
-      collateral_new: { name: '방계 × 신세대', critMin: 20, desc: '하루 1회 대실패 차단' }
-    };
-
-    const NPC_DATA = {
-      argon: {
-        name: '잡화상 아르곤',
-        dialogue: '어서오게! 아카데미 공식 보급품은 언제나 정가에 안전하게 판매하고 있지.',
-        items: [
-          { id: 'item_potion', name: '기초 치료 포션', price: 50, desc: '체력을 20 회복합니다.' },
-          { id: 'item_repair', name: '현장 수리 키트', price: 120, desc: '손상된 장비 내구도를 복구합니다.' }
-        ]
-      },
-      vane: {
-        name: '밀매상 베인',
-        dialogue: '크크... 뒤공작으로 가져온 카룬 장비나 특수 재료를 구하고 싶나? 주사위 조심하라고.',
-        items: [
-          { id: 'item_shadow_sword', name: '그림자 단검 (모듈 수식어)', price: 300, desc: '부분성공 시 손상 리스크 존재' },
-          { id: 'item_karun_core', name: '카룬의 정수', price: 250, desc: '희귀 제작 재료' }
-        ]
-      },
-      elena: {
-        name: '교관 엘레나',
-        dialogue: '사냥에서 얻은 카룬 부산물을 가져오시면 완제품이나 재료로 교환해 드려요.',
-        items: [
-          { id: 'item_recipe_armor', name: '도면: 카룬 가죽 갑옷', price: 150, desc: '갑옷 연성 레시피' }
-        ]
-      },
-      morpheus: {
-        name: '점술사 몰페우스',
-        dialogue: '정체불명의 미감정 상자나 유물의 참된 가치를 보고 싶다면 감정을 시도해 보시게.',
-        items: [
-          { id: 'item_unidentified_box', name: '빛바랜 상자 (미감정)', price: 200, desc: '감정 성공 시 고가치 수식어 부여' }
-        ]
-      }
+    // 초기 스탯 상태 (기본 1 + 여유 포인트 5개 분배)
+    let statsState = {
+      availablePoints: 5,
+      klotho: 1,
+      lachesis: 1,
+      atropos: 1
     };
 
     function showToast(msg) {
@@ -662,272 +440,225 @@
       setTimeout(() => t.classList.remove('show'), 2500);
     }
 
-    function getAvatarHtml(avatarUrl, size = 28) {
-      const src = avatarUrl && avatarUrl.trim() !== '' ? avatarUrl : DEFAULT_AVATAR_SVG;
-      return `<img src="${src}" alt="profile" style="width:${size}px; height:${size}px; border-radius:50%; object-fit:cover; vertical-align:middle; background:#2a2a2a; border:1px solid #444;">`;
+    function checkBannedWords(text) {
+      const lower = text.toLowerCase().replace(/\s+/g, '');
+      return BANNED_WORDS.some(word => lower.includes(word));
     }
 
-    async function handleAuth() {
+    /* 1. 기본 로그인 처리 */
+    async function handleLogin() {
       const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value.trim();
-      let userNickname = document.getElementById('user-nickname').value.trim();
-      const charName = document.getElementById('char-name').value.trim();
-      const originKey = document.getElementById('origin-select').value;
       const errBox = document.getElementById('auth-error');
+      errBox.innerText = '';
 
-      if (!username || !password) return alert('아이디와 비밀번호를 입력해주세요.');
+      if (!username || !password) {
+        errBox.innerText = '아이디와 비밀번호를 입력해주세요.';
+        return;
+      }
 
       currentUsername = username;
       const email = `${username}@lunar-academy.trpg`;
+      
       let { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
+      // 계정이 없을 경우 신규 가입 처리
       if (error) {
-        const signUp = await supabaseClient.auth.signUp({ 
-          email, password, options: { data: { user_nickname: userNickname || username } }
-        });
-        if (signUp.error) return alert('회원가입 실패: ' + signUp.error.message);
+        const signUp = await supabaseClient.auth.signUp({ email, password });
+        if (signUp.error) {
+          errBox.innerText = '로그인/가입 오류: ' + signUp.error.message;
+          return;
+        }
         data = signUp.data;
-
-        const initGold = originKey === 'collateral_ancient' ? 300 : 100;
-        await supabaseClient.from('characters').insert([{
-          user_id: data.user.id,
-          name: charName || username,
-          role: ORIGIN_CONFIG[originKey].name,
-          klotho: 1, lachesis: 1, atropos: 1,
-          available_points: 7,
-          gold: initGold,
-          bargain_count: 3
-        }]);
       }
 
       currentUserId = data.user.id;
-      currentUserNickname = data.user.user_metadata?.user_nickname || username;
-      loadFlow();
+      checkExistingCharacter();
     }
 
-    async function loadFlow() {
-      const { data } = await supabaseClient.from('characters').select('*').eq('user_id', currentUserId).maybeSingle();
-      characterData = data;
+    /* 캐릭터 존재 여부 확인 */
+    async function checkExistingCharacter() {
+      const { data, error } = await supabaseClient
+        .from('characters')
+        .select('*')
+        .eq('user_id', currentUserId)
+        .maybeSingle();
 
       document.getElementById('auth-section').classList.add('hidden');
 
-      if (characterData.available_points > 0) {
-        document.getElementById('character-setup-section').classList.remove('hidden');
-        renderSetupView();
+      if (data) {
+        characterData = data;
+        currentUserNickname = data.user_nickname || currentUsername;
+        enterMain();
       } else {
-        enterCommunity();
+        // 신규 캐릭터 생성 단계로 이동
+        document.getElementById('character-creation-section').classList.remove('hidden');
+        updateOriginInfo();
+        renderStatView();
       }
     }
 
-    function renderSetupView() {
-      document.getElementById('setup-char-name').innerText = characterData.name;
-      document.getElementById('setup-pts').innerText = characterData.available_points;
-      document.getElementById('setup-klotho').innerText = characterData.klotho;
-      document.getElementById('setup-lachesis').innerText = characterData.lachesis;
-      document.getElementById('setup-atropos').innerText = characterData.atropos;
+    /* 닉네임 중복 확인 */
+    function resetNicknameCheck() {
+      isNicknameChecked = false;
+      document.getElementById('nickname-msg').innerText = '';
     }
 
-    function adjustStat(stat, val) {
-      if (val > 0 && characterData.available_points <= 0) return showToast('투자 포인트가 부족합니다.');
-      if (val < 0 && characterData[stat] <= 1) return;
+    async function checkNicknameDuplicate() {
+      const nickname = document.getElementById('user-nickname').value.trim();
+      const msgBox = document.getElementById('nickname-msg');
 
-      characterData[stat] += val;
-      characterData.available_points -= val;
-      renderSetupView();
+      if (!nickname) {
+        msgBox.className = 'error-msg';
+        msgBox.innerText = '닉네임을 입력해주세요.';
+        return;
+      }
+
+      if (checkBannedWords(nickname)) {
+        msgBox.className = 'error-msg';
+        msgBox.innerText = '사용할 수 없는 금지어가 포함되어 있습니다.';
+        return;
+      }
+
+      const { data } = await supabaseClient
+        .from('characters')
+        .select('id')
+        .eq('user_nickname', nickname)
+        .maybeSingle();
+
+      if (data) {
+        msgBox.className = 'error-msg';
+        msgBox.innerText = '이미 사용 중인 닉네임입니다.';
+        isNicknameChecked = false;
+      } else {
+        msgBox.className = 'success-msg';
+        msgBox.innerText = '사용 가능한 닉네임입니다.';
+        isNicknameChecked = true;
+      }
     }
 
-    async function saveInitialStats() {
-      const passive = document.getElementById('passive-select').value;
-      await supabaseClient.from('characters').update({
-        klotho: characterData.klotho,
-        lachesis: characterData.lachesis,
-        atropos: characterData.atropos,
-        available_points: 0,
-        passive: passive
-      }).eq('user_id', currentUserId);
-
-      characterData.available_points = 0;
-      characterData.passive = passive;
-      document.getElementById('character-setup-section').classList.add('hidden');
-      enterCommunity();
+    /* 태생 특성 정보 업데이트 */
+    function updateOriginInfo() {
+      const lineage = document.getElementById('lineage-select').value;
+      const generation = document.getElementById('generation-select').value;
+      const key = `${lineage}_${generation}`;
+      
+      const config = ORIGIN_COMBINATIONS[key];
+      if (config) {
+        document.getElementById('origin-desc').innerHTML = `<b>${config.title}</b><br>${config.desc}`;
+      }
     }
 
-    function enterCommunity() {
+    /* 스탯 조정 로직 */
+    function adjustStat(stat, delta) {
+      if (delta > 0 && statsState.availablePoints <= 0) {
+        showToast('포인트를 모두 소모했습니다.');
+        return;
+      }
+      if (delta < 0 && statsState[stat] <= 1) {
+        return; // 최소 스탯은 1
+      }
+
+      statsState[stat] += delta;
+      statsState.availablePoints -= delta;
+      renderStatView();
+    }
+
+    function renderStatView() {
+      document.getElementById('available-pts').innerText = statsState.availablePoints;
+      document.getElementById('stat-klotho').innerText = statsState.klotho;
+      document.getElementById('stat-lachesis').innerText = statsState.lachesis;
+      document.getElementById('stat-atropos').innerText = statsState.atropos;
+    }
+
+    /* 신규 캐릭터 생성 최종 제출 */
+    async function submitCharacterCreation() {
+      const userNickname = document.getElementById('user-nickname').value.trim();
+      const charName = document.getElementById('char-name').value.trim();
+      const lineage = document.getElementById('lineage-select').value;
+      const generation = document.getElementById('generation-select').value;
+      const originKey = `${lineage}_${generation}`;
+      const errBox = document.getElementById('creation-error');
+      errBox.innerText = '';
+
+      if (!isNicknameChecked) {
+        errBox.innerText = '계정 닉네임 중복 확인을 진행해주세요.';
+        return;
+      }
+
+      if (!charName) {
+        errBox.innerText = '캐릭터 이름을 입력해주세요.';
+        return;
+      }
+
+      if (checkBannedWords(charName)) {
+        errBox.innerText = '캐릭터 이름에 금지어가 포함되어 있습니다.';
+        return;
+      }
+
+      if (statsState.availablePoints > 0) {
+        errBox.innerText = `남은 스탯 포인트(${statsState.availablePoints}pt)를 모두 분배해주세요.`;
+        return;
+      }
+
+      const roleName = ORIGIN_COMBINATIONS[originKey].title;
+      const initialGold = originKey === 'collateral_old' ? 300 : 100;
+
+      const newCharData = {
+        user_id: currentUserId,
+        user_nickname: userNickname,
+        name: charName,
+        role: roleName,
+        klotho: statsState.klotho,
+        lachesis: statsState.lachesis,
+        atropos: statsState.atropos,
+        gold: initialGold
+      };
+
+      const { data, error } = await supabaseClient.from('characters').insert([newCharData]).select().single();
+
+      if (error) {
+        errBox.innerText = '캐릭터 저장 오류: ' + error.message;
+        return;
+      }
+
+      characterData = data;
+      currentUserNickname = userNickname;
+      document.getElementById('character-creation-section').classList.add('hidden');
+      enterMain();
+    }
+
+    /* 메인 화면 진입 */
+    function enterMain() {
       document.getElementById('main-community-section').classList.remove('hidden');
       updateSidePanel();
-      renderShopUI();
-      switchMainTab('trpg');
+      renderProfileView();
     }
 
     function updateSidePanel() {
       document.getElementById('side-char-name').innerText = `${characterData.name} (@${currentUserNickname})`;
       document.getElementById('side-char-origin').innerText = characterData.role;
       document.getElementById('side-gold').innerText = characterData.gold || 100;
-      document.getElementById('side-bargain-count').innerText = `${characterData.bargain_count ?? 3}/3`;
-      document.getElementById('side-avatar-area').innerHTML = getAvatarHtml(characterData.avatar_url, 40);
-    }
-
-    function switchMainTab(tab) {
-      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-      ['notice', 'story', 'trpg', 'craft', 'profile'].forEach(t => {
-        const el = document.getElementById(`tab-${t}-content`);
-        if (el) el.classList.add('hidden');
-      });
-
-      document.getElementById(`btn-tab-${tab}`).classList.add('active');
-      document.getElementById(`tab-${tab}-content`).classList.remove('hidden');
-
-      if (tab === 'profile') renderProfileView();
-    }
-
-    /* TRPG 판정 엔진 */
-    function rollD20(statValue, statName) {
-      const rawRoll = Math.floor(Math.random() * 20) + 1;
-      const originKey = Object.keys(ORIGIN_CONFIG).find(k => ORIGIN_CONFIG[k].name === characterData.role) || 'collateral_ancient';
-      const critThreshold = ORIGIN_CONFIG[originKey].critMin;
-
-      let resultType = ''; // absolute_fail, partial, success, absolute_success
-      let total = rawRoll + statValue;
-
-      if (rawRoll === 1) {
-        if (originKey === 'collateral_new' && characterData.daily_shield_used === false) {
-          resultType = 'partial'; // 방계x신세대 하루 1회 실패 완화
-        } else {
-          resultType = 'absolute_fail';
-        }
-      } else if (rawRoll >= critThreshold) {
-        resultType = 'absolute_success';
-      } else if (rawRoll >= 2 && rawRoll <= 7) {
-        resultType = 'partial';
-      } else {
-        resultType = 'success';
-      }
-
-      return { rawRoll, total, resultType };
-    }
-
-    function selectNPC(npcKey) {
-      selectedNpcKey = npcKey;
-      document.querySelectorAll('.npc-card').forEach(c => c.classList.remove('active'));
-      document.getElementById(`npc-card-${npcKey}`).classList.add('active');
-      renderShopUI();
-    }
-
-    function renderShopUI() {
-      const npc = NPC_DATA[selectedNpcKey];
-      document.getElementById('npc-dialogue-box').innerText = `"${npc.dialogue}"`;
-
-      const container = document.getElementById('shop-items-container');
-      container.innerHTML = '';
-
-      npc.items.forEach(item => {
-        const row = document.createElement('div');
-        row.className = 'shop-item-row';
-        row.innerHTML = `
-          <div>
-            <div style="font-weight:bold; color:#fff;">${item.name}</div>
-            <div style="font-size:0.8rem; color:#aaa;">${item.desc} | 가격: ${item.price} Gold</div>
-          </div>
-          <div style="display:flex; gap:6px;">
-            <button type="button" onclick="buyItem('${item.id}', ${item.price})" style="width:70px; margin-top:0;">구매</button>
-            <button type="button" onclick="rollBargain('${item.id}', ${item.price})" style="width:90px; margin-top:0; background-color:#e67e22;">🎲 흥정</button>
-          </div>
-        `;
-        container.appendChild(row);
-      });
-    }
-
-    async function buyItem(itemId, price) {
-      if ((characterData.gold || 0) < price) return alert('골드가 부족합니다.');
-      characterData.gold -= price;
-      await supabaseClient.from('characters').update({ gold: characterData.gold }).eq('user_id', currentUserId);
-      updateSidePanel();
-      showToast('물품을 구매했습니다.');
-    }
-
-    async function rollBargain(itemId, basePrice) {
-      if ((characterData.bargain_count || 0) <= 0) return alert('오늘의 흥정 가능 횟수를 모두 소모했습니다.');
-
-      characterData.bargain_count -= 1;
-      const { rawRoll, total, resultType } = rollD20(characterData.lachesis || 1, '재정');
-
-      const panel = document.getElementById('dice-result-panel');
-      panel.classList.remove('hidden');
-      document.getElementById('dice-action-title').innerText = `${NPC_DATA[selectedNpcKey].name} 상대 [재정] 흥정 판정`;
-      document.getElementById('dice-roll-number').innerText = `🎲 눈: ${rawRoll} (보정합: ${total})`;
-
-      const outcomeText = document.getElementById('dice-outcome-text');
-      const effectArea = document.getElementById('dice-card-effect');
-
-      if (resultType === 'absolute_fail') {
-        outcomeText.innerText = '💥 Natural 1: 절대 대실패!';
-        outcomeText.style.color = '#ff5252';
-        effectArea.innerHTML = `
-          <div class="risk-card">
-            <b>[리스크 카드: 바가지/거래 거부]</b><br>
-            NPC가 극도로 화를 냅니다! 구매 가격이 20% 인상됩니다. (신규 가격: ${Math.floor(basePrice * 1.2)} G)
-          </div>
-        `;
-      } else if (resultType === 'partial') {
-        outcomeText.innerText = '⚖️ 부분 성공 (대반주)';
-        outcomeText.style.color = '#ffb74d';
-        effectArea.innerHTML = `
-          <div class="risk-card" style="border-color:#ffb74d; color:#ffe082;">
-            <b>[대반주 카드: 대가 요구]</b><br>
-            10% 할인을 받았으나, NPC가 재고 처리를 위해 잡동사니 재료 1개 추가 구매를 조건으로 내겁니다. (할인가: ${Math.floor(basePrice * 0.9)} G)
-          </div>
-        `;
-      } else if (resultType === 'success') {
-        outcomeText.innerText = '✨ 완전 성공';
-        outcomeText.style.color = '#81c784';
-        effectArea.innerHTML = `<div class="success-card">15% 할인이 적용되었습니다. (할인가: ${Math.floor(basePrice * 0.85)} G)</div>`;
-      } else if (resultType === 'absolute_success') {
-        outcomeText.innerText = '🌟 Natural 대성공!';
-        outcomeText.style.color = '#ffd54f';
-        effectArea.innerHTML = `<div class="success-card">25% 파격 할인 + 비밀 상점 메뉴 호감도가 상승합니다! (할인가: ${Math.floor(basePrice * 0.75)} G)</div>`;
-      }
-
-      await supabaseClient.from('characters').update({ bargain_count: characterData.bargain_count }).eq('user_id', currentUserId);
-      updateSidePanel();
-    }
-
-    function rollCrafting(recipeKey) {
-      const { rawRoll, total, resultType } = rollD20(characterData.klotho || 1, '방직');
-      const panel = document.getElementById('craft-dice-result');
-      panel.classList.remove('hidden');
-
-      if (resultType === 'absolute_fail') {
-        panel.innerHTML = `
-          <div style="color:#ff5252; font-weight:bold;">💥 연성 폭발! (Natural 1)</div>
-          <div class="risk-card">재료가 소진되고 [연성 불순물]을 획득하였습니다. 캐릭터 내구도 -1</div>
-        `;
-      } else if (resultType === 'partial') {
-        panel.innerHTML = `
-          <div style="color:#ffb74d; font-weight:bold;">⚖️ 부분 성공</div>
-          <div class="risk-card" style="border-color:#ffb74d; color:#ffe082;">완성품 제작 성공! 단, 마감 불량으로 [조잡한] 수식어가 부여됩니다.</div>
-        `;
-      } else {
-        panel.innerHTML = `
-          <div style="color:#81c784; font-weight:bold;">✨ 명품 연성 성공!</div>
-          <div class="success-card">완벽한 사양으로 완제품을 성공적으로 제작했습니다!</div>
-        `;
-      }
+      document.getElementById('side-avatar-area').innerHTML = `<img src="${DEFAULT_AVATAR_SVG}" style="width:40px; height:40px; border-radius:50%; background:#2a2a2a; border:1px solid #444;">`;
     }
 
     function renderProfileView() {
       document.getElementById('profile-char-name-display').innerText = `${characterData.name} (@${currentUserNickname})`;
       document.getElementById('profile-origin').innerText = characterData.role;
       document.getElementById('profile-gold').innerText = characterData.gold || 100;
-      document.getElementById('profile-klotho').innerText = characterData.klotho;
-      document.getElementById('profile-lachesis').innerText = characterData.lachesis;
-      document.getElementById('profile-atropos').innerText = characterData.atropos;
-      document.getElementById('profile-passive').innerText = characterData.passive || '없음';
-      document.getElementById('profile-avatar-preview-area').innerHTML = getAvatarHtml(characterData.avatar_url, 60);
+      document.getElementById('profile-klotho').innerText = characterData.klotho ?? 1;
+      document.getElementById('profile-lachesis').innerText = characterData.lachesis ?? 1;
+      document.getElementById('profile-atropos').innerText = characterData.atropos ?? 1;
+      document.getElementById('profile-avatar-preview').innerHTML = `<img src="${DEFAULT_AVATAR_SVG}" style="width:60px; height:60px; border-radius:50%; background:#2a2a2a; border:1px solid #444;">`;
     }
 
-    async function toggleNotiDropdown(e) {
-      e.stopPropagation();
-      document.getElementById('noti-dropdown-menu').classList.toggle('hidden');
+    function switchMainTab(tab) {
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-trpg-content').classList.add('hidden');
+      document.getElementById('tab-profile-content').classList.add('hidden');
+
+      document.getElementById(`btn-tab-${tab}`).classList.add('active');
+      document.getElementById(`tab-${tab}-content`).classList.remove('hidden');
     }
   </script>
 </body>
