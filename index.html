@@ -3,82 +3,99 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SNS 커뮤니티</title>
+  <title>TRPG 커뮤니티</title>
   <!-- Supabase JS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    /* 기본 리셋 및 레이아웃 */
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f0f2f5; color: #1c1e21; line-height: 1.5; }
-    .container { max-width: 680px; margin: 0 auto; padding: 20px 10px; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f0f2f5; color: #1c1e21; line-height: 1.5; }
     
-    /* 헤더 및 알림 */
+    /* 헤더 & 프로필 스탯바 */
     header { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 12px 20px; border-bottom: 1px solid #e4e6eb; position: sticky; top: 0; z-index: 100; }
     .logo { font-size: 1.2rem; font-weight: bold; color: #1877f2; }
+    .user-profile-bar { display: flex; align-items: center; gap: 15px; background: #f7f8fa; padding: 6px 14px; border-radius: 20px; border: 1px solid #e4e6eb; }
+    .user-profile-bar .stat { font-size: 0.85rem; font-weight: 600; color: #4b4f56; }
+    .user-profile-bar .gold { color: #d97706; font-weight: bold; }
+    
     .noti-wrapper { position: relative; }
     .noti-btn { background: #e4e6eb; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; position: relative; font-size: 1.1rem; }
     .noti-badge { position: absolute; top: -2px; right: -2px; background: #e41e3f; color: #fff; font-size: 0.75rem; font-weight: bold; border-radius: 10px; padding: 2px 6px; }
     .noti-dropdown { display: none; position: absolute; right: 0; top: 48px; width: 320px; background: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border: 1px solid #e4e6eb; max-height: 400px; overflow-y: auto; z-index: 101; }
     .noti-dropdown.show { display: block; }
-    .noti-item { padding: 10px 14px; border-bottom: 1px solid #f0f2f5; font-size: 0.875rem; cursor: pointer; display: flex; flex-direction: column; gap: 4px; }
-    .noti-item:hover { background-color: #f7f8fa; }
+    .noti-item { padding: 10px 14px; border-bottom: 1px solid #f0f2f5; font-size: 0.875rem; cursor: pointer; }
     .noti-item.unread { background-color: #e7f3ff; }
-    .noti-item .time { font-size: 0.75rem; color: #65676b; }
 
-    /* 피드 및 게시글 카드리셋 */
+    .container { max-width: 680px; margin: 20px auto; padding: 0 10px; }
+
+    /* 카드 및 폼 요소 */
     .card { background: #fff; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); position: relative; }
     .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
     .author-info { display: flex; align-items: center; gap: 10px; }
     .avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #e4e6eb; }
     .author-name { font-weight: 600; font-size: 0.95rem; }
     .post-time { font-size: 0.75rem; color: #65676b; }
+
+    /* 공개범위 설정 라디오 옵션 */
+    .visibility-options { display: flex; gap: 12px; margin: 10px 0; font-size: 0.85rem; color: #4b4f56; flex-wrap: wrap; align-items: center; }
+    .visibility-options label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+
+    .input-wrapper { position: relative; width: 100%; }
+    textarea { width: 100%; border: 1px solid #e4e6eb; border-radius: 6px; padding: 10px; resize: vertical; min-height: 80px; font-family: inherit; font-size: 0.9rem; }
+    textarea:focus { outline: none; border-color: #1877f2; }
     
-    /* 더보기 옵션 토글 */
+    .btn-primary { background: #1877f2; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.875rem; }
+    .btn-primary:hover { background: #166fe5; }
+    .btn-secondary { background: #e4e6eb; color: #050505; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
+    .flex-end { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+
+    /* 더보기 옵션 드롭다운 */
     .more-menu-container { position: relative; }
     .more-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 4px 8px; border-radius: 4px; color: #65676b; }
-    .more-btn:hover { background-color: #f0f2f5; }
     .dropdown-menu { display: none; position: absolute; right: 0; top: 30px; background: #fff; border: 1px solid #e4e6eb; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); width: 100px; z-index: 10; }
     .dropdown-menu.show { display: block; }
     .dropdown-menu button { width: 100%; padding: 8px 12px; border: none; background: none; text-align: left; cursor: pointer; font-size: 0.85rem; }
     .dropdown-menu button:hover { background-color: #f0f2f5; }
     .dropdown-menu button.delete-btn { color: #e41e3f; }
 
-    /* 게시글 본문 및 폼 */
-    .post-content { font-size: 0.95rem; margin-bottom: 12px; whitespace: pre-wrap; word-break: break-word; }
-    .input-wrapper { position: relative; width: 100%; }
-    textarea { width: 100%; border: 1px solid #e4e6eb; border-radius: 6px; padding: 10px; resize: vertical; min-height: 80px; font-family: inherit; font-size: 0.9rem; }
-    textarea:focus { outline: none; border-color: #1877f2; }
-    .btn-primary { background: #1877f2; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.875rem; }
-    .btn-primary:hover { background: #166fe5; }
-    .btn-secondary { background: #e4e6eb; color: #050505; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
-    .flex-end { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
-
-    /* 댓글 및 답글 영역 스타일 (완성) */
+    /* 댓글 섹션 */
     .comments-section { margin-top: 12px; border-top: 1px solid #f0f2f5; padding-top: 12px; }
-    .comment-item { display: flex; gap: 10px; margin-bottom: 10px; position: relative; }
-    .comment-item.reply { margin-left: 36px; }
-    .comment-bubble { background: #f0f2f5; border-radius: 12px; padding: 8px 12px; width: 100%; font-size: 0.875rem; position: relative; }
-    .comment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
+    .comment-item { display: flex; gap: 10px; margin-bottom: 10px; }
+    .comment-bubble { background: #f0f2f5; border-radius: 12px; padding: 8px 12px; width: 100%; font-size: 0.875rem; }
+    .comment-header { display: flex; justify-content: space-between; align-items: center; }
     .comment-author { font-weight: 600; font-size: 0.8rem; }
     .comment-time { font-size: 0.7rem; color: #65676b; margin-left: 6px; }
-    .comment-text { font-size: 0.875rem; word-break: break-word; margin-top: 2px; }
-    .comment-actions { margin-top: 4px; font-size: 0.75rem; color: #65676b; display: flex; gap: 10px; }
-    .comment-actions span { cursor: pointer; font-weight: 600; }
-    .comment-actions span:hover { text-decoration: underline; }
 
     /* @ 멘션 자동완성 드롭다운 */
     .mention-dropdown { display: none; position: absolute; background: #fff; border: 1px solid #e4e6eb; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-height: 150px; overflow-y: auto; width: 200px; z-index: 200; }
     .mention-dropdown.show { display: block; }
     .mention-item { padding: 8px 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.85rem; }
     .mention-item:hover { background-color: #e7f3ff; }
-    .mention-item img { width: 24px; height: 24px; border-radius: 50%; }
     .mention-tag { color: #1877f2; font-weight: 600; }
+
+    /* 모달 팝업 (지정 타겟 사용자 선택) */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000; justify-content: center; align-items: center; }
+    .modal-overlay.show { display: flex; }
+    .modal-content { background: #fff; width: 360px; border-radius: 8px; padding: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+    .user-select-list { max-height: 200px; overflow-y: auto; margin: 12px 0; }
+    .user-select-item { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
   </style>
 </head>
 <body>
 
   <header>
     <div class="logo">Community</div>
+    
+    <!-- 캐릭터 프로필 및 스탯/골드 상단바 -->
+    <div class="user-profile-bar" id="userProfileBar">
+      <img src="https://via.placeholder.com/40" id="userAvatar" class="avatar" style="width:30px; height:30px;" alt="avatar">
+      <span class="stat" id="userName">캐릭터 로딩 중...</span>
+      <span class="stat">클로토 <b id="statKlotho">1</b></span>
+      <span class="stat">라케시스 <b id="statLachesis">1</b></span>
+      <span class="stat">아트로포스 <b id="statAtropos">1</b></span>
+      <span class="stat gold">💰 <span id="userGold">100</span>G</span>
+    </div>
+
+    <!-- 알림 벨 -->
     <div class="noti-wrapper">
       <button class="noti-btn" id="notiBtn" onclick="toggleNotifications()">
         🔔
@@ -93,12 +110,22 @@
   </header>
 
   <div class="container">
-    <!-- 게시글 작성 카드 -->
+    <!-- 게시글 작성 카드리셋 -->
     <div class="card">
       <div class="input-wrapper">
         <textarea id="postInput" placeholder="무슨 생각을 하고 계신가요? (@를 입력하여 멘션)" oninput="handleMentionInput(event, 'postMentionDropdown')"></textarea>
         <div class="mention-dropdown" id="postMentionDropdown"></div>
       </div>
+
+      <!-- 공개범위 라디오 버튼 -->
+      <div class="visibility-options">
+        <label><input type="radio" name="visibility" value="public" checked onclick="handleVisibilityChange('public')"> 전체공개</label>
+        <label><input type="radio" name="visibility" value="friends" onclick="handleVisibilityChange('friends')"> 친구공개</label>
+        <label><input type="radio" name="visibility" value="close_friends" onclick="handleVisibilityChange('close_friends')"> 친한친구</label>
+        <label><input type="radio" name="visibility" value="target_select" onclick="handleVisibilityChange('target_select')"> 지정 선택...</label>
+        <span id="selectedTargetCount" style="font-size: 0.75rem; color: #1877f2; font-weight: bold;"></span>
+      </div>
+
       <div class="flex-end">
         <button class="btn-primary" onclick="createPost()">게시하기</button>
       </div>
@@ -108,106 +135,110 @@
     <div id="feedList"></div>
   </div>
 
+  <!-- 지정 타겟 사용자 선택 모달 -->
+  <div class="modal-overlay" id="targetModal">
+    <div class="modal-content">
+      <h3 style="font-size: 1rem; margin-bottom: 10px;">게시글을 볼 대상 선택</h3>
+      <div class="user-select-list" id="targetUserList"></div>
+      <div class="flex-end">
+        <button class="btn-secondary" onclick="closeTargetModal()">취소</button>
+        <button class="btn-primary" onclick="confirmTargetSelect()">확인</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // 1. Supabase 클라이언트 설정 (프로젝트 URL 및 Anon Key 입력)
-    const SUPABASE_URL = 'https://your-supabase-url.supabase.co';
-    const SUPABASE_KEY = 'your-anon-key';
+    // 1. Supabase 접속 정보 입력
+    const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // 가상의 현재 로그인 유저 정보 (테스트용)
-    const currentUser = {
-      id: 'user-uuid-1234',
-      name: '홍길동',
+    // 테스트용 현재 유저 정보
+    let currentUser = {
+      id: '00000000-0000-0000-0000-000000000000', // 실제 auth user UUID 필요
+      name: '운명의 실타래',
       avatar_url: 'https://via.placeholder.com/40'
     };
 
-    // 멘션 후보용 사용자 목록 (임시 데이터)
-    const mentionCandidates = [
-      { id: 'user-1', name: '김철수', avatar: 'https://via.placeholder.com/24' },
-      { id: 'user-2', name: '이영희', avatar: 'https://via.placeholder.com/24' },
-      { id: 'user-3', name: '박민수', avatar: 'https://via.placeholder.com/24' }
-    ];
+    let selectedTargetUserIds = [];
+    let mentionCandidates = [];
 
-    let unreadCount = 0;
-    let activeTextarea = null;
-
-    // 페이지 로드 시 초기화
     document.addEventListener('DOMContentLoaded', () => {
+      loadCharacterProfile();
       fetchPosts();
       fetchNotifications();
       setupRealtimeNotifications();
+      loadMentionCandidates();
     });
+
+    // -------------------------------------------------------------
+    // 캐릭터 및 프로필 불러오기
+    // -------------------------------------------------------------
+    async function loadCharacterProfile() {
+      const { data, error } = await supabaseClient
+        .from('characters')
+        .select('*')
+        .limit(1)
+        .single();
+
+      if (data) {
+        currentUser.id = data.user_id || currentUser.id;
+        currentUser.name = data.name;
+        currentUser.avatar_url = data.avatar_url || currentUser.avatar_url;
+
+        document.getElementById('userName').innerText = data.name;
+        document.getElementById('statKlotho').innerText = data.klotho;
+        document.getElementById('statLachesis').innerText = data.lachesis;
+        document.getElementById('statAtropos').innerText = data.atropos;
+        document.getElementById('userGold').innerText = data.gold;
+        if(data.avatar_url) document.getElementById('userAvatar').src = data.avatar_url;
+      }
+    }
+
+    async function loadMentionCandidates() {
+      const { data } = await supabaseClient.from('characters').select('user_id, name, avatar_url');
+      if (data) {
+        mentionCandidates = data.map(c => ({ id: c.user_id, name: c.name, avatar: c.avatar_url || 'https://via.placeholder.com/24' }));
+      }
+    }
 
     // -------------------------------------------------------------
     // 유틸리티 함수
     // -------------------------------------------------------------
-
-    // [수정사항 반영] XSS 방지를 위한 HTML 이스케이프
     function escapeHtml(text) {
       if (!text) return '';
-      return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
-    // [수정사항 반영] 상세 시각 포맷터 (YYYY. MM. DD. HH:mm)
     function formatDateTime(dateString) {
       const d = new Date(dateString);
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      const hours = String(d.getHours()).padStart(2, '0');
-      const minutes = String(d.getMinutes()).padStart(2, '0');
-      return `${year}. ${month}. ${day}. ${hours}:${minutes}`;
+      return `${d.getFullYear()}. ${String(d.getMonth() + 1).padStart(2, '0')}. ${String(d.getDate()).padStart(2, '0')}. ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
     }
 
-    // 멘션 텍스트 하이라이트 처리
     function renderMentionText(text) {
-      const escaped = escapeHtml(text);
-      return escaped.replace(/@([가-힣a-zA-Z0-9_]+)/g, '<span class="mention-tag">@$1</span>');
+      return escapeHtml(text).replace(/@([가-힣a-zA-Z0-9_]+)/g, '<span class="mention-tag">@$1</span>');
     }
 
-    // 드롭다운 토글 닫기 (외부 클릭 시)
-    window.onclick = function(e) {
-      if (!e.target.matches('.more-btn')) {
-        document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
-      }
-      if (!e.target.closest('.noti-wrapper')) {
-        document.getElementById('notiDropdown').classList.remove('show');
-      }
-    };
-
     // -------------------------------------------------------------
-    // 피드 & 게시글 관련 기능
+    // 피드 & 게시글 기능
     // -------------------------------------------------------------
-
     async function fetchPosts() {
       const { data: posts, error } = await supabaseClient
         .from('posts')
         .select(`*, comments(*)`)
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('게시글 불러오기 실패:', error);
-        return;
-      }
+      if (error) return;
 
       const feedEl = document.getElementById('feedList');
       feedEl.innerHTML = '';
-      
-      posts.forEach(post => {
-        feedEl.appendChild(createPostElement(post));
-      });
+      posts.forEach(post => feedEl.appendChild(createPostElement(post)));
     }
 
     function createPostElement(post) {
       const card = document.createElement('div');
       card.className = 'card';
       card.id = `post-${post.id}`;
-
       const isAuthor = post.user_id === currentUser.id;
 
       card.innerHTML = `
@@ -216,7 +247,6 @@
             <img src="${escapeHtml(post.avatar_url || currentUser.avatar_url)}" class="avatar" alt="avatar">
             <div>
               <div class="author-name">${escapeHtml(post.author_name)}</div>
-              <!-- [수정사항 반영] 날짜 및 정확한 시각 표기 -->
               <div class="post-time">${formatDateTime(post.created_at)}</div>
             </div>
           </div>
@@ -232,13 +262,12 @@
         </div>
         <div class="post-content" id="post-body-${post.id}">${renderMentionText(post.content)}</div>
         
-        <!-- 댓글 영역 -->
         <div class="comments-section">
           <div id="comments-list-${post.id}">
             ${(post.comments || []).map(c => createCommentHTML(c)).join('')}
           </div>
           <div class="input-wrapper" style="margin-top: 10px;">
-            <textarea id="comment-input-${post.id}" placeholder="댓글을 입력하세요... (@멘션 가능)" style="min-height: 40px;" oninput="handleMentionInput(event, 'comment-mention-${post.id}')"></textarea>
+            <textarea id="comment-input-${post.id}" placeholder="댓글을 입력하세요... (@멘션)" style="min-height: 40px;" oninput="handleMentionInput(event, 'comment-mention-${post.id}')"></textarea>
             <div class="mention-dropdown" id="comment-mention-${post.id}"></div>
           </div>
           <div class="flex-end">
@@ -250,198 +279,130 @@
     }
 
     async function createPost() {
-      const textarea = document.getElementById('postInput');
-      const content = textarea.value.trim();
+      const content = document.getElementById('postInput').value.trim();
+      const visibility = document.querySelector('input[name="visibility"]:checked').value;
       if (!content) return;
 
-      const { data, error } = await supabaseClient
+      const { error } = await supabaseClient
         .from('posts')
         .insert([{
           user_id: currentUser.id,
           author_name: currentUser.name,
           avatar_url: currentUser.avatar_url,
-          content: content
-        }])
-        .select();
+          content: content,
+          visibility: visibility,
+          target_user_ids: selectedTargetUserIds
+        }]);
 
-      if (error) {
-        alert('게시글 등록에 실패했습니다.');
-        return;
+      if (!error) {
+        document.getElementById('postInput').value = '';
+        selectedTargetUserIds = [];
+        document.getElementById('selectedTargetCount').innerText = '';
+        fetchPosts();
       }
-
-      textarea.value = '';
-      fetchPosts();
-    }
-
-    function toggleMenu(e, menuId) {
-      e.stopPropagation();
-      document.querySelectorAll('.dropdown-menu').forEach(m => {
-        if (m.id !== menuId) m.classList.remove('show');
-      });
-      document.getElementById(menuId).classList.toggle('show');
-    }
-
-    function enablePostEdit(postId) {
-      const bodyEl = document.getElementById(`post-body-${postId}`);
-      const rawText = bodyEl.innerText;
-      
-      bodyEl.innerHTML = `
-        <textarea id="edit-post-input-${postId}">${escapeHtml(rawText)}</textarea>
-        <div class="flex-end">
-          <button class="btn-secondary" onclick="fetchPosts()">취소</button>
-          <button class="btn-primary" onclick="updatePost('${postId}')">저장</button>
-        </div>
-      `;
-    }
-
-    async function updatePost(postId) {
-      const newContent = document.getElementById(`edit-post-input-${postId}`).value.trim();
-      if (!newContent) return;
-
-      const { error } = await supabaseClient
-        .from('posts')
-        .update({ content: newContent })
-        .eq('id', postId);
-
-      if (error) alert('수정에 실패했습니다.');
-      else fetchPosts();
     }
 
     async function deletePost(postId) {
-      if (!confirm('정말 삭제하시겠습니까?')) return;
-
-      const { error } = await supabaseClient
-        .from('posts')
-        .delete()
-        .eq('id', postId);
-
-      if (error) alert('삭제에 실패했습니다.');
-      else fetchPosts();
+      if (!confirm('게시글을 삭제하시겠습니까?')) return;
+      await supabaseClient.from('posts').delete().eq('id', postId);
+      fetchPosts();
     }
 
     // -------------------------------------------------------------
-    // 댓글 및 답글 기능 (수정/삭제 추가)
+    // 공개범위 지정 모달
     // -------------------------------------------------------------
+    function handleVisibilityChange(value) {
+      if (value === 'target_select') {
+        openTargetModal();
+      } else {
+        selectedTargetUserIds = [];
+        document.getElementById('selectedTargetCount').innerText = '';
+      }
+    }
 
-    // [수정사항 반영] 개별 댓글 및 답글 생성 HTML (수정/삭제 메뉴 포함)
+    function openTargetModal() {
+      const listEl = document.getElementById('targetUserList');
+      listEl.innerHTML = mentionCandidates.map(u => `
+        <div class="user-select-item">
+          <input type="checkbox" value="${u.id}" class="target-user-checkbox" ${selectedTargetUserIds.includes(u.id) ? 'checked' : ''}>
+          <span>${escapeHtml(u.name)}</span>
+        </div>
+      `).join('');
+      document.getElementById('targetModal').classList.add('show');
+    }
+
+    function closeTargetModal() {
+      document.getElementById('targetModal').classList.remove('show');
+    }
+
+    function confirmTargetSelect() {
+      const checkboxes = document.querySelectorAll('.target-user-checkbox:checked');
+      selectedTargetUserIds = Array.from(checkboxes).map(cb => cb.value);
+      document.getElementById('selectedTargetCount').innerText = selectedTargetUserIds.length > 0 ? `(${selectedTargetUserIds.length}명 선택됨)` : '';
+      closeTargetModal();
+    }
+
+    // -------------------------------------------------------------
+    // 댓글 및 답글
+    // -------------------------------------------------------------
     function createCommentHTML(comment) {
       const isAuthor = comment.user_id === currentUser.id;
       return `
-        <div class="comment-item ${comment.parent_id ? 'reply' : ''}" id="comment-${comment.id}">
+        <div class="comment-item" id="comment-${comment.id}">
           <img src="${escapeHtml(comment.avatar_url || currentUser.avatar_url)}" class="avatar" style="width:28px; height:28px;" alt="avatar">
           <div class="comment-bubble">
             <div class="comment-header">
               <div>
                 <span class="comment-author">${escapeHtml(comment.author_name)}</span>
-                <!-- [수정사항 반영] 댓글 작성 날짜 및 시각 -->
                 <span class="comment-time">${formatDateTime(comment.created_at)}</span>
               </div>
-              ${isAuthor ? `
-                <div class="more-menu-container">
-                  <button class="more-btn" style="font-size: 0.9rem;" onclick="toggleMenu(event, 'menu-cmt-${comment.id}')">⋮</button>
-                  <div class="dropdown-menu" id="menu-cmt-${comment.id}">
-                    <button onclick="enableCommentEdit('${comment.id}')">수정</button>
-                    <button class="delete-btn" onclick="deleteComment('${comment.id}')">삭제</button>
-                  </div>
-                </div>
-              ` : ''}
+              ${isAuthor ? `<button class="more-btn" style="font-size:0.8rem;" onclick="deleteComment('${comment.id}')">✕</button>` : ''}
             </div>
-            <div class="comment-text" id="cmt-body-${comment.id}">${renderMentionText(comment.content)}</div>
+            <div class="comment-text">${renderMentionText(comment.content)}</div>
           </div>
         </div>
       `;
     }
 
-    async function addComment(postId, parentId = null) {
+    async function addComment(postId) {
       const inputEl = document.getElementById(`comment-input-${postId}`);
       const content = inputEl.value.trim();
       if (!content) return;
 
-      const { error } = await supabaseClient
-        .from('comments')
-        .insert([{
-          post_id: postId,
-          parent_id: parentId,
-          user_id: currentUser.id,
-          author_name: currentUser.name,
-          avatar_url: currentUser.avatar_url,
-          content: content
-        }]);
-
-      if (error) {
-        alert('댓글 작성에 실패했습니다.');
-        return;
-      }
+      await supabaseClient.from('comments').insert([{
+        post_id: postId,
+        user_id: currentUser.id,
+        author_name: currentUser.name,
+        avatar_url: currentUser.avatar_url,
+        content: content
+      }]);
 
       inputEl.value = '';
       fetchPosts();
     }
 
-    // [수정사항 반영] 개별 댓글 수정 UI 활성화
-    function enableCommentEdit(commentId) {
-      const bodyEl = document.getElementById(`cmt-body-${commentId}`);
-      const rawText = bodyEl.innerText;
-
-      bodyEl.innerHTML = `
-        <textarea id="edit-cmt-input-${commentId}" style="min-height:30px; font-size:0.8rem;">${escapeHtml(rawText)}</textarea>
-        <div class="flex-end">
-          <button class="btn-secondary" style="font-size:0.75rem;" onclick="fetchPosts()">취소</button>
-          <button class="btn-primary" style="font-size:0.75rem; padding: 2px 8px;" onclick="updateComment('${commentId}')">저장</button>
-        </div>
-      `;
-    }
-
-    // [수정사항 반영] 댓글 수정 DB 연동
-    async function updateComment(commentId) {
-      const newContent = document.getElementById(`edit-cmt-input-${commentId}`).value.trim();
-      if (!newContent) return;
-
-      const { error } = await supabaseClient
-        .from('comments')
-        .update({ content: newContent })
-        .eq('id', commentId);
-
-      if (error) alert('댓글 수정에 실패했습니다.');
-      else fetchPosts();
-    }
-
-    // [수정사항 반영] 댓글 삭제 DB 연동
     async function deleteComment(commentId) {
-      if (!confirm('댓글을 삭제하시겠습니까?')) return;
-
-      const { error } = await supabaseClient
-        .from('comments')
-        .delete()
-        .eq('id', commentId);
-
-      if (error) alert('댓글 삭제에 실패했습니다.');
-      else fetchPosts();
+      if (!confirm('댓글을 삭제할까요?')) return;
+      await supabaseClient.from('comments').delete().eq('id', commentId);
+      fetchPosts();
     }
 
     // -------------------------------------------------------------
-    // [수정사항 반영] `@` 멘션 트리거 및 자동완성 UI
+    // 멘션 및 Realtime 알림
     // -------------------------------------------------------------
-
     function handleMentionInput(e, dropdownId) {
       const textarea = e.target;
       const dropdown = document.getElementById(dropdownId);
       const val = textarea.value;
       const cursorPos = textarea.selectionStart;
-
-      // 커서 위치 직전의 단어 감지
-      const textBeforeCursor = val.substring(0, cursorPos);
-      const words = textBeforeCursor.split(/\s/);
-      const lastWord = words[words.length - 1];
+      const lastWord = val.substring(0, cursorPos).split(/\s/).pop();
 
       if (lastWord.startsWith('@')) {
         const query = lastWord.slice(1).toLowerCase();
         const matches = mentionCandidates.filter(c => c.name.toLowerCase().includes(query));
-
         if (matches.length > 0) {
-          activeTextarea = textarea;
           dropdown.innerHTML = matches.map(m => `
-            <div class="mention-item" onclick="insertMention('${m.name}', '${dropdownId}')">
-              <img src="${m.avatar}" alt="avatar">
+            <div class="mention-item" onclick="insertMention('${m.name}', '${textarea.id}', '${dropdownId}')">
               <span>${escapeHtml(m.name)}</span>
             </div>
           `).join('');
@@ -452,101 +413,36 @@
       dropdown.classList.remove('show');
     }
 
-    function insertMention(name, dropdownId) {
-      if (!activeTextarea) return;
-
-      const val = activeTextarea.value;
-      const cursorPos = activeTextarea.selectionStart;
-      const textBeforeCursor = val.substring(0, cursorPos);
-      const textAfterCursor = val.substring(cursorPos);
-
-      const words = textBeforeCursor.split(/\s/);
-      words.pop(); // `@...` 단어 제거
-      
-      const newTextBefore = words.join(' ') + (words.length > 0 ? ' ' : '') + `@${name} `;
-      activeTextarea.value = newTextBefore + textAfterCursor;
-      
+    function insertMention(name, textareaId, dropdownId) {
+      const textarea = document.getElementById(textareaId);
+      const words = textarea.value.substring(0, textarea.selectionStart).split(/\s/);
+      words.pop();
+      textarea.value = words.join(' ') + (words.length > 0 ? ' ' : '') + `@${name} `;
       document.getElementById(dropdownId).classList.remove('show');
-      activeTextarea.focus();
+      textarea.focus();
     }
 
-    // -------------------------------------------------------------
-    // [수정사항 반영] 알림 및 Supabase Realtime 구독
-    // -------------------------------------------------------------
+    function toggleMenu(e, menuId) {
+      e.stopPropagation();
+      document.querySelectorAll('.dropdown-menu').forEach(m => m.id !== menuId && m.classList.remove('show'));
+      document.getElementById(menuId).classList.toggle('show');
+    }
 
     async function fetchNotifications() {
-      const { data: notifications, error } = await supabaseClient
-        .from('notifications')
-        .select('*')
-        .eq('user_id', currentUser.id)
-        .order('created_at', { ascending: false });
-
-      if (error) return;
-
-      renderNotifications(notifications || []);
+      const { data } = await supabaseClient.from('notifications').select('*').order('created_at', { ascending: false });
+      if (!data) return;
+      const unread = data.filter(n => !n.is_read).length;
+      document.getElementById('notiBadge').innerText = unread;
+      document.getElementById('notiBadge').style.display = unread > 0 ? 'block' : 'none';
+      document.getElementById('notiList').innerHTML = data.map(n => `<div class="noti-item">${escapeHtml(n.message)}</div>`).join('');
     }
 
-    function renderNotifications(list) {
-      const notiListEl = document.getElementById('notiList');
-      const badgeEl = document.getElementById('notiBadge');
-      
-      unreadCount = list.filter(n => !n.is_read).length;
-
-      if (unreadCount > 0) {
-        badgeEl.innerText = unreadCount;
-        badgeEl.style.display = 'block';
-      } else {
-        badgeEl.style.display = 'none';
-      }
-
-      if (list.length === 0) {
-        notiListEl.innerHTML = `<div class="noti-item" style="text-align: center; color: #65676b;">알림이 없습니다.</div>`;
-        return;
-      }
-
-      notiListEl.innerHTML = list.map(n => `
-        <div class="noti-item ${n.is_read ? '' : 'unread'}" onclick="markNotificationAsRead('${n.id}')">
-          <div>${escapeHtml(n.message)}</div>
-          <div class="time">${formatDateTime(n.created_at)}</div>
-        </div>
-      `).join('');
+    function toggleNotifications() {
+      document.getElementById('notiDropdown').classList.toggle('show');
     }
 
-    async function toggleNotifications() {
-      const dropdown = document.getElementById('notiDropdown');
-      dropdown.classList.toggle('show');
-    }
-
-    // [수정사항 반영] 알림 읽음 처리 DB 연동
-    async function markNotificationAsRead(notiId) {
-      const { error } = await supabaseClient
-        .from('notifications')
-        .update({ is_read: true })
-        .eq('id', notiId);
-
-      if (!error) {
-        fetchNotifications();
-      }
-    }
-
-    // [수정사항 반영] Supabase Realtime 채널 구독
     function setupRealtimeNotifications() {
-      supabaseClient
-        .channel('public:notifications')
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'notifications',
-            filter: `user_id=eq.${currentUser.id}`
-          },
-          (payload) => {
-            console.log('새 실시간 알림 수신:', payload);
-            fetchNotifications(); // 새 알림 수신 시 목록 재갱신
-          }
-        )
-        .subscribe();
+      supabaseClient.channel('public:notifications').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, () => fetchNotifications()).subscribe();
     }
   </script>
 </body>
