@@ -18,11 +18,10 @@
       box-sizing: border-box;
     }
 
-    /* 2컬럼 레이아웃 컨테이너 */
     .app-container {
       display: flex;
       gap: 20px;
-      max-width: 920px;
+      max-width: 960px;
       width: 100%;
       align-items: stretch;
     }
@@ -36,12 +35,11 @@
       border: 1px solid #2a2a2a;
     }
 
-    /* 우측 설명서 패널 */
     .guide-card {
       background-color: #18181c;
       border-radius: 12px;
       padding: 24px;
-      width: 380px;
+      width: 400px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.6);
       border: 1px solid #2e2e38;
       display: flex;
@@ -72,7 +70,7 @@
       line-height: 1.6;
       color: #ccc;
       overflow-y: auto;
-      max-height: 520px;
+      max-height: 540px;
     }
 
     .guide-section {
@@ -218,13 +216,6 @@
       justify-content: center;
     }
 
-    .badge {
-      font-size: 0.8rem;
-      color: #88aaff;
-      margin-bottom: 12px;
-      display: block;
-    }
-
     .hidden { display: none !important; }
   </style>
 </head>
@@ -292,24 +283,25 @@
       <!-- STEP 2: 태생 및 학과 선택 -->
       <div id="step-2" class="hidden">
         <div class="form-group">
-          <label>태생 선택:</label>
+          <label>태생 선택 (조합):</label>
           <select id="origin" onchange="updateGuide()">
-            <option value="순혈">순혈 마법사</option>
-            <option value="혼혈">혼혈 마법사</option>
-            <option value="마글출신">마글 출신</option>
+            <option value="직계x고대세대">① 직계 × 고대세대 (원형의 신성)</option>
+            <option value="직계x신세대">② 직계 × 신세대 (순혈의 유리몸)</option>
+            <option value="방계x고대세대">③ 방계 × 고대세대 (고대의 베테랑)</option>
+            <option value="방계x신세대">④ 방계 × 신세대 (현대의 육성형)</option>
           </select>
         </div>
         <div class="form-group">
-          <label>주전공 (1개):</label>
-          <select id="major" onchange="onMajorChange()"></select>
+          <label>주전공 (택1):</label>
+          <select id="major" onchange="updateGuide()"></select>
         </div>
         <div class="form-group">
-          <label>부전공 1 / 부전공 2:</label>
+          <label>부전공 (택2):</label>
           <select id="sub-major-1" onchange="onSubMajorChange()" style="margin-bottom:6px;"></select>
           <select id="sub-major-2" onchange="updateGuide()"></select>
         </div>
         <div class="form-group">
-          <label>공통교양 (1개):</label>
+          <label>공통교양 (택1):</label>
           <select id="general-edu" onchange="updateGuide()"></select>
         </div>
         <button class="btn-primary" onclick="goStep(3)">다음 (스탯 배분)</button>
@@ -354,7 +346,7 @@
       </div>
     </div>
 
-    <!-- Right Side Panel: 오른쪽 설명서 (가이드) -->
+    <!-- Right Side Panel: 가이드 설명서 -->
     <div id="guide-card" class="guide-card hidden">
       <div class="guide-title">
         <span>📖</span> <span id="guide-step-title">가이드 및 설명</span>
@@ -379,46 +371,72 @@
 
     const BANNED_WORDS = ['관리자', '운영진', 'admin', '운영자', 'system', 'fuck', 'shit'];
 
-    const MAJORS_DATA = {
-      "전투사관학": [
-        { name: "원거리 전투학", stat: "방직", passive: "정밀 사격", effect: "엄폐 중이거나 거리가 먼 대상을 공격할 때 판정 보너스 +1", constraint: "상시 적용" },
-        { name: "검술학", stat: "방직", passive: "흘려내기", effect: "방어 성공 시 장비 내구도 피격 피해 50% 감소", constraint: "방어 성공 시" },
-        { name: "마법학", stat: "재정", passive: "마력 효율화", effect: "소모한 마력/자원 일부를 환급받을 기회 +1", constraint: "상시 적용" },
-        { name: "무투학", stat: "방직", passive: "충격 완화", effect: "방어 성공 시 피격을 최소화하며 대상과의 거리 +1 확보", constraint: "방어 성공 시" },
-        { name: "카룬 기초학 (전공)", stat: "재정", passive: "패턴 분석", effect: "패턴 분석 성공 시 다음 방어 주사위에 추가 주사위(+1D) 획득", constraint: "분석 성공 시" },
-        { name: "전투 심리학 (전공)", stat: "단선", passive: "사기 진작", effect: "단선 스탯 판정 시 파티 전체의 디버프 수치를 1단계 완화", constraint: "스탯 판정 시" },
-        { name: "전리품 수집학 (전공)", stat: "방직", passive: "정밀 채취", effect: "전리품 채취 시 획득 아이템 품질 판정에 추가 주사위(+1D) 획득", constraint: "상시 적용" }
-      ],
-      "전투지원학": [
-        { name: "지형 활용학", stat: "재정", passive: "우회로 확보", effect: "지형 이동 시 발생하는 이동 패널티 1 감소", constraint: "상시 적용" },
-        { name: "정보 수집학", stat: "단선", passive: "기습 대비", effect: "단선 스탯 판정 시 자신에게 적용된 판정 불리함(-1D) 제거", constraint: "스탯 판정 시" },
-        { name: "전술 설계학", stat: "재정", passive: "전술 지휘", effect: "아군 판정을 지원할 때 지원 보너스 +1 부여", constraint: "상시 적용" },
-        { name: "모의전투학 (전공)", stat: "재정", passive: "경험 활용", effect: "이전에 교전했던 적과 다시 대치할 때 판정 보너스 +1 획득", constraint: "상시 적용" },
-        { name: "성분분석학 (전공)", stat: "재정", passive: "속성 간파", effect: "속성 분석 성공 시 파티 전체가 받는 속성 피해 감소", constraint: "분석 성공 시" },
-        { name: "메타모포시스 (전공)", stat: "재정", passive: "위장 정찰", effect: "은신 및 정찰 진행 시 추가 주사위(+1D) 획득", constraint: "상시 적용" }
-      ],
-      "실용생활학": [
-        { name: "장비 가공학", stat: "방직", passive: "임시 정비", effect: "손상되거나 정비가 필요한 장비를 임시 사용 상태로 전환", constraint: "아이템당 1회" },
-        { name: "심리 상담학", stat: "단선", passive: "정신적 완화", effect: "단선 스탯 판정 시 정신계 디버프 지속 시간 1턴 감소", constraint: "스탯 판정 시" },
-        { name: "의학 / 카룬 의학", stat: "재정", passive: "응급 지혈", effect: "지속적인 피해(DoT 데미지) 1 감소", constraint: "상시 적용" },
-        { name: "건축학", stat: "방직", passive: "진지 구축", effect: "휴식 진행 시 회복 효과 +1 및 기습 위험성 1 감소", constraint: "휴식 진행 시" },
-        { name: "포션학", stat: "재정", passive: "소모 절감", effect: "포션 제작 실패 시 사용된 재료의 30% 환급", constraint: "제작 실패 시" },
-        { name: "조리학 (전공)", stat: "방직", passive: "식사 재정비", effect: "휴식 후 진행하는 첫 번째 판정에 보너스 +1 획득", constraint: "휴식 후 1회" },
-        { name: "디자인학 (전공)", stat: "방직", passive: "신분 위장", effect: "신분 위장 및 변장 판정 시 추가 주사위(+1D) 획득", constraint: "상시 적용" },
-        { name: "재료 가공학 (전공)", stat: "방직", passive: "효율 가공", effect: "재료 가공 진행 시 재료가 파괴되거나 손실되는 것을 방지", constraint: "상시 적용" },
-        { name: "카룬 해부학 (전공)", stat: "재정", passive: "약점 타격", effect: "판정 성공 시 추가 피해 주사위(+1D) 획득", constraint: "판정 성공 시" },
-        { name: "응용정리학 (전공)", stat: "방직", passive: "도구 수색", effect: "판정 성공 시 소모성 도구 사용 비용 및 소모량 절감", constraint: "판정 성공 시" }
-      ]
+    /* 첨부 이미지 1: 태생 (조합) 데이터 */
+    const ORIGINS_DATA = {
+      "직계x고대세대": {
+        name: "① 직계 × 고대세대 (원형의 신성)",
+        concept: "폭주하는 고대의 힘 (하이리스크 하이리턴)",
+        pros: "대성공(Critical) 범위 +2 (18~20 대성공) / 순간 폭딜 및 전황 뒤집기",
+        cons: "대실패(1) 발생 시 패널티 2배 / 운명의 반작용으로 자신/동료가 돌발 사고에 휘말림"
+      },
+      "직계x신세대": {
+        name: "② 직계 × 신세대 (순혈의 유리몸)",
+        concept: "강력한 권능, 취약한 생존 (유리대포 / 자원 소모형)",
+        pros: "주 스탯 판정 시 대성공 범위 +1 / 판정 결과값에 고정 보너스(+1)",
+        cons: "방어/회피/도주 판정 시 패널티(-1) / 신체적·현실적 적응력이 떨어져 부상·상태이상에 취약"
+      },
+      "방계x고대세대": {
+        name: "③ 방계 × 고대세대 (고대의 베테랑)",
+        concept: "압도적 지식과 생존력 (유틸리티 / 탐색 특화)",
+        pros: "탐색, 분석, 약점 파악 성공률 대폭 증가 / 하루 1회 위험 지역 도주/회피 무조건 성공",
+        cons: "직접 전투/파괴력 판정 시 보너스 없음 / 화려한 대성공 쾌감이 적고 꾸준한 보조 역할"
+      },
+      "방계x신세대": {
+        name: "④ 방계 × 신세대 (현대의 육성형)",
+        concept: "최고의 안정성과 융통성 (안정성 / 성장 특화)",
+        pros: "대실패(1) 발생 시 일반 실패로 완화 / 제작, 인벤토리, 장비 활용 등 유틸리티 최강",
+        cons: "대성공(Critical) 발생 확률 기본 고정 / 한 번에 판을 뒤엎는 폭발적인 권능 행사 불가"
+      }
     };
 
-    const GENERAL_EDU_DATA = [
-      { name: "해독학", stat: "재정", passive: "독성 완화", effect: "독 상태 이상 지속 시간 1턴 감소", constraint: "상시 적용" },
-      { name: "응급처치학", stat: "재정", passive: "응급 처치", effect: "스탯 판정 성공 시 체력(HP) 회복 판정 기회 획득", constraint: "스탯 판정 시" },
-      { name: "상황대처학", stat: "단선", passive: "도주 지원", effect: "단선 판정 시 파티 전체의 도주 판정에 추가 주사위(+1D) 부여", constraint: "스탯 판정 시" },
-      { name: "금전학", stat: "재정", passive: "흥정", effect: "상점 거래 및 가격 흥정 판정 시 추가 주사위(+1D) 획득", constraint: "상시 적용" }
+    /* 첨부 이미지 2: 주전공 데이터 */
+    const MAIN_MAJORS = [
+      { id: "PAS_01", category: "전투사관학", name: "원거리 전투학", stat: "방직", passive: "정밀 사격", effect: "Dice_Bonus +1 (엄폐 및 거리가 먼 대상)", constraint: "상시 적용" },
+      { id: "PAS_02", category: "전투사관학", name: "검술학", stat: "방직", passive: "흘려내기", effect: "Durability_Damage_Reduce 50%", constraint: "방어 성공 시" },
+      { id: "PAS_03", category: "전투사관학", name: "마법학", stat: "재정", passive: "마력 효율화", effect: "Resource_Refund_Check +1", constraint: "상시 적용" },
+      { id: "PAS_04", category: "전투사관학", name: "무투학", stat: "방직", passive: "충격 완화", effect: "Take_Damage_Min & Distance_Gain +1", constraint: "방어 성공 시" },
+      { id: "PAS_08", category: "전투지원학", name: "지형 활용학", stat: "재정", passive: "우회로 확보", effect: "Move_Penalty -1", constraint: "상시 적용" },
+      { id: "PAS_09", category: "전투지원학", name: "정보 수집학", stat: "단선", passive: "기습 대비", effect: "Disadvantage_Remove (본인)", constraint: "스탯 판정 시" },
+      { id: "PAS_10", category: "전투지원학", name: "전술 설계학", stat: "재정", passive: "전술 지휘", effect: "Ally_Check_Bonus +1", constraint: "상시 적용" },
+      { id: "PAS_16", category: "실용생활학", name: "의학", stat: "재정", passive: "응급 지혈", effect: "DoT_Damage -1", constraint: "상시 적용" },
+      { id: "PAS_17", category: "실용생활학", name: "건축학", stat: "방직", passive: "진지 구축", effect: "Rest_Effect +1 & Ambush_Risk -1", constraint: "휴식 시" },
+      { id: "PAS_18", category: "실용생활학", name: "포션학", stat: "재정", passive: "소모 절감", effect: "Ingredient_Refund 30%", constraint: "제작 실패 시" }
     ];
 
-    const ALL_MAJORS_LIST = Object.values(MAJORS_DATA).flat();
+    /* 첨부 이미지 2: 부전공 데이터 */
+    const SUB_MAJORS = [
+      { id: "PAS_05", category: "전투사관학", name: "카룬 기초학", stat: "재정", passive: "패턴 분석", effect: "Next_Defense_Dice +1D", constraint: "성공 시" },
+      { id: "PAS_06", category: "전투사관학", name: "전투 심리학", stat: "단선", passive: "사기 진작", effect: "Debuff_Level -1 (파티 전체)", constraint: "스탯 판정 시" },
+      { id: "PAS_07", category: "전투사관학", name: "전리품 수집학", stat: "방직", passive: "정밀 채취", effect: "Loot_Quality_Dice +1D", constraint: "상시 적용" },
+      { id: "PAS_11", category: "전투지원학", name: "모의전투학", stat: "재정", passive: "경험 활용", effect: "Dice_Bonus +1 (재대치 적)", constraint: "상시 적용" },
+      { id: "PAS_12", category: "전투지원학", name: "성분분석학", stat: "재정", passive: "속성 간파", effect: "Element_Damage_Reduce (파티)", constraint: "성공 시" },
+      { id: "PAS_13", category: "전투지원학", name: "메타모포시스", stat: "재정", passive: "위장 정찰", effect: "Stealth_Dice +1D", constraint: "상시 적용" },
+      { id: "PAS_14", category: "실용생활학", name: "장비 가공학", stat: "방직", passive: "임시 정비", effect: "Item_Status = Temporary_Use", constraint: "아이템당 1회" },
+      { id: "PAS_15", category: "실용생활학", name: "심리 상담학", stat: "단선", passive: "정신적 완화", effect: "Mental_Debuff_Duration -1Turn", constraint: "스탯 판정 시" },
+      { id: "PAS_19", category: "실용생활학", name: "조리학", stat: "방직", passive: "식사 재정비", effect: "Next_Check_Bonus +1", constraint: "휴식 후 1회" },
+      { id: "PAS_20", category: "실용생활학", name: "디자인학", stat: "방직", passive: "신분 위장", effect: "Disguise_Dice +1D", constraint: "상시 적용" },
+      { id: "PAS_21", category: "실용생활학", name: "재료 가공학", stat: "방직", passive: "효율 가공", effect: "Material_Destroy_Prevent", constraint: "상시 적용" },
+      { id: "PAS_22", category: "실용생활학", name: "카룬 해부학", stat: "재정", passive: "약점 타격", effect: "Extra_Damage_Dice +1D", constraint: "성공 시" },
+      { id: "PAS_23", category: "실용생활학", name: "응용정리학", stat: "방직", passive: "도구 수색", effect: "Consumable_Cost_Reduce", constraint: "성공 시" }
+    ];
+
+    /* 첨부 이미지 2: 공통교양 데이터 */
+    const GENERAL_EDU_DATA = [
+      { id: "PAS_24", category: "공통교양", name: "해독학", stat: "재정", passive: "독성 완화", effect: "Poison_Duration -1Turn", constraint: "상시 적용" },
+      { id: "PAS_25", category: "공통교양", name: "응급처치학", stat: "재정", passive: "응급 처치", effect: "HP_Recovery_Check", constraint: "스탯 판정 시" },
+      { id: "PAS_26", category: "공통교양", name: "상황대처학", stat: "단선", passive: "도주 지원", effect: "Escape_Dice +1D (파티 전체)", constraint: "스탯 판정 시" },
+      { id: "PAS_27", category: "공통교양", name: "금전학", stat: "재정", passive: "흥정", effect: "Trade_Discount_Check +1D", constraint: "상시 적용" }
+    ];
 
     let currentStep = 1;
     let stats = { klotho: 1, lachesis: 1, atropos: 1 };
@@ -431,24 +449,32 @@
     };
 
     function initDropdowns() {
-      const majorSelect = document.getElementById('major');
-      let majorHTML = "";
-      for (const [cat, list] of Object.entries(MAJORS_DATA)) {
-        majorHTML += `<optgroup label="[${cat}]">`;
-        list.forEach(m => {
-          majorHTML += `<option value="${m.name}">${m.name}</option>`;
-        });
-        majorHTML += `</optgroup>`;
-      }
-      majorSelect.innerHTML = majorHTML;
+      // 주전공 바인딩
+      const mainSelect = document.getElementById('major');
+      mainSelect.innerHTML = MAIN_MAJORS.map(m => `<option value="${m.name}">${m.name} (${m.category})</option>`).join('');
 
+      // 공통교양 바인딩
       const genSelect = document.getElementById('general-edu');
       genSelect.innerHTML = GENERAL_EDU_DATA.map(g => `<option value="${g.name}">${g.name}</option>`).join('');
 
-      onMajorChange();
+      // 부전공 바인딩
+      updateSubMajorDropdowns();
     }
 
-    /* 학년 변경 시 스탯 최대 포인트 및 혜택 연동 */
+    function updateSubMajorDropdowns() {
+      const sub1Select = document.getElementById('sub-major-1');
+      sub1Select.innerHTML = SUB_MAJORS.map(m => `<option value="${m.name}">${m.name} (${m.category})</option>`).join('');
+      onSubMajorChange();
+    }
+
+    function onSubMajorChange() {
+      const sub1Val = document.getElementById('sub-major-1').value;
+      const sub2Select = document.getElementById('sub-major-2');
+      const filtered = SUB_MAJORS.filter(m => m.name !== sub1Val);
+      sub2Select.innerHTML = filtered.map(m => `<option value="${m.name}">${m.name} (${m.category})</option>`).join('');
+      updateGuide();
+    }
+
     function onGradeChange() {
       updateMaxPoints();
       updateGuide();
@@ -458,16 +484,9 @@
       const gradeStr = document.getElementById('grade').value;
       const gradeNum = parseInt(gradeStr.replace('학년', ''), 10);
 
-      // 1~8학년: 7pt, 9~12학년: 8pt
-      if (gradeNum >= 9) {
-        maxPoints = 8;
-      } else {
-        maxPoints = 7;
-      }
-
+      maxPoints = (gradeNum >= 9) ? 8 : 7;
       document.getElementById('max-pt').innerText = maxPoints;
 
-      // 스탯 초기화 및 포인트 재계산
       stats = { klotho: 1, lachesis: 1, atropos: 1 };
       document.getElementById('val-klotho').innerText = 1;
       document.getElementById('val-lachesis').innerText = 1;
@@ -478,32 +497,6 @@
 
       document.getElementById('remain-pt').innerText = remain;
       document.getElementById('btn-complete').disabled = (remain !== 0);
-    }
-
-    function onMajorChange() {
-      updateSubMajorDropdowns();
-      updateGuide();
-    }
-
-    function onSubMajorChange() {
-      const currentMajor = document.getElementById('major').value;
-      const sub1Val = document.getElementById('sub-major-1').value;
-
-      const sub2Select = document.getElementById('sub-major-2');
-      const filtered2 = ALL_MAJORS_LIST.filter(m => m.name !== currentMajor && m.name !== sub1Val);
-      sub2Select.innerHTML = filtered2.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
-
-      updateGuide();
-    }
-
-    function updateSubMajorDropdowns() {
-      const currentMajor = document.getElementById('major').value;
-
-      const sub1Select = document.getElementById('sub-major-1');
-      const filtered1 = ALL_MAJORS_LIST.filter(m => m.name !== currentMajor);
-      sub1Select.innerHTML = filtered1.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
-
-      onSubMajorChange();
     }
 
     function openSignupModal() {
@@ -561,9 +554,9 @@
         if (gradeNum <= 4) {
           bonusText = "기본 스탯 포인트 <strong>7pt</strong> 제공";
         } else if (gradeNum <= 8) {
-          bonusText = "스탯 포인트 <strong>7pt</strong> + TRPG 어시스트 시 <strong>다이스 판정 +1 (+1D)</strong> 혜택";
+          bonusText = "스탯 포인트 <strong>7pt</strong> + TRPG 어시스트 시 <strong>다이스 판정 +1 (+1D)</strong>";
         } else {
-          bonusText = "스탯 포인트 <strong>8pt</strong> + TRPG 어시스트 시 <strong>다이스 판정 +1 (+1D)</strong> 혜택";
+          bonusText = "스탯 포인트 <strong>8pt</strong> + TRPG 어시스트 시 <strong>다이스 판정 +1 (+1D)</strong>";
         }
 
         guideBody.innerHTML = `
@@ -580,50 +573,60 @@
           <div class="guide-section">
             <div class="guide-section-title">💡 계정 및 캐릭터 설정</div>
             <p>· <strong>본닉</strong>: 커뮤니티 플레이어 식별용 이름</p>
-            <p>· <strong>캐릭터 이름</strong>: RP(Role Play) 진행 시 마법학교 내에서 사용되는 공식 성명입니다.</p>
+            <p>· <strong>캐릭터 이름</strong>: RP(Role Play) 진행 시 공식 성명입니다.</p>
           </div>
         `;
       } 
       else if (currentStep === 2) {
-        guideTitle.innerText = "Step 2. 선택 학과/교양 패시브 혜택";
+        guideTitle.innerText = "Step 2. 태생 및 전공/교양 정보";
         
+        const originKey = document.getElementById('origin').value;
+        const originInfo = ORIGINS_DATA[originKey];
+
         const mName = document.getElementById('major').value;
         const s1Name = document.getElementById('sub-major-1').value;
         const s2Name = document.getElementById('sub-major-2').value;
         const gName = document.getElementById('general-edu').value;
 
-        const mObj = ALL_MAJORS_LIST.find(x => x.name === mName) || {};
-        const s1Obj = ALL_MAJORS_LIST.find(x => x.name === s1Name) || {};
-        const s2Obj = ALL_MAJORS_LIST.find(x => x.name === s2Name) || {};
+        const mObj = MAIN_MAJORS.find(x => x.name === mName) || {};
+        const s1Obj = SUB_MAJORS.find(x => x.name === s1Name) || {};
+        const s2Obj = SUB_MAJORS.find(x => x.name === s2Name) || {};
         const gObj = GENERAL_EDU_DATA.find(x => x.name === gName) || {};
 
         guideBody.innerHTML = `
-          <div class="guide-section">
-            <span class="guide-badge">주전공</span> <strong>${mObj.name || ''}</strong>
-            <p><strong>패시브:</strong> ${mObj.passive || ''} (${mObj.stat || ''})</p>
-            <p>· <strong>유저 혜택:</strong> ${mObj.effect || ''}</p>
-            <div class="guide-constraint">⚠️ 제약 조건: ${mObj.constraint || ''}</div>
+          <div class="guide-section" style="border-left-color: #ffaa00;">
+            <span class="guide-badge" style="background:#4a3800; color:#ffdd88;">태생 선택</span> <strong>${originInfo.name}</strong>
+            <p style="margin-top:4px;"><strong>콘셉트:</strong> ${originInfo.concept}</p>
+            <p><strong>장점:</strong> ${originInfo.pros}</p>
+            <div class="guide-constraint">⚠️ 단점: ${originInfo.cons}</div>
           </div>
 
           <div class="guide-section">
-            <span class="guide-badge">부전공 1</span> <strong>${s1Obj.name || ''}</strong>
-            <p><strong>패시브:</strong> ${s1Obj.passive || ''} (${s1Obj.stat || ''})</p>
-            <p>· <strong>유저 혜택:</strong> ${s1Obj.effect || ''}</p>
-            <div class="guide-constraint">⚠️ 제약 조건: ${s1Obj.constraint || ''}</div>
+            <span class="guide-badge">주전공</span> <strong>${mObj.name || ''}</strong> (${mObj.category || ''})
+            <p><strong>패시브:</strong> ${mObj.passive || ''} [스탯: ${mObj.stat || ''}]</p>
+            <p>· <strong>효과:</strong> ${mObj.effect || ''}</p>
+            <div class="guide-constraint">⚠️ 제약: ${mObj.constraint || ''}</div>
           </div>
 
           <div class="guide-section">
-            <span class="guide-badge">부전공 2</span> <strong>${s2Obj.name || ''}</strong>
-            <p><strong>패시브:</strong> ${s2Obj.passive || ''} (${s2Obj.stat || ''})</p>
-            <p>· <strong>유저 혜택:</strong> ${s2Obj.effect || ''}</p>
-            <div class="guide-constraint">⚠️ 제약 조건: ${s2Obj.constraint || ''}</div>
+            <span class="guide-badge">부전공 1</span> <strong>${s1Obj.name || ''}</strong> (${s1Obj.category || ''})
+            <p><strong>패시브:</strong> ${s1Obj.passive || ''} [스탯: ${s1Obj.stat || ''}]</p>
+            <p>· <strong>효과:</strong> ${s1Obj.effect || ''}</p>
+            <div class="guide-constraint">⚠️ 제약: ${s1Obj.constraint || ''}</div>
+          </div>
+
+          <div class="guide-section">
+            <span class="guide-badge">부전공 2</span> <strong>${s2Obj.name || ''}</strong> (${s2Obj.category || ''})
+            <p><strong>패시브:</strong> ${s2Obj.passive || ''} [스탯: ${s2Obj.stat || ''}]</p>
+            <p>· <strong>효과:</strong> ${s2Obj.effect || ''}</p>
+            <div class="guide-constraint">⚠️ 제약: ${s2Obj.constraint || ''}</div>
           </div>
 
           <div class="guide-section">
             <span class="guide-badge">공통교양</span> <strong>${gObj.name || ''}</strong>
-            <p><strong>패시브:</strong> ${gObj.passive || ''} (${gObj.stat || ''})</p>
-            <p>· <strong>유저 혜택:</strong> ${gObj.effect || ''}</p>
-            <div class="guide-constraint">⚠️ 제약 조건: ${gObj.constraint || ''}</div>
+            <p><strong>패시브:</strong> ${gObj.passive || ''} [스탯: ${gObj.stat || ''}]</p>
+            <p>· <strong>효과:</strong> ${gObj.effect || ''}</p>
+            <div class="guide-constraint">⚠️ 제약: ${gObj.constraint || ''}</div>
           </div>
         `;
       } 
@@ -721,7 +724,8 @@
       const nickname = document.getElementById('nickname').value.trim();
       const charName = document.getElementById('char-name').value.trim();
       const grade = document.getElementById('grade').value;
-      const origin = document.getElementById('origin').value;
+      const originKey = document.getElementById('origin').value;
+      const originName = ORIGINS_DATA[originKey]?.name || originKey;
 
       if (!username || !password || password.length < 6) {
         return alert("아이디와 6자리 이상의 비밀번호를 입력해 주세요.");
@@ -739,7 +743,7 @@
         username: username,
         nickname: nickname,
         name: charName,
-        role: `${grade} (${origin})`,
+        role: `${grade} (${originName})`,
         klotho: stats.klotho,
         lachesis: stats.lachesis,
         atropos: stats.atropos,
