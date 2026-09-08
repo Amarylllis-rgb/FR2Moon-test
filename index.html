@@ -270,12 +270,19 @@
         </div>
         <div class="form-group">
           <label>신분 및 학년 선택:</label>
-          <select id="grade" onchange="updateGuide()">
-            <option value="1년차">1년차 (신입생 - 7pt)</option>
-            <option value="2년차">2년차 (8pt)</option>
-            <option value="3년차">3년차 (9pt)</option>
-            <option value="4년차">4년차 (10pt)</option>
-            <option value="5년차">5년차 (11pt)</option>
+          <select id="grade" onchange="onGradeChange()">
+            <option value="1학년">1학년 (7pt)</option>
+            <option value="2학년">2학년 (7pt)</option>
+            <option value="3학년">3학년 (7pt)</option>
+            <option value="4학년">4학년 (7pt)</option>
+            <option value="5학년">5학년 (7pt + 어시스트 보너스)</option>
+            <option value="6학년">6학년 (7pt + 어시스트 보너스)</option>
+            <option value="7학년">7학년 (7pt + 어시스트 보너스)</option>
+            <option value="8학년">8학년 (7pt + 어시스트 보너스)</option>
+            <option value="9학년">9학년 (8pt + 어시스트 보너스)</option>
+            <option value="10학년">10학년 (8pt + 어시스트 보너스)</option>
+            <option value="11학년">11학년 (8pt + 어시스트 보너스)</option>
+            <option value="12학년">12학년 (8pt + 어시스트 보너스)</option>
           </select>
         </div>
         <button class="btn-primary" onclick="goStep(2)">다음 (태생 및 학과 선택)</button>
@@ -372,7 +379,6 @@
 
     const BANNED_WORDS = ['관리자', '운영진', 'admin', '운영자', 'system', 'fuck', 'shit'];
 
-    // Sheet2 기반 학과/교양 데이터 (패시브, 적용스탯, 실질 혜택, 제약조건)
     const MAJORS_DATA = {
       "전투사관학": [
         { name: "원거리 전투학", stat: "방직", passive: "정밀 사격", effect: "엄폐 중이거나 거리가 먼 대상을 공격할 때 판정 보너스 +1", constraint: "상시 적용" },
@@ -412,7 +418,6 @@
       { name: "금전학", stat: "재정", passive: "흥정", effect: "상점 거래 및 가격 흥정 판정 시 추가 주사위(+1D) 획득", constraint: "상시 적용" }
     ];
 
-    // 평탄화된 모든 학과 리스트
     const ALL_MAJORS_LIST = Object.values(MAJORS_DATA).flat();
 
     let currentStep = 1;
@@ -422,10 +427,10 @@
 
     window.onload = () => {
       initDropdowns();
+      updateMaxPoints();
     };
 
     function initDropdowns() {
-      // 주전공 드롭다운 (그룹화)
       const majorSelect = document.getElementById('major');
       let majorHTML = "";
       for (const [cat, list] of Object.entries(MAJORS_DATA)) {
@@ -437,11 +442,42 @@
       }
       majorSelect.innerHTML = majorHTML;
 
-      // 공통교양 드롭다운
       const genSelect = document.getElementById('general-edu');
       genSelect.innerHTML = GENERAL_EDU_DATA.map(g => `<option value="${g.name}">${g.name}</option>`).join('');
 
       onMajorChange();
+    }
+
+    /* 학년 변경 시 스탯 최대 포인트 및 혜택 연동 */
+    function onGradeChange() {
+      updateMaxPoints();
+      updateGuide();
+    }
+
+    function updateMaxPoints() {
+      const gradeStr = document.getElementById('grade').value;
+      const gradeNum = parseInt(gradeStr.replace('학년', ''), 10);
+
+      // 1~8학년: 7pt, 9~12학년: 8pt
+      if (gradeNum >= 9) {
+        maxPoints = 8;
+      } else {
+        maxPoints = 7;
+      }
+
+      document.getElementById('max-pt').innerText = maxPoints;
+
+      // 스탯 초기화 및 포인트 재계산
+      stats = { klotho: 1, lachesis: 1, atropos: 1 };
+      document.getElementById('val-klotho').innerText = 1;
+      document.getElementById('val-lachesis').innerText = 1;
+      document.getElementById('val-atropos').innerText = 1;
+
+      const currentUsed = (stats.klotho - 1) + (stats.lachesis - 1) + (stats.atropos - 1);
+      const remain = maxPoints - currentUsed;
+
+      document.getElementById('remain-pt').innerText = remain;
+      document.getElementById('btn-complete').disabled = (remain !== 0);
     }
 
     function onMajorChange() {
@@ -512,7 +548,6 @@
       updateGuide();
     }
 
-    // 우측 설명 패널 동적 생성 함수
     function updateGuide() {
       const guideTitle = document.getElementById('guide-step-title');
       const guideBody = document.getElementById('guide-body');
@@ -520,12 +555,27 @@
       if (currentStep === 1) {
         guideTitle.innerText = "Step 1. 학년 및 캐릭터 가이드";
         const selectedGrade = document.getElementById('grade').value;
+        const gradeNum = parseInt(selectedGrade.replace('학년', ''), 10);
+
+        let bonusText = "";
+        if (gradeNum <= 4) {
+          bonusText = "기본 스탯 포인트 <strong>7pt</strong> 제공";
+        } else if (gradeNum <= 8) {
+          bonusText = "스탯 포인트 <strong>7pt</strong> + TRPG 어시스트 시 <strong>다이스 판정 +1 (+1D)</strong> 혜택";
+        } else {
+          bonusText = "스탯 포인트 <strong>8pt</strong> + TRPG 어시스트 시 <strong>다이스 판정 +1 (+1D)</strong> 혜택";
+        }
+
         guideBody.innerHTML = `
           <div class="guide-section">
             <span class="guide-badge">현재 선택: ${selectedGrade}</span>
-            <div class="guide-section-title">🎓 학년별 스탯 혜택</div>
-            <p>· <strong>1년차 (신입생)</strong>: 기본 <strong>7pt</strong> 지급</p>
-            <p>· <strong>2~5년차</strong>: 학년 상승당 +1pt 추가 지급 (최대 11pt)</p>
+            <div class="guide-section-title">🎓 학년별 스탯 및 패시브 혜택</div>
+            <p>· <strong>1~4학년</strong>: 스탯 포인트 7pt</p>
+            <p>· <strong>5~8학년</strong>: 스탯 포인트 7pt + 어시스트 시 다이스 판정 +1</p>
+            <p>· <strong>9~12학년</strong>: 스탯 포인트 8pt + 어시스트 시 다이스 판정 +1</p>
+            <div style="margin-top:10px; padding:8px; background:#1e1e24; border-radius:4px; font-size:0.8rem; color:#88aaff;">
+              ✨ <strong>적용 혜택:</strong> ${bonusText}
+            </div>
           </div>
           <div class="guide-section">
             <div class="guide-section-title">💡 계정 및 캐릭터 설정</div>
