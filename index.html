@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>[달에서.] 접속하기</title>
-  <!-- Supabase JS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body {
@@ -13,14 +12,14 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
       margin: 0;
     }
     .card {
       background-color: #1e1e1e;
       border-radius: 8px;
       padding: 24px;
-      width: 360px;
+      width: 400px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     }
     .title {
@@ -71,6 +70,11 @@
       cursor: pointer;
       margin-top: 8px;
     }
+    .btn-primary:disabled {
+      background-color: #333;
+      color: #666;
+      cursor: not-allowed;
+    }
     .btn-secondary {
       width: 100%;
       padding: 10px;
@@ -81,56 +85,177 @@
       margin-top: 8px;
       cursor: pointer;
     }
-    .hidden {
-      display: none !important;
+    .link-btn {
+      color: #88aaff;
+      font-size: 0.85rem;
+      text-align: center;
+      margin-top: 12px;
+      cursor: pointer;
+      text-decoration: underline;
     }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .stat-ctrl {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid #555;
+      background-color: #2a2a2a;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .badge {
+      font-size: 0.8rem;
+      color: #88aaff;
+      margin-bottom: 12px;
+      display: block;
+    }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-  <!-- 1. 인증/가입 모달 카드 -->
-  <div id="auth-card" class="card">
+  <!-- STEP 0: 메인 접속/로그인 폼 -->
+  <div id="step-0-card" class="card">
     <div class="title">[달에서.] 접속하기</div>
+    <div class="form-group">
+      <label>아이디:</label>
+      <input type="text" id="login-username" placeholder="아이디 입력">
+    </div>
+    <div class="form-group">
+      <label>비밀번호:</label>
+      <input type="password" id="login-password" placeholder="비밀번호 입력">
+    </div>
+    <button class="btn-primary" onclick="handleLogin()">접속하기</button>
+    <div class="link-btn" onclick="openSignupModal()">신규 학생 등록(회원가입)</div>
+  </div>
 
-    <!-- STEP 1: 기본 로그인 / 계정 확인 -->
+  <!-- 회원가입 모달 카드 (Step 1~3) -->
+  <div id="signup-card" class="card hidden">
+    <div class="title" id="modal-title">Step 1. 계정 및 기본 정보</div>
+
+    <!-- STEP 1: 기본 정보 설정 -->
     <div id="step-1">
       <div class="form-group">
-        <label>아이디:</label>
-        <input type="text" id="username" placeholder="아이디 입력">
+        <label>신규 아이디 / 비밀번호</label>
+        <input type="text" id="reg-username" placeholder="사용할 아이디" style="margin-bottom:6px;">
+        <input type="password" id="reg-password" placeholder="비밀번호 (6자리 이상)">
       </div>
       <div class="form-group">
-        <label>비밀번호:</label>
-        <input type="password" id="password" placeholder="비밀번호 입력">
-      </div>
-      <button class="btn-primary" onclick="handleStep1Next()">접속하기</button>
-    </div>
-
-    <!-- STEP 2: 신규 가입 추가 정보 입력 -->
-    <div id="step-2" class="hidden">
-      <div class="form-group">
-        <label>계정 닉네임 (본닉 - 신규가입 시):</label>
+        <label>계정 닉네임 (본닉):</label>
         <div class="input-with-btn">
           <input type="text" id="nickname" placeholder="예: 구름">
-          <button class="btn-side" onclick="checkDuplicate()">중복확인</button>
+          <button class="btn-side" onclick="checkNicknameDuplicate()">중복확인</button>
         </div>
       </div>
       <div class="form-group">
-        <label>캐릭터 이름 (RP용 - 신규가입 시):</label>
+        <label>RP용 캐릭터 이름 (성/이름):</label>
         <input type="text" id="char-name" placeholder="예: 아마릴리스 클로토">
       </div>
       <div class="form-group">
-        <label>직급 선택 (신규가입 시):</label>
-        <select id="role">
-          <option value="일반 학생">일반 학생 (10pt / 상한 5)</option>
-          <option value="교직원">교직원</option>
+        <label>신분 및 학년 선택:</label>
+        <span class="badge">※ 신입생 기본 7pt 스탯 제공</span>
+        <select id="grade" style="margin-top:4px;">
+          <option value="1년차">1년차 (신입생)</option>
+          <option value="2년차">2년차</option>
+          <option value="3년차">3년차</option>
+          <option value="4년차">4년차</option>
+          <option value="5년차">5년차</option>
+          <option value="6년차">6년차</option>
+          <option value="7년차">7년차</option>
+          <option value="8년차">8년차</option>
+          <option value="9년차">9년차</option>
+          <option value="10년차">10년차</option>
+          <option value="11년차">11년차</option>
+          <option value="12년차">12년차</option>
         </select>
       </div>
-      <button class="btn-primary" onclick="handleRegisterComplete()">가입 및 접속 완료</button>
-      <button class="btn-secondary" onclick="goToStep(1)">이전 단계로</button>
+      <button class="btn-primary" onclick="goStep(2)">다음 (태생 및 학과 선택)</button>
+      <button class="btn-secondary" onclick="closeSignupModal()">취소</button>
+    </div>
+
+    <!-- STEP 2: 태생 및 학과 선택 -->
+    <div id="step-2" class="hidden">
+      <div class="form-group">
+        <label>태생 선택:</label>
+        <select id="origin">
+          <option value="순혈">순혈 마법사</option>
+          <option value="혼혈">혼혈</option>
+          <option value="마글출신">마글 출신</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>주전공 (1개):</label>
+        <select id="major" onchange="updateSubMajorOptions()"></select>
+      </div>
+      <div class="form-group">
+        <label>부전공 1 / 부전공 2:</label>
+        <select id="sub-major-1" onchange="updateSubMajorOptions()" style="margin-bottom:6px;"></select>
+        <select id="sub-major-2"></select>
+      </div>
+      <div class="form-group">
+        <label>공통교양 (1개):</label>
+        <select id="general-edu">
+          <option value="마법사 사회와 문화">마법사 사회와 문화</option>
+          <option value="기초 마법약학">기초 마법약학</option>
+          <option value="천문학 개론">천문학 개론</option>
+          <option value="신비한 동물 관리">신비한 동물 관리</option>
+        </select>
+      </div>
+      <button class="btn-primary" onclick="goStep(3)">다음 (스탯 배분)</button>
+      <button class="btn-secondary" onclick="goStep(1)">이전</button>
+    </div>
+
+    <!-- STEP 3: 스탯 배분 (7pt 컨트롤러) -->
+    <div id="step-3" class="hidden">
+      <div style="text-align:center; margin-bottom: 16px;">
+        <span style="font-size:1.1rem; font-weight:bold;">남은 포인트: <span id="remain-pt" style="color:#88aaff;">7</span> / 7 pt</span>
+      </div>
+
+      <div class="stat-row">
+        <div><strong>방직 (紡織)</strong></div>
+        <div class="stat-ctrl">
+          <button class="btn-circle" onclick="changeStat('klotho', -1)">-</button>
+          <span id="val-klotho">1</span>
+          <button class="btn-circle" onclick="changeStat('klotho', 1)">+</button>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div><strong>재정 (裁定)</strong></div>
+        <div class="stat-ctrl">
+          <button class="btn-circle" onclick="changeStat('lachesis', -1)">-</button>
+          <span id="val-lachesis">1</span>
+          <button class="btn-circle" onclick="changeStat('lachesis', 1)">+</button>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div><strong>단선 (斷線)</strong></div>
+        <div class="stat-ctrl">
+          <button class="btn-circle" onclick="changeStat('atropos', -1)">-</button>
+          <span id="val-atropos">1</span>
+          <button class="btn-circle" onclick="changeStat('atropos', 1)">+</button>
+        </div>
+      </div>
+      <span class="badge">※ 단선 수치만큼 전투 토큰 최대치가 동기화됩니다.</span>
+
+      <button id="btn-complete" class="btn-primary" disabled onclick="handleRegisterComplete()">완료 및 메인 접속</button>
+      <button class="btn-secondary" onclick="goStep(2)">이전</button>
     </div>
   </div>
 
-  <!-- 2. 메인 대시보드 화면 -->
+  <!-- 메인 대시보드 (로그인 완료 상태) -->
   <div id="main-app" class="card hidden">
     <div class="title">환영합니다!</div>
     <p id="user-info-text">성공적으로 접속되었습니다.</p>
@@ -138,94 +263,104 @@
   </div>
 
   <script>
-    // Supabase 설정 (단 한 번만 선언)
-    const SUPABASE_URL = 'https://ussdpozmngczyrabcgun.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_NHt6pA_nGOl4zDKgUTntfA_LGioJewy';
-    
-    // 글로벌 window.supabaseClient 사용
+    // -----------------------------------------------------------------
+    // Supabase 설정
+    // -----------------------------------------------------------------
+    const SUPABASE_URL = 'https://YOUR_SUPABASE_PROJECT_URL.supabase.co';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let currentAuthUser = null;
+    // 금지어 필터링 목록 (Client & Server)
+    const BANNED_WORDS = ['관리자', 'admin', '운영자', 'system', 'fuck', 'shit'];
 
-    function goToStep(stepNumber) {
-      if (stepNumber === 1) {
-        document.getElementById('step-1').classList.remove('hidden');
-        document.getElementById('step-2').classList.add('hidden');
-      } else if (stepNumber === 2) {
-        document.getElementById('step-1').classList.add('hidden');
-        document.getElementById('step-2').classList.remove('hidden');
-      }
+    // 27개 학과 샘플 데이터
+    const MAJORS = [
+      "변신술학과", "마법약학과", "어둠의 마법 방어학과", "신비한 동물 학과", "점술학과", 
+      "천문학과", "마법식물학과", "마법사 역사학과", "비행학과", "고대 룬 문자학과",
+      "산술점학과", "연금술학과", "마피아학", "결투학", "소환술학", 
+      "주문학", "저주해제학", "마법도구학", "치유학", "마법의회학",
+      "마글연구학", "용학", "정령학", "공간마법학", "시간마법학", "환상학", "정신마법학"
+    ];
+
+    let stats = { klotho: 1, lachesis: 1, atropos: 1 };
+    let initialPts = 7;
+    let isNicknameChecked = false;
+
+    // 초기화
+    window.onload = () => {
+      initMajors();
+    };
+
+    function initMajors() {
+      const majorSelect = document.getElementById('major');
+      majorSelect.innerHTML = MAJORS.map(m => `<option value="${m}">${m}</option>`).join('');
+      updateSubMajorOptions();
     }
 
-    // STEP 1: 접속 및 인증 로직
-    async function handleStep1Next() {
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value.trim();
+    // 주전공 선택 시 부전공 목록에서 주전공 항목 자동 제외/비활성화
+    function updateSubMajorOptions() {
+      const currentMajor = document.getElementById('major').value;
+      const sub1Val = document.getElementById('sub-major-1').value;
 
-      if (!username || !password) {
-        alert("아이디와 비밀번호를 모두 입력해주세요.");
-        return;
-      }
-
-      const fakeEmail = `${username}@moon.local`;
-
-      try {
-        // 1. Auth 로그인 시도
-        const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
-          email: fakeEmail,
-          password: password
-        });
-
-        if (authError) {
-          // 비밀번호 오류 또는 미가입 사용자의 경우 신규 가입 시도
-          if (authError.message.includes("Invalid login credentials")) {
-            const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({
-              email: fakeEmail,
-              password: password
-            });
-
-            if (signUpError) {
-              alert("로그인/가입 처리 중 오류 발생: " + signUpError.message);
-              return;
-            }
-
-            currentAuthUser = signUpData.user;
-            alert("신규 계정입니다. 가입 세부 정보 입력 단계로 이동합니다.");
-            goToStep(2);
-            return;
-          } else {
-            alert("로그인 오류: " + authError.message);
-            return;
-          }
-        }
-
-        // 로그인 성공 시
-        currentAuthUser = authData.user;
-
-        // 2. characters 테이블 프로필 존재 확인
-        const { data: character, error: charError } = await supabaseClient
-          .from('characters')
-          .select('*')
-          .eq('user_id', currentAuthUser.id)
-          .maybeSingle();
-
-        if (character) {
-          renderMainApp(character.username || username, character.nickname);
-        } else {
-          // Auth 계정은 있지만 캐릭터 프로필이 없으면 Step 2로 이동
-          goToStep(2);
-        }
-      } catch (err) {
-        console.error(err);
-        alert("시스템 오류가 발생했습니다: " + err.message);
-      }
+      const filtered1 = MAJORS.filter(m => m !== currentMajor);
+      document.getElementById('sub-major-1').innerHTML = filtered1.map(m => `<option value="${m}">${m}</option>`).join('');
+      
+      const selectedSub1 = document.getElementById('sub-major-1').value;
+      const filtered2 = MAJORS.filter(m => m !== currentMajor && m !== selectedSub1);
+      document.getElementById('sub-major-2').innerHTML = filtered2.map(m => `<option value="${m}">${m}</option>`).join('');
     }
 
-    // STEP 2: 닉네임 중복 확인
-    async function checkDuplicate() {
+    // 금지어 검증 함수
+    function containsBannedWord(text) {
+      return BANNED_WORDS.some(word => text.toLowerCase().includes(word.toLowerCase()));
+    }
+
+    // Modal UI 제어
+    function openSignupModal() {
+      document.getElementById('step-0-card').classList.add('hidden');
+      document.getElementById('signup-card').classList.remove('hidden');
+      goStep(1);
+    }
+
+    function closeSignupModal() {
+      document.getElementById('signup-card').classList.add('hidden');
+      document.getElementById('step-0-card').classList.remove('hidden');
+    }
+
+    function goStep(step) {
+      if (step === 2) {
+        const nickname = document.getElementById('nickname').value.trim();
+        const charName = document.getElementById('char-name').value.trim();
+        if (!nickname || !charName) {
+          alert("닉네임과 캐릭터 이름을 입력해주세요.");
+          return;
+        }
+        if (containsBannedWord(nickname) || containsBannedWord(charName)) {
+          alert("사용 불가능한 단어(금지어)가 포함되어 있습니다.");
+          return;
+        }
+        if (!isNicknameChecked) {
+          alert("닉네임 중복확인을 먼저 진행해 주세요.");
+          return;
+        }
+      }
+
+      ['step-1', 'step-2', 'step-3'].forEach((id, idx) => {
+        document.getElementById(id).classList.toggle('hidden', idx + 1 !== step);
+      });
+      document.getElementById('modal-title').innerText = `Step ${step}. ` + 
+        (step === 1 ? '기본 정보' : step === 2 ? '태생 및 학과 선택' : '운명 스탯 배분');
+    }
+
+    // 닉네임 중복확인
+    async function checkNicknameDuplicate() {
       const nickname = document.getElementById('nickname').value.trim();
       if (!nickname) {
         alert("닉네임을 입력해주세요.");
+        return;
+      }
+      if (containsBannedWord(nickname)) {
+        alert("금지어가 포함된 닉네임입니다.");
         return;
       }
 
@@ -234,75 +369,138 @@
         .select('id')
         .eq('nickname', nickname);
 
-      if (error) {
-        alert("중복 확인 오류: " + error.message);
-        return;
-      }
-
       if (data && data.length > 0) {
-        alert("이미 사용 중인 닉네임입니다.");
+        alert("이미 존재하거나 사용 중인 닉네임입니다.");
+        isNicknameChecked = false;
       } else {
-        alert("사용 가능한 닉네임입니다.");
+        alert("사용 가능한 닉네임입니다!");
+        isNicknameChecked = true;
       }
     }
 
-    // STEP 2: 가입완료 및 DB 저장
-    async function handleRegisterComplete() {
-      const username = document.getElementById('username').value.trim();
-      const nickname = document.getElementById('nickname').value.trim();
-      const charName = document.getElementById('char-name').value.trim();
-      const role = document.getElementById('role').value;
+    // 스탯 배분 컨트롤러 (총 7pt 제한)
+    function changeStat(key, delta) {
+      const currentUsed = (stats.klotho - 1) + (stats.lachesis - 1) + (stats.atropos - 1);
+      const remain = initialPts - currentUsed;
 
-      if (!nickname || !charName) {
-        alert("모든 가입 정보를 입력해주세요.");
+      if (delta > 0 && remain <= 0) return;
+      if (delta < 0 && stats[key] <= 1) return;
+
+      stats[key] += delta;
+      document.getElementById(`val-${key}`).innerText = stats[key];
+
+      const newUsed = (stats.klotho - 1) + (stats.lachesis - 1) + (stats.atropos - 1);
+      const newRemain = initialPts - newUsed;
+      document.getElementById('remain-pt').innerText = newRemain;
+
+      // 0pt가 되어야만 [완료 및 메인 접속] 버튼 활성화
+      document.getElementById('btn-complete').disabled = (newRemain !== 0);
+    }
+
+    // STEP 0: 로그인 로직
+    async function handleLogin() {
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value.trim();
+
+      if (!username || !password) {
+        alert("아이디와 비밀번호를 입력해 주세요.");
         return;
       }
 
-      if (!currentAuthUser) {
-        alert("인증 정보가 없습니다. 다시 진행해주세요.");
-        goToStep(1);
-        return;
-      }
-
-      const { data, error } = await supabaseClient
-        .from('characters')
-        .insert([
-          {
-            user_id: currentAuthUser.id,
-            username: username,
-            nickname: nickname,
-            name: charName,
-            role: role
-          }
-        ])
-        .select()
-        .single();
+      const fakeEmail = `${username}@moon.local`;
+      const { data: authData, error } = await supabaseClient.auth.signInWithPassword({
+        email: fakeEmail,
+        password: password
+      });
 
       if (error) {
-        alert("프로필 저장 실패: " + error.message);
+        alert("로그인 실패: 비밀번호 또는 아이디가 일치하지 않습니다.");
         return;
       }
 
-      alert("가입이 완료되었습니다!");
+      // 프로필 조회
+      const { data: character } = await supabaseClient
+        .from('characters')
+        .select('*')
+        .eq('user_id', authData.user.id)
+        .maybeSingle();
+
+      if (character) {
+        renderMainApp(character.username || username, character.nickname);
+      } else {
+        alert("프로필 정보가 없습니다. 회원가입을 완료해 주세요.");
+        openSignupModal();
+      }
+    }
+
+    // STEP 3 완료: 회원가입 최종 DB 저장
+    async function handleRegisterComplete() {
+      const username = document.getElementById('reg-username').value.trim();
+      const password = document.getElementById('reg-password').value.trim();
+      const nickname = document.getElementById('nickname').value.trim();
+      const charName = document.getElementById('char-name').value.trim();
+      const grade = document.getElementById('grade').value;
+      
+      const origin = document.getElementById('origin').value;
+      const major = document.getElementById('major').value;
+      const sub1 = document.getElementById('sub-major-1').value;
+      const sub2 = document.getElementById('sub-major-2').value;
+      const generalEdu = document.getElementById('general-edu').value;
+
+      if (!username || !password || password.length < 6) {
+        alert("아이디와 6자리 이상의 비밀번호를 입력해 주세요.");
+        return;
+      }
+
+      const fakeEmail = `${username}@moon.local`;
+
+      // 1. Supabase Auth 가입
+      const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({
+        email: fakeEmail,
+        password: password
+      });
+
+      if (signUpError) {
+        alert("계정 가입 실패: " + signUpError.message);
+        return;
+      }
+
+      // 2. DB Insert
+      const { error: dbError } = await supabaseClient
+        .from('characters')
+        .insert([{
+          user_id: signUpData.user.id,
+          username: username,
+          nickname: nickname,
+          name: charName,
+          role: `${grade} (${origin})`,
+          klotho: stats.klotho,
+          lachesis: stats.lachesis,
+          atropos: stats.atropos,
+          available_points: 0
+        }]);
+
+      if (dbError) {
+        alert("DB 저장 오류: " + dbError.message);
+        return;
+      }
+
+      alert("가입이 성공적으로 완료되었습니다!");
+      closeSignupModal();
       renderMainApp(username, nickname);
     }
 
-    // 메인 화면 전환
     function renderMainApp(username, nickname) {
-      document.getElementById('auth-card').classList.add('hidden');
+      document.getElementById('step-0-card').classList.add('hidden');
+      document.getElementById('signup-card').classList.add('hidden');
       document.getElementById('main-app').classList.remove('hidden');
       document.getElementById('user-info-text').innerText = `${nickname} (${username}) 님으로 접속되었습니다.`;
     }
 
-    // 로그아웃
     async function handleLogout() {
       await supabaseClient.auth.signOut();
-      currentAuthUser = null;
-      document.getElementById('username').value = '';
-      document.getElementById('password').value = '';
       document.getElementById('main-app').classList.add('hidden');
-      document.getElementById('auth-card').classList.remove('hidden');
-      goToStep(1);
+      document.getElementById('step-0-card').classList.remove('hidden');
     }
   </script>
 </body>
