@@ -285,10 +285,10 @@
         <div class="form-group">
           <label>태생 선택 (조합):</label>
           <select id="origin" onchange="updateGuide()">
-            <option value="직계x고대세대">① 직계 × 고대세대 (원형의 신성)</option>
-            <option value="직계x신세대">② 직계 × 신세대 (순혈의 유리몸)</option>
-            <option value="방계x고대세대">③ 방계 × 고대세대 (고대의 베테랑)</option>
-            <option value="방계x신세대">④ 방계 × 신세대 (현대의 육성형)</option>
+            <option value="직계x고대세대">직계 × 고대세대</option>
+            <option value="직계x신세대">직계 × 신세대</option>
+            <option value="방계x고대세대">방계 × 고대세대</option>
+            <option value="방계x신세대">방계 × 신세대</option>
           </select>
         </div>
         <div class="form-group">
@@ -371,35 +371,39 @@
 
     const BANNED_WORDS = ['관리자', '운영진', 'admin', '운영자', 'system', 'fuck', 'shit'];
 
-    /* 첨부 이미지 1: 태생 (조합) 데이터 */
+    /* 3-Track Filter 및 구체화된 태생 데이터 */
     const ORIGINS_DATA = {
       "직계x고대세대": {
-        name: "① 직계 × 고대세대 (원형의 신성)",
-        concept: "폭주하는 고대의 힘 (하이리스크 하이리턴)",
-        pros: "대성공(Critical) 범위 +2 (18~20 대성공) / 순간 폭딜 및 전황 뒤집기",
-        cons: "대실패(1) 발생 시 패널티 2배 / 운명의 반작용으로 자신/동료가 돌발 사고에 휘말림"
+        name: "직계 × 고대세대",
+        type: "하이리스크 하이리턴 / 고출력 권능",
+        filter: "방직(고출력 물리 파괴/실체 조작), 재정(대규모 현상학적 간섭/인과 왜곡), 단선(인과율 절단 및 방어 장벽)",
+        pros: "대성공 범위 확장 (18~20), 고위력 포텐셜",
+        cons: "대실패(1) 발생 시 패널티 2배 (보너스 수치로 인한 대성공 불가)"
       },
       "직계x신세대": {
-        name: "② 직계 × 신세대 (순혈의 유리몸)",
-        concept: "강력한 권능, 취약한 생존 (유리대포 / 자원 소모형)",
-        pros: "주 스탯 판정 시 대성공 범위 +1 / 판정 결과값에 고정 보너스(+1)",
-        cons: "방어/회피/도주 판정 시 패널티(-1) / 신체적·현실적 적응력이 떨어져 부상·상태이상에 취약"
+        name: "직계 × 신세대",
+        type: "유리대포 / 자원 소모형",
+        filter: "방직(정밀 무기 조작/신체 강화), 재정(데이터 연산/마력 효율 변환), 단선(리스크 회피 및 자원 소모형 차단)",
+        pros: "주 스탯 판정 시 대성공 범위 +1 (19~20) / 공격 일반판정(2~19) 결과값에 고정 보너스(+1)",
+        cons: "해로운 판정 결과값에서 리스크 +1 (보너스 수치로 인한 대성공 불가)"
       },
       "방계x고대세대": {
-        name: "③ 방계 × 고대세대 (고대의 베테랑)",
-        concept: "압도적 지식과 생존력 (유틸리티 / 탐색 특화)",
-        pros: "탐색, 분석, 약점 파악 성공률 대폭 증가 / 하루 1회 위험 지역 도주/회피 무조건 성공",
-        cons: "직접 전투/파괴력 판정 시 보너스 없음 / 화려한 대성공 쾌감이 적고 꾸준한 보조 역할"
+        name: "방계 × 고대세대",
+        type: "탐색 / 분석 특화",
+        filter: "방직(위험 지형 회피/은밀 이동), 재정(환경 분석/약점 파악/정보 스캔 - 핵심), 단선(위기 사전 도주 및 위험 차단)",
+        pros: "탐색·분석·약점 파악 판정 시 다이스 보너스 +1D 및 +2 고정 / 하루 1회 위험 지역 도주·회피 무조건 성공",
+        cons: "직접 전투 및 물리 파괴력 판정 시 보너스 다이스 없음(-1D 패널티, 보너스 수치로 인한 대성공 불가)"
       },
       "방계x신세대": {
-        name: "④ 방계 × 신세대 (현대의 육성형)",
-        concept: "최고의 안정성과 융통성 (안정성 / 성장 특화)",
-        pros: "대실패(1) 발생 시 일반 실패로 완화 / 제작, 인벤토리, 장비 활용 등 유틸리티 최강",
-        cons: "대성공(Critical) 발생 확률 기본 고정 / 한 번에 판을 뒤엎는 폭발적인 권능 행사 불가"
+        name: "방계 × 신세대",
+        type: "유틸리티 / 안정성 특화",
+        filter: "방직(장비 수리/간이 제작/도구 활용), 재정(시스템 해킹/유틸리티 가동), 단선(판정 실패 완화 및 안정성 확보)",
+        pros: "제작·인벤토리·장비 활용·해킹 판정 시 결과값 고정 보너스(+2) 및 대성공 범위 +1(19~20) / 대실패(1)가 일반 실패로 완화",
+        cons: "폭발적인 권능 행사 불가 (대성공 기본 20 고정, 추가 확장 불가 및 보너스 수치로 인한 대성공 불가)"
       }
     };
 
-    /* 첨부 이미지 2: 주전공 데이터 */
+    /* 주전공 데이터 */
     const MAIN_MAJORS = [
       { id: "PAS_01", category: "전투사관학", name: "원거리 전투학", stat: "방직", passive: "정밀 사격", effect: "Dice_Bonus +1 (엄폐 및 거리가 먼 대상)", constraint: "상시 적용" },
       { id: "PAS_02", category: "전투사관학", name: "검술학", stat: "방직", passive: "흘려내기", effect: "Durability_Damage_Reduce 50%", constraint: "방어 성공 시" },
@@ -413,7 +417,7 @@
       { id: "PAS_18", category: "실용생활학", name: "포션학", stat: "재정", passive: "소모 절감", effect: "Ingredient_Refund 30%", constraint: "제작 실패 시" }
     ];
 
-    /* 첨부 이미지 2: 부전공 데이터 */
+    /* 부전공 데이터 */
     const SUB_MAJORS = [
       { id: "PAS_05", category: "전투사관학", name: "카룬 기초학", stat: "재정", passive: "패턴 분석", effect: "Next_Defense_Dice +1D", constraint: "성공 시" },
       { id: "PAS_06", category: "전투사관학", name: "전투 심리학", stat: "단선", passive: "사기 진작", effect: "Debuff_Level -1 (파티 전체)", constraint: "스탯 판정 시" },
@@ -430,7 +434,7 @@
       { id: "PAS_23", category: "실용생활학", name: "응용정리학", stat: "방직", passive: "도구 수색", effect: "Consumable_Cost_Reduce", constraint: "성공 시" }
     ];
 
-    /* 첨부 이미지 2: 공통교양 데이터 */
+    /* 공통교양 데이터 */
     const GENERAL_EDU_DATA = [
       { id: "PAS_24", category: "공통교양", name: "해독학", stat: "재정", passive: "독성 완화", effect: "Poison_Duration -1Turn", constraint: "상시 적용" },
       { id: "PAS_25", category: "공통교양", name: "응급처치학", stat: "재정", passive: "응급 처치", effect: "HP_Recovery_Check", constraint: "스탯 판정 시" },
@@ -449,15 +453,12 @@
     };
 
     function initDropdowns() {
-      // 주전공 바인딩
       const mainSelect = document.getElementById('major');
       mainSelect.innerHTML = MAIN_MAJORS.map(m => `<option value="${m.name}">${m.name} (${m.category})</option>`).join('');
 
-      // 공통교양 바인딩
       const genSelect = document.getElementById('general-edu');
       genSelect.innerHTML = GENERAL_EDU_DATA.map(g => `<option value="${g.name}">${g.name}</option>`).join('');
 
-      // 부전공 바인딩
       updateSubMajorDropdowns();
     }
 
@@ -596,7 +597,8 @@
         guideBody.innerHTML = `
           <div class="guide-section" style="border-left-color: #ffaa00;">
             <span class="guide-badge" style="background:#4a3800; color:#ffdd88;">태생 선택</span> <strong>${originInfo.name}</strong>
-            <p style="margin-top:4px;"><strong>콘셉트:</strong> ${originInfo.concept}</p>
+            <p style="margin-top:4px;"><strong>특화 형태:</strong> ${originInfo.type}</p>
+            <p><strong>3-Track Filter 범위:</strong> ${originInfo.filter}</p>
             <p><strong>장점:</strong> ${originInfo.pros}</p>
             <div class="guide-constraint">⚠️ 단점: ${originInfo.cons}</div>
           </div>
