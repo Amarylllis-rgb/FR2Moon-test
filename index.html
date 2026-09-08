@@ -2,513 +2,97 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>[달에서.] 커뮤니티</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <title>[달에서.] 접속하기</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
-    }
-
     body {
       background-color: #121212;
-      color: #e0e0e0;
-      min-height: 100vh;
-    }
-
-    .hidden { display: none !important; }
-
-    .center-wrapper {
+      color: #ffffff;
+      font-family: sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      padding: 20px;
+      height: 100vh;
+      margin: 0;
     }
-
     .card {
       background-color: #1e1e1e;
-      border: 1px solid #333;
-      border-radius: 12px;
-      padding: 28px;
-      width: 100%;
-      max-width: 460px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-    }
-
-    h1 {
-      font-size: 1.4rem;
-      margin-bottom: 20px;
-      color: #ffffff;
-      font-weight: 700;
-    }
-
-    .form-group { margin-bottom: 16px; }
-    label { display: block; font-size: 0.9rem; margin-bottom: 6px; color: #aaa; }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 6px;
-      border: 1px solid #444;
-      background-color: #2a2a2a;
-      color: #fff;
-      font-size: 0.95rem;
-      outline: none;
-    }
-
-    textarea { resize: vertical; min-height: 80px; }
-    input:focus, select:focus, textarea:focus { border-color: #4b6cb7; }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      border-radius: 6px;
-      border: none;
-      background-color: #3b5998;
-      color: #fff;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.2s;
-      margin-top: 10px;
-    }
-
-    button:hover { background-color: #4c70ba; }
-
-    .stat-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-      font-size: 0.95rem;
-      position: relative;
-    }
-
-    .stat-label {
-      position: relative;
-      cursor: help;
-      text-decoration: underline dotted #888;
-    }
-
-    .stat-label:hover::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      left: 0;
-      bottom: 125%;
-      background-color: #333;
-      color: #fff;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      white-space: pre-line;
-      width: 220px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-      border: 1px solid #555;
-      z-index: 10;
-      font-weight: normal;
-    }
-
-    .stat-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 4px;
-      background-color: #3a3a3a;
-      margin-top: 0;
-    }
-
-    .warning-box {
-      background-color: rgba(255, 152, 0, 0.1);
-      border: 1px solid #ff9800;
-      border-radius: 6px;
-      padding: 10px 12px;
-      margin-bottom: 16px;
-      font-size: 0.85rem;
-      color: #ffb74d;
-    }
-
-    .error-msg { color: #ff6b6b; font-size: 0.85rem; margin-top: 10px; }
-
-    /* 헤더 및 알림 영역 */
-    .app-header {
-      position: sticky;
-      top: 0;
-      background-color: #1e1e1e;
-      border-bottom: 1px solid #333;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 24px;
-      z-index: 100;
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .logo {
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: #ffc107;
-      cursor: pointer;
-    }
-
-    .nav-tabs {
-      display: flex;
-      gap: 8px;
-    }
-
-    .nav-btn {
-      background: transparent;
-      border: none;
-      color: #888;
-      padding: 8px 16px;
-      font-size: 0.95rem;
-      cursor: pointer;
-      margin-top: 0;
-      border-bottom: 2px solid transparent;
-      border-radius: 0;
-      width: auto;
-    }
-
-    .nav-btn.active {
-      color: #fff;
-      border-bottom-color: #ffc107;
-      font-weight: bold;
-    }
-
-    .noti-wrapper {
-      position: relative;
-    }
-
-    .noti-btn {
-      background: none;
-      border: none;
-      font-size: 1.3rem;
-      color: #ccc;
-      cursor: pointer;
-      position: relative;
-      padding: 4px;
-      width: auto;
-      margin-top: 0;
-    }
-
-    .noti-badge {
-      position: absolute;
-      top: 0;
-      right: 0;
-      background-color: #e53935;
-      color: #fff;
-      font-size: 0.65rem;
-      padding: 2px 5px;
-      border-radius: 10px;
-      font-weight: bold;
-    }
-
-    .noti-dropdown {
-      position: absolute;
-      right: 0;
-      top: 45px;
-      width: 320px;
-      max-height: 400px;
-      background-color: #252525;
-      border: 1px solid #444;
       border-radius: 8px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-      overflow-y: auto;
-      z-index: 200;
+      padding: 24px;
+      width: 360px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     }
-
-    .noti-header {
-      padding: 12px 16px;
+    .title {
+      font-size: 1.25rem;
       font-weight: bold;
-      border-bottom: 1px solid #333;
-      font-size: 0.9rem;
-      color: #fff;
-      background-color: #1e1e1e;
+      margin-bottom: 20px;
     }
-
-    .noti-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 12px 16px;
-      border-bottom: 1px solid #333;
-      font-size: 0.85rem;
-      transition: background-color 0.2s;
-    }
-
-    .noti-item:hover { background-color: #2e2e2e; }
-    .noti-item.unread { background-color: #2c323f; }
-
-    .noti-content { flex: 1; color: #ddd; }
-    .noti-time { font-size: 0.75rem; color: #888; margin-top: 4px; }
-
-    .main-layout {
-      max-width: 960px;
-      margin: 24px auto;
-      display: flex;
-      gap: 24px;
-      padding: 0 16px;
-    }
-
-    .feed-container {
-      flex: 1;
-      max-width: 620px;
-    }
-
-    .side-panel {
-      width: 280px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .panel-card {
-      background-color: #1e1e1e;
-      border: 1px solid #333;
-      border-radius: 10px;
-      padding: 16px;
-    }
-
-    .post-box {
-      background-color: #1e1e1e;
-      border: 1px solid #333;
-      border-radius: 10px;
-      padding: 18px;
+    .form-group {
       margin-bottom: 16px;
     }
-
-    .post-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
+    label {
+      display: block;
       font-size: 0.85rem;
       color: #aaa;
+      margin-bottom: 6px;
     }
-
-    .post-header-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .post-more-container {
-      position: relative;
-      display: inline-block;
-    }
-
-    .post-more-btn {
-      background: none;
-      border: none;
-      color: #888;
-      font-size: 1rem;
-      cursor: pointer;
-      padding: 0 4px;
-      margin: 0;
-      width: auto;
-      line-height: 1;
-    }
-
-    .post-more-btn:hover { color: #fff; }
-
-    .post-dropdown-menu {
-      position: absolute;
-      right: 0;
-      top: 100%;
-      margin-top: 4px;
-      background-color: #2a2a2a;
-      border: 1px solid #444;
-      border-radius: 6px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-      z-index: 50;
-      display: flex;
-      flex-direction: column;
-      min-width: 80px;
-      overflow: hidden;
-    }
-
-    .post-dropdown-item {
-      background: none;
-      border: none;
-      color: #ccc;
-      padding: 8px 12px;
-      font-size: 0.8rem;
-      text-align: left;
-      cursor: pointer;
-      margin: 0;
-      border-radius: 0;
+    input, select {
       width: 100%;
-    }
-
-    .post-dropdown-item:hover { background-color: #3b5998; color: #fff; }
-    .post-dropdown-item.delete:hover { background-color: #d32f2f; color: #fff; }
-
-    .author-wrapper {
-      display: inline-flex;
-      align-items: center;
-    }
-
-    .post-author {
-      font-weight: bold;
-      color: #ffc107;
-      cursor: pointer;
-    }
-    .post-author:hover { text-decoration: underline; }
-
-    .notice-badge {
-      background-color: #e53935;
-      color: #fff;
-      font-size: 0.75rem;
-      padding: 2px 6px;
+      padding: 10px;
       border-radius: 4px;
-      margin-right: 6px;
-    }
-
-    .post-content { font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; }
-
-    /* 댓글 및 답글 관련 스타일 */
-    .comments-section {
-      margin-top: 14px;
-      padding-top: 12px;
-      border-top: 1px solid #2d2d2d;
-    }
-
-    .comment-item {
-      padding: 8px 0;
-      font-size: 0.85rem;
-      border-bottom: 1px dashed #2a2a2a;
-    }
-
-    .comment-item.reply {
-      margin-left: 24px;
-      border-left: 2px solid #333;
-      padding-left: 10px;
-    }
-
-    .comment-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 4px;
-    }
-
-    .comment-author {
-      font-weight: bold;
-      color: #bbb;
-      cursor: pointer;
-    }
-
-    .comment-actions {
-      display: flex;
-      gap: 8px;
-      color: #777;
-      font-size: 0.75rem;
-    }
-
-    .comment-action-btn {
-      cursor: pointer;
-      color: #888;
-    }
-    .comment-action-btn:hover { color: #fff; text-decoration: underline; }
-
-    .comment-input-box {
-      margin-top: 10px;
-      position: relative;
-    }
-
-    .mention-dropdown {
-      position: absolute;
-      bottom: 100%;
-      left: 0;
+      border: 1px solid #333;
       background-color: #2a2a2a;
-      border: 1px solid #444;
-      border-radius: 6px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
-      max-height: 150px;
-      overflow-y: auto;
-      width: 200px;
-      z-index: 100;
-    }
-
-    .mention-item {
-      padding: 8px 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      color: #ddd;
-    }
-    .mention-item:hover { background-color: #3b5998; color: #fff; }
-
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .modal-card {
-      background-color: #1e1e1e;
-      border: 1px solid #444;
-      border-radius: 12px;
-      padding: 24px;
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
-      position: relative;
-    }
-
-    .modal-close {
-      position: absolute;
-      top: 14px; right: 16px;
-      background: none; border: none;
-      color: #888; font-size: 1.2rem;
-      cursor: pointer; width: auto; margin-top: 0;
-    }
-    .modal-close:hover { color: #fff; }
-
-    .profile-preview-container {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 16px;
-    }
-
-    #toast {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #2e7d32;
       color: #fff;
-      padding: 10px 20px;
-      border-radius: 6px;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s;
-      z-index: 2000;
+      box-sizing: border-box;
     }
-    #toast.show { opacity: 1; visibility: visible; }
+    .input-with-btn {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-side {
+      width: auto;
+      white-space: nowrap;
+      background-color: #444;
+      border: none;
+      color: #fff;
+      padding: 0 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-primary {
+      width: 100%;
+      padding: 12px;
+      background-color: #3b5998;
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .btn-secondary {
+      width: 100%;
+      padding: 10px;
+      background-color: transparent;
+      border: 1px solid #555;
+      border-radius: 4px;
+      color: #aaa;
+      margin-top: 8px;
+      cursor: pointer;
+    }
+    /* 숨김 처리 클래스 */
+    .hidden {
+      display: none !important;
+    }
   </style>
 </head>
 <body>
 
-  <!-- 인증 (로그인/회원가입) 섹션 -->
-  <div id="auth-section" class="center-wrapper">
-    <div class="card">
-      <h1>[달에서.] 접속하기</h1>
+  <!-- 1. 인증/가입 모달 카드 -->
+  <div id="auth-card" class="card">
+    <div class="title">[달에서.] 접속하기</div>
+
+    <!-- STEP 1: 기본 로그인 / 계정 확인 -->
+    <div id="step-1">
       <div class="form-group">
         <label>아이디:</label>
         <input type="text" id="username" placeholder="아이디 입력">
@@ -517,978 +101,122 @@
         <label>비밀번호:</label>
         <input type="password" id="password" placeholder="비밀번호 입력">
       </div>
+      <button class="btn-primary" onclick="handleStep1Next()">접속하기</button>
+    </div>
 
+    <!-- STEP 2: 신규 가입 추가 정보 입력 -->
+    <div id="step-2" class="hidden">
       <div class="form-group">
         <label>계정 닉네임 (본닉 - 신규가입 시):</label>
-        <div style="display: flex; gap: 6px;">
-          <input type="text" id="user-nickname" placeholder="예: 구름">
-          <button type="button" onclick="checkNicknameDuplicate()" style="width: 100px; margin-top: 0; font-size: 0.85rem; background-color: #555;">중복확인</button>
+        <div class="input-with-btn">
+          <input type="text" id="nickname" placeholder="예: 구름">
+          <button class="btn-side" onclick="checkDuplicate()">중복확인</button>
         </div>
       </div>
-
       <div class="form-group">
         <label>캐릭터 이름 (RP용 - 신규가입 시):</label>
         <input type="text" id="char-name" placeholder="예: 아마릴리스 클로토">
       </div>
-
       <div class="form-group">
         <label>직급 선택 (신규가입 시):</label>
-        <select id="role-select">
+        <select id="role">
           <option value="student">일반 학생 (10pt / 상한 5)</option>
-          <option value="council">학생회장 (12pt / 상한 6)</option>
-          <option value="teacher">교사 (15pt / 상한 7)</option>
+          <option value="teacher">교직원</option>
         </select>
       </div>
-      <button type="button" onclick="handleAuth()">접속 / 가입</button>
-      <div id="auth-error" class="error-msg"></div>
+      <button class="btn-primary" onclick="handleRegisterComplete()">가입 및 접속 완료</button>
+      <button class="btn-secondary" onclick="goToStep(1)">이전 단계로</button>
     </div>
   </div>
 
-  <!-- 초기 스탯 설정 섹션 -->
-  <div id="character-setup-section" class="center-wrapper hidden">
-    <div class="card">
-      <h1 id="setup-char-name">캐릭터 스탯 설정</h1>
-      <p style="margin-bottom: 12px; color: #aaa;">남은 포인트: <span id="setup-pts" style="color: #ffc107; font-weight: bold;">0</span></p>
-
-      <div class="warning-box">
-        ⚠️ 초기 스탯은 저장 후 수정이 불가능합니다!
-      </div>
-
-      <div style="margin-bottom: 20px;">
-        <div class="stat-row">
-          <span class="stat-label" data-tooltip="지혜 (Wisdom)&#10;학식과 분석력, 상황 판단력 및 마법적 지식을 지칭합니다.">지혜 (Wisdom): <b id="setup-wisdom">1</b></span>
-          <div>
-            <button type="button" class="stat-btn" onclick="adjustStat('wisdom', -1)">-</button>
-            <button type="button" class="stat-btn" onclick="adjustStat('wisdom', 1)">+</button>
-          </div>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label" data-tooltip="의지 (Willpower)&#10;정신적 저항력, 정신집중 및 시련에 굴하지 않는 정신력입니다.">의지 (Willpower): <b id="setup-willpower">1</b></span>
-          <div>
-            <button type="button" class="stat-btn" onclick="adjustStat('willpower', -1)">-</button>
-            <button type="button" class="stat-btn" onclick="adjustStat('willpower', 1)">+</button>
-          </div>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label" data-tooltip="가호 (Divine)&#10;행운과 영적인 보호, 신성한 기적 및 위기 극복 능력을 의미합니다.">가호 (Divine): <b id="setup-divine">1</b></span>
-          <div>
-            <button type="button" class="stat-btn" onclick="adjustStat('divine', -1)">-</button>
-            <button type="button" class="stat-btn" onclick="adjustStat('divine', 1)">+</button>
-          </div>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label" data-tooltip="교감 (Affinity)&#10;타인과의 공감대, 대화 능력, 영물 또는 존재들과의 소통 능력입니다.">교감 (Affinity): <b id="setup-affinity">1</b></span>
-          <div>
-            <button type="button" class="stat-btn" onclick="adjustStat('affinity', -1)">-</button>
-            <button type="button" class="stat-btn" onclick="adjustStat('affinity', 1)">+</button>
-          </div>
-        </div>
-      </div>
-
-      <button type="button" style="background-color: #2e7d32;" onclick="saveInitialStats()">스탯 확정 및 커뮤니티 입장</button>
-    </div>
+  <!-- 2. 로그인 성공 후 표시되는 메인 화면 (검은 화면 방지) -->
+  <div id="main-app" class="card hidden">
+    <div class="title">환영합니다!</div>
+    <p id="user-info-text">성공적으로 접속되었습니다.</p>
+    <button class="btn-secondary" onclick="handleLogout()">로그아웃</button>
   </div>
-
-  <!-- 커뮤니티 메인 화면 -->
-  <div id="main-community-section" class="hidden">
-    <header class="app-header">
-      <div class="logo">🌙 달에서.</div>
-      <div class="header-right">
-        <div class="nav-tabs">
-          <button type="button" class="nav-btn active" id="btn-tab-notice" onclick="switchMainTab('notice')">공지사항</button>
-          <button type="button" class="nav-btn" id="btn-tab-story" onclick="switchMainTab('story')">커뮤니티</button>
-          <button type="button" class="nav-btn" id="btn-tab-profile" onclick="switchMainTab('profile')">내 프로필</button>
-          <button type="button" class="nav-btn" id="btn-tab-friends" onclick="switchMainTab('friends')">친구 관리</button>
-        </div>
-
-        <!-- 오른쪽 상단 알림 영역 -->
-        <div class="noti-wrapper">
-          <button type="button" class="noti-btn" onclick="toggleNotiDropdown(event)">
-            🔔<span id="noti-badge-count" class="noti-badge hidden">0</span>
-          </button>
-          <div id="noti-dropdown-menu" class="noti-dropdown hidden">
-            <div class="noti-header">최근 알림</div>
-            <div id="noti-list-body"></div>
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <div class="main-layout">
-      <div class="feed-container">
-        
-        <!-- Tab 1: 공지사항 -->
-        <div id="tab-notice-content">
-          <div id="notice-write-box" class="post-box hidden">
-            <p style="color: #ffc107; font-weight: bold; margin-bottom: 8px;">📢 운영 공지사항 작성 (관리자)</p>
-            <textarea id="notice-input" placeholder="전체 공지사항 내용을 입력하세요..."></textarea>
-            <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
-              <button type="button" onclick="submitNotice()" style="width: 110px; margin-top: 0; background-color: #d32f2f;">공지 등록</button>
-            </div>
-          </div>
-          <div id="notice-feed"></div>
-        </div>
-
-        <!-- Tab 2: 이야기 피드 -->
-        <div id="tab-story-content" class="hidden">
-          <div class="post-box">
-            <textarea id="post-input" placeholder="오늘 어떤 일이 있었나요? 이야기를 남겨보세요..."></textarea>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-              <select id="post-visibility" style="width: 140px;">
-                <option value="public">전체공개</option>
-                <option value="friends">친구공개</option>
-              </select>
-              <button type="button" onclick="submitPost()" style="width: 90px; margin-top: 0;">올리기</button>
-            </div>
-          </div>
-          <div id="posts-feed"></div>
-        </div>
-
-        <!-- Tab 3: 내 프로필 -->
-        <div id="tab-profile-content" class="hidden">
-          <div class="post-box">
-            <div class="profile-preview-container">
-              <div id="profile-avatar-preview-area"></div>
-              <div>
-                <h2 id="profile-char-name-display" style="margin-bottom: 4px;">-</h2>
-                <p style="color: #aaa;">직급: <span id="profile-role" style="color:#fff;">-</span></p>
-              </div>
-            </div>
-
-            <div style="background-color: #2a2a2a; padding: 14px; border-radius: 8px; margin-bottom: 16px;">
-              <p style="font-size: 0.9rem; font-weight: bold; margin-bottom: 8px; color: #ffc107;">프로필 사진 변경</p>
-              <input type="file" id="avatar-file-input" accept="image/*" style="margin-bottom: 8px; font-size: 0.85rem;">
-              <div style="display: flex; gap: 8px;">
-                <button type="button" onclick="uploadProfileAvatar()" style="background-color: #3b5998; margin-top: 0; font-size: 0.85rem;">사진 업로드</button>
-                <button type="button" onclick="resetToDefaultAvatar()" style="background-color: #555; margin-top: 0; font-size: 0.85rem;">기본 이미지로 변경</button>
-              </div>
-            </div>
-            
-            <hr style="border-color: #333; margin-bottom: 16px;">
-            <p style="margin-bottom: 6px;"><b>스탯 현황</b></p>
-            <p style="font-size: 0.9rem; color: #ccc;">
-              지혜: <b id="profile-wisdom">0</b> | 
-              의지: <b id="profile-willpower">0</b> | 
-              가호: <b id="profile-divine">0</b> | 
-              교감: <b id="profile-affinity">0</b>
-            </p>
-            
-            <hr style="border-color: #333; margin: 16px 0;">
-            <p style="margin-bottom: 8px;"><b>캐릭터 이름 수정</b></p>
-            <input type="text" id="edit-char-name" placeholder="캐릭터 이름" style="margin-bottom: 12px;">
-            
-            <button type="button" onclick="updateProfile()" style="background-color: #2e7d32; margin-top: 12px;">프로필 저장</button>
-          </div>
-        </div>
-
-        <!-- Tab 4: 친구 관리 -->
-        <div id="tab-friends-content" class="hidden">
-          <div class="post-box">
-            <div style="display: flex; gap: 8px;">
-              <input type="text" id="friend-search-name" placeholder="친구 캐릭터 이름 검색">
-              <button type="button" onclick="addFriendByName()" style="width: 90px; margin-top: 0;">추가</button>
-            </div>
-          </div>
-          <div id="friend-list"></div>
-        </div>
-
-      </div>
-
-      <!-- 우측 사이드 패널 -->
-      <div class="side-panel">
-        <div class="panel-card" style="display: flex; align-items: center; gap: 12px;">
-          <div id="side-avatar-area"></div>
-          <div>
-            <h3 id="side-char-name" style="color: #ffc107; margin-bottom: 2px; font-size: 1rem;">-</h3>
-            <p id="side-char-role" style="font-size: 0.85rem; color: #aaa;">-</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 게시글 수정 모달 -->
-  <div id="edit-post-modal" class="modal-overlay hidden">
-    <div class="modal-card">
-      <button type="button" class="modal-close" onclick="closeEditPostModal()">✕</button>
-      <h2 style="font-size: 1.1rem; margin-bottom: 12px; color: #ffc107;">글 수정하기</h2>
-      <textarea id="edit-post-content" style="min-height: 120px; margin-bottom: 12px;"></textarea>
-      <button type="button" onclick="saveEditedPost()" style="background-color: #2e7d32; margin-top: 0;">수정 완료</button>
-    </div>
-  </div>
-
-  <!-- 프로필 모달 (상세 정보 팝업) -->
-  <div id="profile-modal" class="modal-overlay hidden">
-    <div class="modal-card">
-      <button type="button" class="modal-close" onclick="closeProfileModal()">✕</button>
-      <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
-        <div id="modal-avatar-area"></div>
-        <div>
-          <h2 id="modal-char-name" style="color: #ffc107; margin-bottom: 2px; font-size: 1.1rem;">-</h2>
-          <p style="font-size: 0.85rem; color: #aaa;">직급: <span id="modal-role" style="color:#fff;">-</span></p>
-        </div>
-      </div>
-      
-      <div style="background-color: #2a2a2a; padding: 12px; border-radius: 6px; font-size: 0.85rem;">
-        <p style="color: #ffc107; font-weight: bold; margin-bottom: 6px;">스탯 정보</p>
-        <p>지혜: <span id="modal-wisdom">0</span> | 의지: <span id="modal-willpower">0</span></p>
-        <p style="margin-top: 4px;">가호: <span id="modal-divine">0</span> | 교감: <span id="modal-affinity">0</span></p>
-      </div>
-    </div>
-  </div>
-
-  <!-- 알림 토스트 -->
-  <div id="toast">알림</div>
 
   <script>
-    const SUPABASE_URL = 'https://ussdpozmngczyrabcgun.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_NHt6pA_nGOl4zDKgUTntfA_LGioJewy';
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    const ADMIN_USERNAME = 'admin';
-    const FORBIDDEN_WORDS = ['admin', '낙화', '달에서', '운영자', '관리자', 'master'];
-    
-    const DEFAULT_AVATAR_SVG = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzg4ODg4OCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSI+PHBhdGggZD0iTTEyIDJDNi44OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTAgM2MxLjY2IDAgMyAxLjM0IDMgM3MtMS4zNCAzLTMgMy0zLTEuMzQtMy0zIDEuMzQtMyAzLTN6bTAgMTQuMmMtMi41IDAtNC43MS0xLjI4LTYtMy4yMi4wMy0xLjk5IDQtMy4wög2TMuMDggMS45OSAwIDUuOTcgMS4wOSA2IDMuMDgtMS4yOSAxLjk0LTMuNCAzLjIyLTYgMy4yMnoiLz48L3N2Zz4=';
-
-    let currentUserId = null;
-    let currentUsername = null;
-    let currentUserNickname = '';
-    let characterData = null;
-    let isNicknameChecked = false;
-    let editingPostId = null;
-    let allCharactersList = []; // 언급 멘션용 캐릭터 목록
-
-    const ROLE_CONFIG = {
-      student: { name: '일반 학생', pts: 10, max: 5 },
-      council: { name: '학생회장', pts: 12, max: 6 },
-      teacher: { name: '교사', pts: 15, max: 7 }
+    // 가상의 기존 회원 데이터베이스 (예시)
+    const mockUserDB = {
+      "admin": { password: "password123", nickname: "관리자", charName: "아마릴리스" }
     };
 
-    // 드롭다운 및 모달 창 외부 클릭 닫기 이벤트 핸들러
-    document.addEventListener('click', function(e) {
-      if (!e.target.closest('.post-more-container')) {
-        document.querySelectorAll('.post-dropdown-menu').forEach(menu => menu.classList.add('hidden'));
+    function goToStep(stepNumber) {
+      if (stepNumber === 1) {
+        document.getElementById('step-1').classList.remove('hidden');
+        document.getElementById('step-2').classList.add('hidden');
+      } else if (stepNumber === 2) {
+        document.getElementById('step-1').classList.add('hidden');
+        document.getElementById('step-2').classList.remove('hidden');
       }
-      if (!e.target.closest('.noti-wrapper')) {
-        document.getElementById('noti-dropdown-menu').classList.add('hidden');
-      }
-    });
-
-    function showToast(msg) {
-      const t = document.getElementById('toast');
-      t.innerText = msg;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2500);
     }
 
-    function getAvatarHtml(avatarUrl, size = 28) {
-      const src = avatarUrl && avatarUrl.trim() !== '' ? avatarUrl : DEFAULT_AVATAR_SVG;
-      return `<img src="${src}" alt="profile" style="width:${size}px; height:${size}px; border-radius:50%; object-fit:cover; vertical-align:middle; background:#2a2a2a; border:1px solid #444;" onerror="this.onerror=null; this.src='${DEFAULT_AVATAR_SVG}';">`;
-    }
-
-    function resizeImage(file, maxWidth = 150, maxHeight = 150) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = (event) => {
-          const img = new Image();
-          img.src = event.target.result;
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = maxWidth;
-            canvas.height = maxHeight;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, maxWidth, maxHeight);
-            
-            canvas.toBlob((blob) => {
-              if (blob) resolve(blob);
-              else reject(new Error('이미지 압축에 실패했습니다.'));
-            }, 'image/webp', 0.8);
-          };
-          img.onerror = (err) => reject(err);
-        };
-        reader.onerror = (err) => reject(err);
-      });
-    }
-
-    function validateNickname(nick, isSystemAdmin = false) {
-      if (isSystemAdmin) return true;
-      const lowerNick = nick.toLowerCase();
-      for (const word of FORBIDDEN_WORDS) {
-        if (lowerNick.includes(word.toLowerCase())) return false;
-      }
-      return true;
-    }
-
-    async function checkNicknameDuplicate() {
-      const username = document.getElementById('username').value.trim();
-      const userNickname = document.getElementById('user-nickname').value.trim();
-      const isSystemAdmin = username === ADMIN_USERNAME;
-
-      if (!userNickname && !isSystemAdmin) return alert('검사할 계정 닉네임을 입력해주세요.');
-
-      const targetNick = userNickname || '낙화';
-
-      if (!validateNickname(targetNick, isSystemAdmin)) {
-        return alert(`'${targetNick}'은(는) 예약어 및 사용금지어가 포함되어 지정할 수 없습니다.`);
-      }
-
-      const { data } = await supabaseClient
-        .from('posts')
-        .select('author_name')
-        .ilike('author_name', `%(@${targetNick})%`)
-        .limit(1);
-
-      if (data && data.length > 0) {
-        isNicknameChecked = false;
-        return alert('이미 사용 중인 계정 닉네임입니다.');
-      }
-
-      isNicknameChecked = true;
-      showToast('사용 가능한 계정 닉네임입니다.');
-    }
-
-    async function handleAuth() {
+    // Step 1 처리: 기존 사용자면 로그인 완료, 신규 ID면 Step 2로 이동
+    function handleStep1Next() {
       const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value.trim();
-      let userNickname = document.getElementById('user-nickname').value.trim();
+
+      if (!username || !password) {
+        alert("아이디와 비밀번호를 모두 입력해주세요.");
+        return;
+      }
+
+      if (mockUserDB[username]) {
+        // 기존 회원이 존재할 경우 비밀번호 검증
+        if (mockUserDB[username].password === password) {
+          renderMainApp(username, mockUserDB[username].nickname);
+        } else {
+          alert("비밀번호가 일치하지 않습니다.");
+        }
+      } else {
+        // 기존 회원이 없을 경우 Step 2 가입 절차 진행
+        alert("등록되지 않은 계정입니다. 신규 가입 절차를 진행합니다.");
+        goToStep(2);
+      }
+    }
+
+    function checkDuplicate() {
+      const nickname = document.getElementById('nickname').value.trim();
+      if (!nickname) {
+        alert("닉네임을 입력해주세요.");
+        return;
+      }
+      alert("사용 가능한 닉네임입니다.");
+    }
+
+    // Step 2 처리: 회원가입 제출 후 메인 화면 진입
+    function handleRegisterComplete() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const nickname = document.getElementById('nickname').value.trim();
       const charName = document.getElementById('char-name').value.trim();
-      const roleKey = document.getElementById('role-select').value;
-      const errBox = document.getElementById('auth-error');
-      errBox.innerText = '';
 
-      if (!username || !password) return alert('아이디와 비밀번호를 입력해주세요.');
+      if (!nickname || !charName) {
+        alert("모든 가입 정보를 입력해주세요.");
+        return;
+      }
 
-      currentUsername = username;
-      const email = `${username}@lunar-academy.trpg`;
-      const isSystemAdmin = username === ADMIN_USERNAME;
-
-      if (isSystemAdmin && !userNickname) userNickname = '낙화';
+      // DB 저장 처리
+      mockUserDB[username] = { password, nickname, charName };
+      alert("가입이 완료되었습니다!");
       
-      let { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-
-      if (error) {
-        const finalNickname = userNickname || (isSystemAdmin ? '낙화' : username);
-
-        if (!validateNickname(finalNickname, isSystemAdmin)) {
-          return alert('사용할 수 없는 계정 닉네임입니다. (금지어 포함)');
-        }
-
-        const signUp = await supabaseClient.auth.signUp({ 
-          email, 
-          password,
-          options: { data: { user_nickname: finalNickname } }
-        });
-
-        if (signUp.error) return alert('회원가입 실패: ' + signUp.error.message);
-
-        data = signUp.data;
-        const roleInfo = ROLE_CONFIG[roleKey];
-        const finalCharName = charName || (isSystemAdmin ? '운영진' : username);
-        
-        const { error: insertErr } = await supabaseClient.from('characters').insert([{
-          user_id: data.user.id,
-          name: finalCharName,
-          role: roleInfo.name,
-          wisdom: 1, willpower: 1, divine: 1, affinity: 1,
-          available_points: roleInfo.pts,
-          avatar_url: null
-        }]);
-
-        if (insertErr) {
-          errBox.innerText = '캐릭터 생성 오류: ' + insertErr.message;
-          return;
-        }
-      }
-
-      currentUserId = data.user.id;
-      currentUserNickname = isSystemAdmin ? '낙화' : (data.user.user_metadata?.user_nickname || username);
-      loadFlow();
+      renderMainApp(username, nickname);
     }
 
-    async function loadFlow() {
-      try {
-        const { data, error } = await supabaseClient.from('characters').select('*').eq('user_id', currentUserId).maybeSingle();
-        
-        if (error) {
-          document.getElementById('auth-error').innerText = '캐릭터 불러오기 오류: ' + error.message;
-          return;
-        }
-
-        if (!data) {
-          const charName = document.getElementById('char-name').value.trim() || currentUsername;
-          const { data: newChar } = await supabaseClient.from('characters').insert([{
-            user_id: currentUserId,
-            name: charName,
-            role: '일반 학생',
-            wisdom: 1, willpower: 1, divine: 1, affinity: 1,
-            available_points: 10,
-            avatar_url: null
-          }]).select().single();
-          characterData = newChar;
-        } else {
-          characterData = data;
-        }
-
-        // 전체 캐릭터 목록 캐싱 (멘션 창 용)
-        const { data: chars } = await supabaseClient.from('characters').select('*');
-        if (chars) allCharactersList = chars;
-
-        document.getElementById('auth-section').classList.add('hidden');
-
-        if (characterData.available_points > 0) {
-          renderSetupView();
-          document.getElementById('character-setup-section').classList.remove('hidden');
-        } else {
-          enterCommunity();
-        }
-      } catch (err) {
-        document.getElementById('auth-error').innerText = '시스템 오류가 발생했습니다.';
-      }
+    // 메인 애플리케이션 뷰 전환 (검은 화면 해결)
+    function renderMainApp(username, nickname) {
+      document.getElementById('auth-card').classList.add('hidden');
+      document.getElementById('main-app').classList.remove('hidden');
+      document.getElementById('user-info-text').innerText = `${nickname} (${username}) 님으로 접속되었습니다.`;
     }
 
-    function renderSetupView() {
-      document.getElementById('setup-char-name').innerText = characterData.name;
-      document.getElementById('setup-pts').innerText = characterData.available_points;
-      document.getElementById('setup-wisdom').innerText = characterData.wisdom;
-      document.getElementById('setup-willpower').innerText = characterData.willpower;
-      document.getElementById('setup-divine').innerText = characterData.divine;
-      document.getElementById('setup-affinity').innerText = characterData.affinity;
-    }
-
-    function adjustStat(stat, val) {
-      if (val > 0 && characterData.available_points <= 0) return showToast('포인트가 부족합니다.');
-      if (val < 0 && characterData[stat] <= 1) return;
-
-      characterData[stat] += val;
-      characterData.available_points -= val;
-      renderSetupView();
-    }
-
-    async function saveInitialStats() {
-      await supabaseClient.from('characters').update({
-        wisdom: characterData.wisdom,
-        willpower: characterData.willpower,
-        divine: characterData.divine,
-        affinity: characterData.affinity,
-        available_points: 0
-      }).eq('user_id', currentUserId);
-
-      characterData.available_points = 0;
-      document.getElementById('character-setup-section').classList.add('hidden');
-      enterCommunity();
-    }
-
-    function enterCommunity() {
-      document.getElementById('main-community-section').classList.remove('hidden');
-      document.getElementById('side-char-name').innerText = `${characterData.name} (@${currentUserNickname})`;
-      document.getElementById('side-char-role').innerText = characterData.role;
-      document.getElementById('side-avatar-area').innerHTML = getAvatarHtml(characterData.avatar_url, 44);
-
-      if (currentUsername === ADMIN_USERNAME) {
-        document.getElementById('notice-write-box').classList.remove('hidden');
-      } else {
-        document.getElementById('notice-write-box').classList.add('hidden');
-      }
-
-      loadNotifications();
-      switchMainTab('notice');
-    }
-
-    function switchMainTab(tab) {
-      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('tab-notice-content').classList.add('hidden');
-      document.getElementById('tab-story-content').classList.add('hidden');
-      document.getElementById('tab-profile-content').classList.add('hidden');
-      document.getElementById('tab-friends-content').classList.add('hidden');
-
-      document.getElementById(`btn-tab-${tab}`).classList.add('active');
-      document.getElementById(`tab-${tab}-content`).classList.remove('hidden');
-
-      if (tab === 'notice') loadNotices();
-      if (tab === 'story') loadPosts();
-      if (tab === 'profile') renderProfileView();
-      if (tab === 'friends') loadFriends();
-    }
-
-    /* ========================================================
-       알림 기능 로직
-       ======================================================== */
-    async function loadNotifications() {
-      const { data } = await supabaseClient
-        .from('notifications')
-        .select('*')
-        .eq('user_id', currentUserId)
-        .order('created_at', { ascending: false });
-
-      const notiBody = document.getElementById('noti-list-body');
-      const badge = document.getElementById('noti-badge-count');
-      notiBody.innerHTML = '';
-
-      if (!data || data.length === 0) {
-        notiBody.innerHTML = '<div style="padding:16px; color:#888; text-align:center;">알림이 없습니다.</div>';
-        badge.classList.add('hidden');
-        return;
-      }
-
-      const unreadCount = data.filter(n => !n.is_read).length;
-      if (unreadCount > 0) {
-        badge.innerText = unreadCount;
-        badge.classList.remove('hidden');
-      } else {
-        badge.classList.add('hidden');
-      }
-
-      data.forEach(n => {
-        const item = document.createElement('div');
-        item.className = `noti-item ${n.is_read ? '' : 'unread'}`;
-        item.innerHTML = `
-          ${getAvatarHtml(n.sender_avatar, 32)}
-          <div class="noti-content">
-            <div><b>${n.sender_name}</b>님이 ${n.message}</div>
-            <div class="noti-time">${new Date(n.created_at).toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'})}</div>
-          </div>
-        `;
-        notiBody.appendChild(item);
-      });
-    }
-
-    async function toggleNotiDropdown(e) {
-      e.stopPropagation();
-      const menu = document.getElementById('noti-dropdown-menu');
-      menu.classList.toggle('hidden');
-
-      if (!menu.classList.contains('hidden')) {
-        await supabaseClient
-          .from('notifications')
-          .update({ is_read: true })
-          .eq('user_id', currentUserId);
-        document.getElementById('noti-badge-count').classList.add('hidden');
-      }
-    }
-
-    async function createNotification(targetUserId, message) {
-      if (targetUserId === currentUserId) return; // 자기 자신에겐 알림 생성 안 함
-      await supabaseClient.from('notifications').insert([{
-        user_id: targetUserId,
-        sender_name: characterData.name,
-        sender_avatar: characterData.avatar_url,
-        message: message
-      }]);
-    }
-
-    /* ========================================================
-       댓글 & 멘션 기능 로직
-       ======================================================== */
-    async function loadComments(postId) {
-      const { data } = await supabaseClient
-        .from('comments')
-        .select('*, characters(avatar_url)')
-        .eq('post_id', postId)
-        .order('created_at', { ascending: true });
-
-      const container = document.getElementById(`comments-list-${postId}`);
-      if (!container) return;
-      container.innerHTML = '';
-
-      if (!data) return;
-
-      data.forEach(c => {
-        const isReply = !!c.parent_id;
-        const avatarHtml = getAvatarHtml(c.characters?.avatar_url, 24);
-
-        const el = document.createElement('div');
-        el.className = `comment-item ${isReply ? 'reply' : ''}`;
-        el.innerHTML = `
-          <div class="comment-header">
-            <div>
-              ${avatarHtml}
-              <span class="comment-author" onclick="openProfileModal('${c.user_id}')">${c.author_name}</span>
-            </div>
-            <div class="comment-actions">
-              <span class="comment-action-btn" onclick="setReplyTarget('${postId}', '${c.id}', '${c.author_name}')">답글</span>
-              ${c.user_id === currentUserId || currentUsername === ADMIN_USERNAME ? `
-                <span class="comment-action-btn" onclick="deleteComment('${postId}', '${c.id}')">삭제</span>
-              ` : ''}
-            </div>
-          </div>
-          <div style="color:#ccc; font-size:0.85rem; padding-left:28px;">${c.content}</div>
-        `;
-        container.appendChild(el);
-      });
-    }
-
-    function handleCommentInput(e, postId) {
-      const input = e.target;
-      const val = input.value;
-      const dropdown = document.getElementById(`mention-dropdown-${postId}`);
-
-      if (val.endsWith('@')) {
-        dropdown.innerHTML = '';
-        allCharactersList.forEach(c => {
-          const item = document.createElement('div');
-          item.className = 'mention-item';
-          item.innerHTML = `${getAvatarHtml(c.avatar_url, 20)} <span>${c.name}</span>`;
-          item.onclick = () => {
-            input.value = val + c.name + ' ';
-            dropdown.classList.add('hidden');
-            input.focus();
-          };
-          dropdown.appendChild(item);
-        });
-        dropdown.classList.remove('hidden');
-      } else if (!val.includes('@')) {
-        dropdown.classList.add('hidden');
-      }
-    }
-
-    function setReplyTarget(postId, commentId, authorName) {
-      const input = document.getElementById(`comment-input-${postId}`);
-      input.dataset.parentId = commentId;
-      input.placeholder = `@${authorName} 님에게 답글 작성 중...`;
-      input.focus();
-    }
-
-    async function submitComment(postId, postUserId) {
-      const input = document.getElementById(`comment-input-${postId}`);
-      const content = input.value.trim();
-      const parentId = input.dataset.parentId || null;
-
-      if (!content) return;
-
-      const { data: newComment } = await supabaseClient.from('comments').insert([{
-        post_id: postId,
-        user_id: currentUserId,
-        author_name: `${characterData.name}`,
-        content: content,
-        parent_id: parentId
-      }]).select().single();
-
-      // 게시글 작성자에게 댓글 알림
-      await createNotification(postUserId, `내 글에 댓글을 남겼습니다: "${content.substring(0, 15)}..."`);
-
-      // `@멘션`된 사람 탐지하여 알림
-      for (const c of allCharactersList) {
-        if (content.includes(`@${c.name}`)) {
-          await createNotification(c.user_id, `댓글에서 ${characterData.name}님을 언급했습니다.`);
-        }
-      }
-
-      input.value = '';
-      delete input.dataset.parentId;
-      input.placeholder = '댓글을 입력하세요. (@로 언급)';
-      document.getElementById(`mention-dropdown-${postId}`).classList.add('hidden');
-
-      loadComments(postId);
-      showToast('댓글이 등록되었습니다.');
-    }
-
-    async function deleteComment(postId, commentId) {
-      if (!confirm('댓글을 삭제하시겠습니까?')) return;
-      await supabaseClient.from('comments').delete().eq('id', commentId);
-      loadComments(postId);
-      showToast('댓글이 삭제되었습니다.');
-    }
-
-    /* ========================================================
-       피드 및 공지사항 로드
-       ======================================================== */
-    async function loadNotices() {
-      const { data } = await supabaseClient
-        .from('posts')
-        .select('*, characters(avatar_url)')
-        .eq('is_notice', true)
-        .order('created_at', { ascending: false });
-
-      const feed = document.getElementById('notice-feed');
-      feed.innerHTML = '';
-
-      if (!data || data.length === 0) {
-        feed.innerHTML = '<p style="color: #888; text-align: center; padding: 20px;">등록된 공지사항이 없습니다.</p>';
-        return;
-      }
-
-      data.forEach(p => {
-        const avatarUrl = p.characters?.avatar_url;
-        const avatarHtml = getAvatarHtml(avatarUrl, 28);
-        const isOwner = p.user_id === currentUserId || currentUsername === ADMIN_USERNAME;
-
-        const item = document.createElement('div');
-        item.className = 'post-box';
-        item.innerHTML = `
-          <div class="post-header">
-            <div class="author-wrapper">
-              <span class="notice-badge">공지</span>
-              ${avatarHtml}
-              <span class="post-author" style="margin-left: 6px;" onclick="openProfileModal('${p.user_id}')">${p.author_name}</span>
-            </div>
-            <div class="post-header-right">
-              <span>${new Date(p.created_at).toLocaleDateString('ko-KR')}</span>
-              ${isOwner ? `
-                <div class="post-more-container">
-                  <button type="button" class="post-more-btn" onclick="toggleMoreMenu(event, '${p.id}')">⋮</button>
-                  <div id="dropdown-${p.id}" class="post-dropdown-menu hidden">
-                    <button type="button" class="post-dropdown-item" onclick="openEditPostModal('${p.id}', \`${escapeQuotes(p.content)}\`)">수정</button>
-                    <button type="button" class="post-dropdown-item delete" onclick="deletePost('${p.id}')">삭제</button>
-                  </div>
-                </div>
-              ` : ''}
-            </div>
-          </div>
-          <div class="post-content">${p.content}</div>
-          
-          <div class="comments-section">
-            <div id="comments-list-${p.id}"></div>
-            <div class="comment-input-box">
-              <div id="mention-dropdown-${p.id}" class="mention-dropdown hidden"></div>
-              <div style="display:flex; gap:6px; margin-top:6px;">
-                <input type="text" id="comment-input-${p.id}" placeholder="댓글을 입력하세요. (@로 언급)" oninput="handleCommentInput(event, '${p.id}')">
-                <button type="button" onclick="submitComment('${p.id}', '${p.user_id}')" style="width:70px; margin-top:0; font-size:0.85rem;">등록</button>
-              </div>
-            </div>
-          </div>
-        `;
-        feed.appendChild(item);
-        loadComments(p.id);
-      });
-    }
-
-    async function loadPosts() {
-      const { data } = await supabaseClient
-        .from('posts')
-        .select('*, characters(avatar_url)')
-        .eq('is_notice', false)
-        .order('created_at', { ascending: false });
-
-      const feed = document.getElementById('posts-feed');
-      feed.innerHTML = '';
-
-      if (!data || data.length === 0) {
-        feed.innerHTML = '<p style="color: #888; text-align: center; padding: 20px;">등록된 이야기가 없습니다.</p>';
-        return;
-      }
-
-      data.forEach(p => {
-        const avatarUrl = p.characters?.avatar_url;
-        const avatarHtml = getAvatarHtml(avatarUrl, 28);
-        const isOwner = p.user_id === currentUserId || currentUsername === ADMIN_USERNAME;
-
-        const item = document.createElement('div');
-        item.className = 'post-box';
-        item.innerHTML = `
-          <div class="post-header">
-            <div class="author-wrapper">
-              ${avatarHtml}
-              <span class="post-author" style="margin-left: 6px;" onclick="openProfileModal('${p.user_id}')">${p.author_name}</span>
-            </div>
-            <div class="post-header-right">
-              <span>${new Date(p.created_at).toLocaleDateString('ko-KR')}</span>
-              ${isOwner ? `
-                <div class="post-more-container">
-                  <button type="button" class="post-more-btn" onclick="toggleMoreMenu(event, '${p.id}')">⋮</button>
-                  <div id="dropdown-${p.id}" class="post-dropdown-menu hidden">
-                    <button type="button" class="post-dropdown-item" onclick="openEditPostModal('${p.id}', \`${escapeQuotes(p.content)}\`)">수정</button>
-                    <button type="button" class="post-dropdown-item delete" onclick="deletePost('${p.id}')">삭제</button>
-                  </div>
-                </div>
-              ` : ''}
-            </div>
-          </div>
-          <div class="post-content">${p.content}</div>
-
-          <div class="comments-section">
-            <div id="comments-list-${p.id}"></div>
-            <div class="comment-input-box">
-              <div id="mention-dropdown-${p.id}" class="mention-dropdown hidden"></div>
-              <div style="display:flex; gap:6px; margin-top:6px;">
-                <input type="text" id="comment-input-${p.id}" placeholder="댓글을 입력하세요. (@로 언급)" oninput="handleCommentInput(event, '${p.id}')">
-                <button type="button" onclick="submitComment('${p.id}', '${p.user_id}')" style="width:70px; margin-top:0; font-size:0.85rem;">등록</button>
-              </div>
-            </div>
-          </div>
-        `;
-        feed.appendChild(item);
-        loadComments(p.id);
-      });
-    }
-
-    async function submitNotice() {
-      const content = document.getElementById('notice-input').value.trim();
-      if (!content) return;
-
-      await supabaseClient.from('posts').insert([{
-        user_id: currentUserId,
-        author_name: `운영진 (@낙화)`,
-        content: content,
-        visibility: 'public',
-        is_notice: true
-      }]);
-
-      document.getElementById('notice-input').value = '';
-      showToast('공지사항이 등록되었습니다.');
-      loadNotices();
-    }
-
-    async function submitPost() {
-      const content = document.getElementById('post-input').value.trim();
-      const visibility = document.getElementById('post-visibility').value;
-      if (!content) return;
-
-      await supabaseClient.from('posts').insert([{
-        user_id: currentUserId,
-        author_name: `${characterData.name} (@${currentUserNickname})`,
-        content: content,
-        visibility: visibility,
-        is_notice: false
-      }]);
-
-      document.getElementById('post-input').value = '';
-      showToast('이야기가 등록되었습니다.');
-      loadPosts();
-    }
-
-    function toggleMoreMenu(event, postId) {
-      event.stopPropagation();
-      const targetMenu = document.getElementById(`dropdown-${postId}`);
-      document.querySelectorAll('.post-dropdown-menu').forEach(menu => {
-        if (menu !== targetMenu) menu.classList.add('hidden');
-      });
-      targetMenu.classList.toggle('hidden');
-    }
-
-    function escapeQuotes(str) {
-      return str.replace(/`/g, '\\`').replace(/\$/g, '\\$');
-    }
-
-    function openEditPostModal(postId, content) {
-      editingPostId = postId;
-      document.getElementById('edit-post-content').value = content;
-      document.getElementById('edit-post-modal').classList.remove('hidden');
-      document.querySelectorAll('.post-dropdown-menu').forEach(menu => menu.classList.add('hidden'));
-    }
-
-    function closeEditPostModal() {
-      editingPostId = null;
-      document.getElementById('edit-post-modal').classList.add('hidden');
-    }
-
-    async function saveEditedPost() {
-      if (!editingPostId) return;
-      const content = document.getElementById('edit-post-content').value.trim();
-      if (!content) return alert('내용을 입력하세요.');
-
-      await supabaseClient.from('posts').update({ content: content }).eq('id', editingPostId);
-      showToast('글이 수정되었습니다.');
-      closeEditPostModal();
-      loadNotices();
-      loadPosts();
-    }
-
-    async function deletePost(postId) {
-      if (!confirm('정말 이 게시글을 삭제하시겠습니까?')) return;
-      await supabaseClient.from('posts').delete().eq('id', postId);
-      showToast('글이 삭제되었습니다.');
-      loadNotices();
-      loadPosts();
-    }
-
-    function renderProfileView() {
-      document.getElementById('profile-char-name-display').innerText = `${characterData.name} (@${currentUserNickname})`;
-      document.getElementById('profile-role').innerText = characterData.role;
-      document.getElementById('profile-avatar-preview-area').innerHTML = getAvatarHtml(characterData.avatar_url, 70);
-
-      document.getElementById('profile-wisdom').innerText = characterData.wisdom;
-      document.getElementById('profile-willpower').innerText = characterData.willpower;
-      document.getElementById('profile-divine').innerText = characterData.divine;
-      document.getElementById('profile-affinity').innerText = characterData.affinity;
-
-      document.getElementById('edit-char-name').value = characterData.name;
-    }
-
-    async function uploadProfileAvatar() {
-      const fileInput = document.getElementById('avatar-file-input');
-      const file = fileInput.files[0];
-      if (!file) return alert('업로드할 이미지 파일을 선택해주세요.');
-
-      try {
-        showToast('이미지 변환 및 업로드 중...');
-
-        const resizedBlob = await resizeImage(file, 150, 150);
-        const filePath = `avatars/${currentUserId}.webp`;
-
-        await supabaseClient.storage.from('community-assets').upload(filePath, resizedBlob, {
-          contentType: 'image/webp',
-          upsert: true
-        });
-
-        const { data } = supabaseClient.storage.from('community-assets').getPublicUrl(filePath);
-        const newAvatarUrl = `${data.publicUrl}?t=${new Date().getTime()}`;
-
-        await supabaseClient.from('characters').update({ avatar_url: newAvatarUrl }).eq('user_id', currentUserId);
-
-        characterData.avatar_url = newAvatarUrl;
-        document.getElementById('side-avatar-area').innerHTML = getAvatarHtml(newAvatarUrl, 44);
-        renderProfileView();
-
-        fileInput.value = '';
-        showToast('프로필 사진이 변경되었습니다!');
-      } catch (err) {
-        alert('프로필 이미지 처리 중 오류가 발생했습니다.');
-      }
-    }
-
-    async function resetToDefaultAvatar() {
-      if (!confirm('프로필 사진을 기본 이미지로 변경하시겠습니까?')) return;
-
-      await supabaseClient.from('characters').update({ avatar_url: null }).eq('user_id', currentUserId);
-      characterData.avatar_url = null;
-      document.getElementById('side-avatar-area').innerHTML = getAvatarHtml(null, 44);
-      renderProfileView();
-      showToast('기본 프로필 사진으로 변경되었습니다.');
-    }
-
-    async function updateProfile() {
-      const newCharName = document.getElementById('edit-char-name').value.trim();
-      if (!newCharName) return alert('캐릭터 이름을 입력해주세요.');
-
-      await supabaseClient.from('characters').update({ name: newCharName }).eq('user_id', currentUserId);
-      characterData.name = newCharName;
-
-      document.getElementById('side-char-name').innerText = `${newCharName} (@${currentUserNickname})`;
-      renderProfileView();
-      showToast('프로필이 저장되었습니다.');
-    }
-
-    async function openProfileModal(userId) {
-      const { data } = await supabaseClient.from('characters').select('*').eq('user_id', userId).maybeSingle();
-
-      if (!data) return alert('캐릭터 정보를 찾을 수 없습니다.');
-
-      document.getElementById('modal-char-name').innerText = data.name;
-      document.getElementById('modal-role').innerText = data.role;
-      document.getElementById('modal-wisdom').innerText = data.wisdom;
-      document.getElementById('modal-willpower').innerText = data.willpower;
-      document.getElementById('modal-divine').innerText = data.divine;
-      document.getElementById('modal-affinity').innerText = data.affinity;
-      document.getElementById('modal-avatar-area').innerHTML = getAvatarHtml(data.avatar_url, 50);
-
-      document.getElementById('profile-modal').classList.remove('hidden');
-    }
-
-    function closeProfileModal() {
-      document.getElementById('profile-modal').classList.add('hidden');
-    }
-
-    async function loadFriends() {
-      const list = document.getElementById('friend-list');
-      list.innerHTML = '<p style="color: #888; text-align: center; padding: 20px;">등록된 친구가 없습니다.</p>';
-    }
-
-    async function addFriendByName() {
-      const name = document.getElementById('friend-search-name').value.trim();
-      if (!name) return;
-      showToast('친구 신청 기능 준비 중입니다.');
-      document.getElementById('friend-search-name').value = '';
+    function handleLogout() {
+      document.getElementById('username').value = '';
+      document.getElementById('password').value = '';
+      document.getElementById('main-app').classList.add('hidden');
+      document.getElementById('auth-card').classList.remove('hidden');
+      goToStep(1);
     }
   </script>
 </body>
