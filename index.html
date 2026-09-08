@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>[달에서.] 접속하기</title>
+  <!-- Supabase JS SDK 추가 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body {
       background-color: #121212;
@@ -120,8 +122,8 @@
       <div class="form-group">
         <label>직급 선택 (신규가입 시):</label>
         <select id="role">
-          <option value="student">일반 학생 (10pt / 상한 5)</option>
-          <option value="teacher">교직원</option>
+          <option value="일반 학생">일반 학생 (10pt / 상한 5)</option>
+          <option value="교직원">교직원</option>
         </select>
       </div>
       <button class="btn-primary" onclick="handleRegisterComplete()">가입 및 접속 완료</button>
@@ -137,10 +139,15 @@
   </div>
 
   <script>
-    // 가상의 기존 회원 데이터베이스 (예시)
-    const mockUserDB = {
-      "admin": { password: "password123", nickname: "관리자", charName: "아마릴리스" }
-    };
+    // -----------------------------------------------------------------
+    // 1. Supabase 클라이언트 설정 (본인의 Project URL과 Anon Key로 대체하세요)
+    // -----------------------------------------------------------------
+    const SUPABASE_URL = 'https://YOUR_SUPABASE_PROJECT_URL.supabase.co';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // 현재 생성 시도 중인 Auth User 저장 변수
+    let currentAuthUser = null;
 
     function goToStep(stepNumber) {
       if (stepNumber === 1) {
@@ -152,8 +159,10 @@
       }
     }
 
-    // Step 1 처리: 기존 사용자면 로그인 완료, 신규 ID면 Step 2로 이동
-    function handleStep1Next() {
+    // -----------------------------------------------------------------
+    // 2. Step 1: 접속 시도 로직 (Supabase Auth & DB 연동)
+    // -----------------------------------------------------------------
+    async function handleStep1Next() {
       const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value.trim();
 
@@ -162,56 +171,137 @@
         return;
       }
 
-      if (mockUserDB[username]) {
-        // 기존 회원이 존재할 경우 비밀번호 검증
-        if (mockUserDB[username].password === password) {
-          renderMainApp(username, mockUserDB[username].nickname);
-        } else {
-          alert("비밀번호가 일치하지 않습니다.");
+      // Supabase Auth는 이메일 형식을 사용하므로 가상 이메일 주소로 매핑
+      const fakeEmail = `${username}@moon.local`;
+
+      // 1) Auth 로그인 시도
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: fakeEmail,
+        password: password
+      });
+
+      if (authError) {
+        // 비밀번호가 틀렸거나 없는 계정인 경우 신규가입 Auth 생성 시도
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email: fakeEmail,
+          password: password
+        });
+
+        if (signUpError) {
+          // 이미 존재하는 계정인데 비밀번호가 틀린 경우
+          alert("비밀번호가 일치하지 않거나 접속에 실패했습니다.");
+          return;
         }
+
+        // 신규 계정 생성 성공 -> Step 2 진행
+        currentAuthUser = signUpData.user;
+        alert("신규 계정입니다. 가입 정보를 입력해주세요.");
+        goToStep(2);
+        return;
+      }
+
+      // 2) 로그인 성공 -> characters 테이블에서 프로필(캐릭터) 정보 조회
+      const user = authData.user;
+      currentAuthUser = user;
+
+      const { data: character, error: charError } = await supabase
+        .from('characters')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (character) {
+        // 캐릭터 정보가 등록되어 있으면 메인 앱 진입
+        renderMainApp(character.username || username, character.nickname);
       } else {
-        // 기존 회원이 없을 경우 Step 2 가입 절차 진행
-        alert("등록되지 않은 계정입니다. 신규 가입 절차를 진행합니다.");
+        // Auth 계정은 생성되었으나 Step 2 캐릭터 생성이 미완료된 경우
         goToStep(2);
       }
     }
 
-    function checkDuplicate() {
+    // -----------------------------------------------------------------
+    // 3. Step 2: 닉네임 중복 확인
+    // -----------------------------------------------------------------
+    async function checkDuplicate() {
       const nickname = document.getElementById('nickname').value.trim();
       if (!nickname) {
         alert("닉네임을 입력해주세요.");
         return;
       }
-      alert("사용 가능한 닉네임입니다.");
+
+      const { data, error } = await supabase
+        .from('characters')
+        .select('id')
+        .eq('nickname', nickname);
+
+      if (error) {
+        alert("중복 확인 중 오류가 발생했습니다.");
+        return;
+      }
+
+      if (data && data.length > 0) {
+        alert("이미 사용 중인 닉네임입니다.");
+      } else {
+        alert("사용 가능한 닉네임입니다.");
+      }
     }
 
-    // Step 2 처리: 회원가입 제출 후 메인 화면 진입
-    function handleRegisterComplete() {
+    // -----------------------------------------------------------------
+    // 4. Step 2: 캐릭터 등록 완료 및 DB 저장
+    // -----------------------------------------------------------------
+    async function handleRegisterComplete() {
       const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value.trim();
       const nickname = document.getElementById('nickname').value.trim();
       const charName = document.getElementById('char-name').value.trim();
+      const role = document.getElementById('role').value;
 
       if (!nickname || !charName) {
         alert("모든 가입 정보를 입력해주세요.");
         return;
       }
 
-      // DB 저장 처리
-      mockUserDB[username] = { password, nickname, charName };
+      if (!currentAuthUser) {
+        alert("인증 정보가 유효하지 않습니다. Step 1부터 다시 진행해주세요.");
+        goToStep(1);
+        return;
+      }
+
+      // Supabase characters 테이블에 저장
+      const { data, error } = await supabase
+        .from('characters')
+        .insert([
+          {
+            user_id: currentAuthUser.id,
+            username: username,
+            nickname: nickname,
+            name: charName,
+            role: role
+          }
+        ])
+        .select()
+        .single();
+
+      if (error) {
+        alert("가입 중 오류가 발생했습니다: " + error.message);
+        return;
+      }
+
       alert("가입이 완료되었습니다!");
-      
       renderMainApp(username, nickname);
     }
 
-    // 메인 애플리케이션 뷰 전환 (검은 화면 해결)
+    // -----------------------------------------------------------------
+    // 5. 뷰 전환 및 로그아웃
+    // -----------------------------------------------------------------
     function renderMainApp(username, nickname) {
       document.getElementById('auth-card').classList.add('hidden');
       document.getElementById('main-app').classList.remove('hidden');
       document.getElementById('user-info-text').innerText = `${nickname} (${username}) 님으로 접속되었습니다.`;
     }
 
-    function handleLogout() {
+    async function handleLogout() {
+      await supabase.auth.signOut();
+      currentAuthUser = null;
       document.getElementById('username').value = '';
       document.getElementById('password').value = '';
       document.getElementById('main-app').classList.add('hidden');
