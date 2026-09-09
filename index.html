@@ -2,20 +2,31 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>[달에서.] 접속하기</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>[달에서.] 통합 대시보드</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
     body {
       background-color: #121212;
       color: #ffffff;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+    }
+
+    .hidden { display: none !important; }
+
+    .center-wrapper {
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      margin: 0;
       padding: 20px;
-      box-sizing: border-box;
     }
 
     .app-container {
@@ -24,6 +35,7 @@
       max-width: 960px;
       width: 100%;
       align-items: stretch;
+      margin: 0 auto;
     }
 
     .card {
@@ -116,7 +128,7 @@
       margin-bottom: 6px;
     }
 
-    input, select {
+    input, select, textarea {
       width: 100%;
       padding: 10px 12px;
       border-radius: 6px;
@@ -125,12 +137,11 @@
       color: #fff;
       box-sizing: border-box;
       font-size: 0.9rem;
+      outline: none;
     }
 
-    input:focus, select:focus {
-      outline: none;
-      border-color: #4f70e8;
-    }
+    textarea { resize: vertical; min-height: 80px; }
+    input:focus, select:focus, textarea:focus { border-color: #4f70e8; }
 
     .input-with-btn {
       display: flex;
@@ -216,14 +227,366 @@
       justify-content: center;
     }
 
-    .hidden { display: none !important; }
+    /* 메인 커뮤니티 헤더 및 레이아웃 */
+    .app-header {
+      position: sticky;
+      top: 0;
+      background-color: #1e1e1e;
+      border-bottom: 1px solid #333;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #ffc107;
+      cursor: pointer;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: #888;
+      padding: 8px 16px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      margin-top: 0;
+      border-bottom: 2px solid transparent;
+      border-radius: 0;
+      width: auto;
+    }
+
+    .nav-btn.active {
+      color: #fff;
+      border-bottom-color: #ffc107;
+      font-weight: bold;
+    }
+
+    .noti-wrapper {
+      position: relative;
+    }
+
+    .noti-btn {
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      color: #ccc;
+      cursor: pointer;
+      position: relative;
+      padding: 4px;
+      width: auto;
+      margin-top: 0;
+    }
+
+    .noti-badge {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background-color: #e53935;
+      color: #fff;
+      font-size: 0.65rem;
+      padding: 2px 5px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+
+    .noti-dropdown {
+      position: absolute;
+      right: 0;
+      top: 45px;
+      width: 320px;
+      max-height: 400px;
+      background-color: #252525;
+      border: 1px solid #444;
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      overflow-y: auto;
+      z-index: 200;
+    }
+
+    .noti-header {
+      padding: 12px 16px;
+      font-weight: bold;
+      border-bottom: 1px solid #333;
+      font-size: 0.9rem;
+      color: #fff;
+      background-color: #1e1e1e;
+    }
+
+    .noti-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 16px;
+      border-bottom: 1px solid #333;
+      font-size: 0.85rem;
+    }
+    .noti-item.unread { background-color: #2c323f; }
+    .noti-content { flex: 1; color: #ddd; }
+    .noti-time { font-size: 0.75rem; color: #888; margin-top: 4px; }
+
+    .main-layout {
+      max-width: 960px;
+      margin: 24px auto;
+      display: flex;
+      gap: 24px;
+      padding: 0 16px;
+    }
+
+    .feed-container {
+      flex: 1;
+      max-width: 620px;
+    }
+
+    .side-panel {
+      width: 280px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .panel-card {
+      background-color: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .post-box {
+      background-color: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 10px;
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 0.85rem;
+      color: #aaa;
+    }
+
+    .post-header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .post-more-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    .post-more-btn {
+      background: none;
+      border: none;
+      color: #888;
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 0 4px;
+      margin: 0;
+      width: auto;
+    }
+
+    .post-dropdown-menu {
+      position: absolute;
+      right: 0;
+      top: 100%;
+      margin-top: 4px;
+      background-color: #2a2a2a;
+      border: 1px solid #444;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      min-width: 80px;
+      overflow: hidden;
+    }
+
+    .post-dropdown-item {
+      background: none;
+      border: none;
+      color: #ccc;
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      text-align: left;
+      cursor: pointer;
+      width: 100%;
+      margin: 0;
+      border-radius: 0;
+    }
+    .post-dropdown-item:hover { background-color: #3b5998; color: #fff; }
+    .post-dropdown-item.delete:hover { background-color: #d32f2f; color: #fff; }
+
+    .author-wrapper {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .post-author {
+      font-weight: bold;
+      color: #ffc107;
+      cursor: pointer;
+    }
+    .post-author:hover { text-decoration: underline; }
+
+    .notice-badge {
+      background-color: #e53935;
+      color: #fff;
+      font-size: 0.75rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-right: 6px;
+    }
+
+    .post-content { font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; }
+
+    /* 댓글 및 멘션 스타일 */
+    .comments-section {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid #2d2d2d;
+    }
+
+    .comment-item {
+      padding: 8px 0;
+      font-size: 0.85rem;
+      border-bottom: 1px dashed #2a2a2a;
+    }
+
+    .comment-item.reply {
+      margin-left: 24px;
+      border-left: 2px solid #333;
+      padding-left: 10px;
+    }
+
+    .comment-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .comment-author {
+      font-weight: bold;
+      color: #bbb;
+      cursor: pointer;
+    }
+
+    .comment-actions {
+      display: flex;
+      gap: 8px;
+      color: #777;
+      font-size: 0.75rem;
+    }
+
+    .comment-action-btn { cursor: pointer; color: #888; }
+    .comment-action-btn:hover { color: #fff; text-decoration: underline; }
+
+    .comment-input-box {
+      margin-top: 10px;
+      position: relative;
+    }
+
+    .mention-dropdown {
+      position: absolute;
+      bottom: 100%;
+      left: 0;
+      background-color: #2a2a2a;
+      border: 1px solid #444;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+      max-height: 150px;
+      overflow-y: auto;
+      width: 200px;
+      z-index: 100;
+    }
+
+    .mention-item {
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: #ddd;
+    }
+    .mention-item:hover { background-color: #3b5998; color: #fff; }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-card {
+      background-color: #1e1e1e;
+      border: 1px solid #444;
+      border-radius: 12px;
+      padding: 24px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 14px; right: 16px;
+      background: none; border: none;
+      color: #888; font-size: 1.2rem;
+      cursor: pointer; width: auto; margin-top: 0;
+    }
+    .modal-close:hover { color: #fff; }
+
+    #toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #2e7d32;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 6px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+      z-index: 2000;
+    }
+    #toast.show { opacity: 1; visibility: visible; }
   </style>
 </head>
 <body>
 
-  <div class="app-container">
+  <!-- 전체 레이아웃 래퍼 -->
+  <div class="app-container" id="auth-flow-container">
+    
     <!-- STEP 0: 로그인 메인 -->
-    <div id="step-0-card" class="card" style="max-width: 400px; margin: 0 auto;">
+    <div id="step-0-card" class="card" style="max-width: 400px; margin: auto;">
       <div class="title">[달에서.] 접속하기</div>
       <div class="form-group">
         <label>아이디:</label>
@@ -252,7 +615,7 @@
           <label>계정 닉네임 (본닉):</label>
           <div class="input-with-btn">
             <input type="text" id="nickname" placeholder="예: 구름">
-            <button class="btn-side" onclick="checkNicknameDuplicate()">중복확인</button>
+            <button class="btn-side" type="button" onclick="checkNicknameDuplicate()">중복확인</button>
           </div>
         </div>
         <div class="form-group">
@@ -272,12 +635,12 @@
             <option value="8학년">8학년 (7pt + 어시스트 보너스)</option>
             <option value="9학년">9학년 (8pt + 어시스트 보너스)</option>
             <option value="10학년">10학년 (8pt + 어시스트 보너스)</option>
-            <option value="11학년">11학년 (8pt + 어시스트 보너스)</option>
-            <option value="12학년">12학년 (8pt + 어시스트 보너스)</option>
+            <option value="11학년">11학년 (11학년 / 8pt + 어시스트 보너스)</option>
+            <option value="12학년">12학년 (12학년 / 8pt + 어시스트 보너스)</option>
           </select>
         </div>
-        <button class="btn-primary" onclick="goStep(2)">다음 (태생 및 학과 선택)</button>
-        <button class="btn-secondary" onclick="closeSignupModal()">취소</button>
+        <button class="btn-primary" type="button" onclick="goStep(2)">다음 (태생 및 학과 선택)</button>
+        <button class="btn-secondary" type="button" onclick="closeSignupModal()">취소</button>
       </div>
 
       <!-- STEP 2: 태생 및 학과 선택 -->
@@ -304,8 +667,8 @@
           <label>공통교양 (택1):</label>
           <select id="general-edu" onchange="updateGuide()"></select>
         </div>
-        <button class="btn-primary" onclick="goStep(3)">다음 (스탯 배분)</button>
-        <button class="btn-secondary" onclick="goStep(1)">이전</button>
+        <button class="btn-primary" type="button" onclick="goStep(3)">다음 (스탯 배분)</button>
+        <button class="btn-secondary" type="button" onclick="goStep(1)">이전</button>
       </div>
 
       <!-- STEP 3: 스탯 배분 -->
@@ -317,32 +680,32 @@
         <div class="stat-row">
           <div><strong>방직 (紡織 / Clotho)</strong></div>
           <div class="stat-ctrl">
-            <button class="btn-circle" onclick="changeStat('klotho', -1)">-</button>
+            <button class="btn-circle" type="button" onclick="changeStat('klotho', -1)">-</button>
             <span id="val-klotho">1</span>
-            <button class="btn-circle" onclick="changeStat('klotho', 1)">+</button>
+            <button class="btn-circle" type="button" onclick="changeStat('klotho', 1)">+</button>
           </div>
         </div>
 
         <div class="stat-row">
           <div><strong>재정 (裁定 / Lachesis)</strong></div>
           <div class="stat-ctrl">
-            <button class="btn-circle" onclick="changeStat('lachesis', -1)">-</button>
+            <button class="btn-circle" type="button" onclick="changeStat('lachesis', -1)">-</button>
             <span id="val-lachesis">1</span>
-            <button class="btn-circle" onclick="changeStat('lachesis', 1)">+</button>
+            <button class="btn-circle" type="button" onclick="changeStat('lachesis', 1)">+</button>
           </div>
         </div>
 
         <div class="stat-row">
           <div><strong>단선 (斷線 / Atropos)</strong></div>
           <div class="stat-ctrl">
-            <button class="btn-circle" onclick="changeStat('atropos', -1)">-</button>
+            <button class="btn-circle" type="button" onclick="changeStat('atropos', -1)">-</button>
             <span id="val-atropos">1</span>
-            <button class="btn-circle" onclick="changeStat('atropos', 1)">+</button>
+            <button class="btn-circle" type="button" onclick="changeStat('atropos', 1)">+</button>
           </div>
         </div>
 
-        <button id="btn-complete" class="btn-primary" disabled onclick="handleRegisterComplete()">완료 및 메인 접속</button>
-        <button class="btn-secondary" onclick="goStep(2)">이전</button>
+        <button id="btn-complete" class="btn-primary" disabled type="button" onclick="handleRegisterComplete()">완료 및 메인 접속</button>
+        <button class="btn-secondary" type="button" onclick="goStep(2)">이전</button>
       </div>
     </div>
 
@@ -351,27 +714,175 @@
       <div class="guide-title">
         <span>📖</span> <span id="guide-step-title">가이드 및 설명</span>
       </div>
-      <div class="guide-content" id="guide-body">
-        <!-- 동적 렌더링 영역 -->
-      </div>
-    </div>
-
-    <!-- 메인 대시보드 -->
-    <div id="main-app" class="card hidden">
-      <div class="title">환영합니다!</div>
-      <p id="user-info-text">성공적으로 접속되었습니다.</p>
-      <button class="btn-secondary" onclick="handleLogout()">로그아웃</button>
+      <div class="guide-content" id="guide-body"></div>
     </div>
   </div>
+
+  <!-- 메인 커뮤니티 대시보드 화면 -->
+  <div id="main-community-section" class="hidden">
+    <header class="app-header">
+      <div class="logo">🌙 달에서.</div>
+      <div class="header-right">
+        <div class="nav-tabs">
+          <button type="button" class="nav-btn active" id="btn-tab-notice" onclick="switchMainTab('notice')">공지사항</button>
+          <button type="button" class="nav-btn" id="btn-tab-story" onclick="switchMainTab('story')">커뮤니티</button>
+          <button type="button" class="nav-btn" id="btn-tab-profile" onclick="switchMainTab('profile')">내 프로필</button>
+          <button type="button" class="nav-btn" id="btn-tab-friends" onclick="switchMainTab('friends')">친구 관리</button>
+        </div>
+
+        <!-- 알림 영역 -->
+        <div class="noti-wrapper">
+          <button type="button" class="noti-btn" onclick="toggleNotiDropdown(event)">
+            🔔<span id="noti-badge-count" class="noti-badge hidden">0</span>
+          </button>
+          <div id="noti-dropdown-menu" class="noti-dropdown hidden">
+            <div class="noti-header">최근 알림</div>
+            <div id="noti-list-body"></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="main-layout">
+      <div class="feed-container">
+        
+        <!-- 공지사항 탭 -->
+        <div id="tab-notice-content">
+          <div id="notice-write-box" class="post-box hidden">
+            <p style="color: #ffc107; font-weight: bold; margin-bottom: 8px;">📢 운영 공지사항 작성 (관리자)</p>
+            <textarea id="notice-input" placeholder="전체 공지사항 내용을 입력하세요..."></textarea>
+            <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+              <button type="button" onclick="submitNotice()" style="width: 110px; margin-top: 0; background-color: #d32f2f; padding:10px; border:none; border-radius:6px; color:#fff; cursor:pointer;">공지 등록</button>
+            </div>
+          </div>
+          <div id="notice-feed"></div>
+        </div>
+
+        <!-- 커뮤니티(이야기) 탭 -->
+        <div id="tab-story-content" class="hidden">
+          <div class="post-box">
+            <textarea id="post-input" placeholder="오늘 어떤 일이 있었나요? 이야기를 남겨보세요..."></textarea>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+              <select id="post-visibility" style="width: 140px;">
+                <option value="public">전체공개</option>
+                <option value="friends">친구공개</option>
+              </select>
+              <button type="button" onclick="submitPost()" style="width: 90px; margin-top: 0; padding:10px; border:none; border-radius:6px; background:#3b5998; color:#fff; cursor:pointer;">올리기</button>
+            </div>
+          </div>
+          <div id="posts-feed"></div>
+        </div>
+
+        <!-- 내 프로필 탭 -->
+        <div id="tab-profile-content" class="hidden">
+          <div class="post-box">
+            <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+              <div id="profile-avatar-preview-area"></div>
+              <div>
+                <h2 id="profile-char-name-display" style="margin-bottom: 4px; font-size:1.1rem;">-</h2>
+                <p style="color: #aaa; font-size:0.85rem;">학년/태생: <span id="profile-role" style="color:#fff;">-</span></p>
+              </div>
+            </div>
+
+            <div style="background-color: #2a2a2a; padding: 14px; border-radius: 8px; margin-bottom: 16px;">
+              <p style="font-size: 0.9rem; font-weight: bold; margin-bottom: 8px; color: #ffc107;">프로필 사진 변경</p>
+              <input type="file" id="avatar-file-input" accept="image/*" style="margin-bottom: 8px; font-size: 0.85rem;">
+              <div style="display: flex; gap: 8px;">
+                <button type="button" onclick="uploadProfileAvatar()" style="background-color: #3b5998; margin-top: 0; padding:8px; border:none; border-radius:6px; color:#fff; cursor:pointer; font-size: 0.85rem;">사진 업로드</button>
+                <button type="button" onclick="resetToDefaultAvatar()" style="background-color: #555; margin-top: 0; padding:8px; border:none; border-radius:6px; color:#fff; cursor:pointer; font-size: 0.85rem;">기본 이미지로 변경</button>
+              </div>
+            </div>
+            
+            <hr style="border-color: #333; margin-bottom: 16px;">
+            <p style="margin-bottom: 6px;"><b>운명 스탯 현황</b></p>
+            <p style="font-size: 0.9rem; color: #ccc;">
+              방직: <b id="profile-klotho">1</b> | 
+              재정: <b id="profile-lachesis">1</b> | 
+              단선: <b id="profile-atropos">1</b>
+            </p>
+            
+            <hr style="border-color: #333; margin: 16px 0;">
+            <p style="margin-bottom: 8px;"><b>캐릭터 이름 수정</b></p>
+            <input type="text" id="edit-char-name" placeholder="캐릭터 이름" style="margin-bottom: 12px;">
+            <button type="button" onclick="updateProfile()" style="background-color: #2e7d32; margin-top: 4px; padding:10px; border:none; border-radius:6px; color:#fff; cursor:pointer;">프로필 저장</button>
+          </div>
+        </div>
+
+        <!-- 친구 관리 탭 -->
+        <div id="tab-friends-content" class="hidden">
+          <div class="post-box">
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="friend-search-name" placeholder="친구 캐릭터 이름 검색">
+              <button type="button" onclick="addFriendByName()" style="width: 90px; margin-top: 0; padding:10px; border:none; border-radius:6px; background:#3b5998; color:#fff; cursor:pointer;">추가</button>
+            </div>
+          </div>
+          <div id="friend-list"></div>
+        </div>
+
+      </div>
+
+      <!-- 우측 사이드 패널 -->
+      <div class="side-panel">
+        <div class="panel-card" style="display: flex; align-items: center; gap: 12px;">
+          <div id="side-avatar-area"></div>
+          <div>
+            <h3 id="side-char-name" style="color: #ffc107; margin-bottom: 2px; font-size: 0.95rem;">-</h3>
+            <p id="side-char-role" style="font-size: 0.8rem; color: #aaa;">-</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 게시글 수정 모달 -->
+  <div id="edit-post-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <button type="button" class="modal-close" onclick="closeEditPostModal()">✕</button>
+      <h2 style="font-size: 1.1rem; margin-bottom: 12px; color: #ffc107;">글 수정하기</h2>
+      <textarea id="edit-post-content" style="min-height: 120px; margin-bottom: 12px;"></textarea>
+      <button type="button" onclick="saveEditedPost()" style="background-color: #2e7d32; width:100%; padding:10px; border:none; border-radius:6px; color:#fff; cursor:pointer;">수정 완료</button>
+    </div>
+  </div>
+
+  <!-- 다른 유저 프로필 조회 모달 -->
+  <div id="profile-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <button type="button" class="modal-close" onclick="closeProfileModal()">✕</button>
+      <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
+        <div id="modal-avatar-area"></div>
+        <div>
+          <h2 id="modal-char-name" style="color: #ffc107; margin-bottom: 2px; font-size: 1.1rem;">-</h2>
+          <p style="font-size: 0.85rem; color: #aaa;">소속: <span id="modal-role" style="color:#fff;">-</span></p>
+        </div>
+      </div>
+      
+      <div style="background-color: #2a2a2a; padding: 12px; border-radius: 6px; font-size: 0.85rem;">
+        <p style="color: #ffc107; font-weight: bold; margin-bottom: 6px;">운명 스탯 정보</p>
+        <p>방직: <span id="modal-klotho">1</span> | 재정: <span id="modal-lachesis">1</span> | 단선: <span id="modal-atropos">1</span></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast">알림</div>
 
   <script>
     const SUPABASE_URL = 'https://ussdpozmngczyrabcgun.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_NHt6pA_nGOl4zDKgUTntfA_LGioJewy';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const BANNED_WORDS = ['관리자', '운영진', 'admin', '운영자', 'system', 'fuck', 'shit'];
+    const ADMIN_USERNAME = 'admin';
+    const BANNED_WORDS = ['관리자', '운영진', 'admin', '운영자', 'system', 'fuck', 'shit', '낙화'];
+    const DEFAULT_AVATAR_SVG = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzg4ODg4OCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSI+PHBhdGggZD0iTTEyIDJDNi44OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTAgM2MxLjY2IDAgMyAxLjM0IDMgM3MtMS4zNCAzLTMgMy0zLTEuMzQtMy0zIDEuMzQtMyAzLTN6bTAgMTQuMmMtMi41IDAtNC43MS0xLjI4LTYtMy4yMi4wMy0xLjk5IDQtMy4wOCA2LTMuMDggMS45OSAwIDUuOTcgMS4wOSA2IDMuMDgtMS4yOSAxLjk0LTMuNCAzLjIyLTYgMy4yMnoiLz48L3N2Zz4=';
 
-    /* 태생 데이터 (filter 항목 제거 및 요청된 장단점 반영) */
+    let currentUserId = null;
+    let currentUsername = null;
+    let currentUserNickname = '';
+    let characterData = null;
+    let isNicknameChecked = false;
+    let editingPostId = null;
+    let allCharactersList = [];
+
+    /* 태생 데이터 */
     const ORIGINS_DATA = {
       "직계x고대세대": {
         name: "직계 × 고대세대",
@@ -401,52 +912,91 @@
 
     /* 주전공 데이터 */
     const MAIN_MAJORS = [
-      { id: "PAS_01", category: "전투사관학", name: "원거리 전투학", stat: "방직", passive: "정밀 사격", effect: "Dice_Bonus +1 (엄폐 및 거리가 먼 대상)", constraint: "상시 적용" },
+      { id: "PAS_01", category: "전투사관학", name: "원거리 전투학", stat: "방직", passive: "정밀 사격", effect: "Dice_Bonus +1", constraint: "상시 적용" },
       { id: "PAS_02", category: "전투사관학", name: "검술학", stat: "방직", passive: "흘려내기", effect: "Durability_Damage_Reduce 50%", constraint: "방어 성공 시" },
       { id: "PAS_03", category: "전투사관학", name: "마법학", stat: "재정", passive: "마력 효율화", effect: "Resource_Refund_Check +1", constraint: "상시 적용" },
-      { id: "PAS_04", category: "전투사관학", name: "무투학", stat: "방직", passive: "충격 완화", effect: "Take_Damage_Min & Distance_Gain +1", constraint: "방어 성공 시" },
+      { id: "PAS_04", category: "전투사관학", name: "무투학", stat: "방직", passive: "충격 완화", effect: "Take_Damage_Min", constraint: "방어 성공 시" },
       { id: "PAS_08", category: "전투지원학", name: "지형 활용학", stat: "재정", passive: "우회로 확보", effect: "Move_Penalty -1", constraint: "상시 적용" },
-      { id: "PAS_09", category: "전투지원학", name: "정보 수집학", stat: "단선", passive: "기습 대비", effect: "Disadvantage_Remove (본인)", constraint: "스탯 판정 시" },
+      { id: "PAS_09", category: "전투지원학", name: "정보 수집학", stat: "단선", passive: "기습 대비", effect: "Disadvantage_Remove", constraint: "스탯 판정 시" },
       { id: "PAS_10", category: "전투지원학", name: "전술 설계학", stat: "재정", passive: "전술 지휘", effect: "Ally_Check_Bonus +1", constraint: "상시 적용" },
       { id: "PAS_16", category: "실용생활학", name: "의학", stat: "재정", passive: "응급 지혈", effect: "DoT_Damage -1", constraint: "상시 적용" },
-      { id: "PAS_17", category: "실용생활학", name: "건축학", stat: "방직", passive: "진지 구축", effect: "Rest_Effect +1 & Ambush_Risk -1", constraint: "휴식 시" },
+      { id: "PAS_17", category: "실용생활학", name: "건축학", stat: "방직", passive: "진지 구축", effect: "Rest_Effect +1", constraint: "휴식 시" },
       { id: "PAS_18", category: "실용생활학", name: "포션학", stat: "재정", passive: "소모 절감", effect: "Ingredient_Refund 30%", constraint: "제작 실패 시" }
     ];
 
     /* 부전공 데이터 */
     const SUB_MAJORS = [
       { id: "PAS_05", category: "전투사관학", name: "카룬 기초학", stat: "재정", passive: "패턴 분석", effect: "Next_Defense_Dice +1D", constraint: "성공 시" },
-      { id: "PAS_06", category: "전투사관학", name: "전투 심리학", stat: "단선", passive: "사기 진작", effect: "Debuff_Level -1 (파티 전체)", constraint: "스탯 판정 시" },
+      { id: "PAS_06", category: "전투사관학", name: "전투 심리학", stat: "단선", passive: "사기 진작", effect: "Debuff_Level -1", constraint: "스탯 판정 시" },
       { id: "PAS_07", category: "전투사관학", name: "전리품 수집학", stat: "방직", passive: "정밀 채취", effect: "Loot_Quality_Dice +1D", constraint: "상시 적용" },
-      { id: "PAS_11", category: "전투지원학", name: "모의전투학", stat: "재정", passive: "경험 활용", effect: "Dice_Bonus +1 (재대치 적)", constraint: "상시 적용" },
-      { id: "PAS_12", category: "전투지원학", name: "성분분석학", stat: "재정", passive: "속성 간파", effect: "Element_Damage_Reduce (파티)", constraint: "성공 시" },
+      { id: "PAS_11", category: "전투지원학", name: "모의전투학", stat: "재정", passive: "경험 활용", effect: "Dice_Bonus +1", constraint: "상시 적용" },
+      { id: "PAS_12", category: "전투지원학", name: "성분분석학", stat: "재정", passive: "속성 간파", effect: "Element_Damage_Reduce", constraint: "성공 시" },
       { id: "PAS_13", category: "전투지원학", name: "메타모포시스", stat: "재정", passive: "위장 정찰", effect: "Stealth_Dice +1D", constraint: "상시 적용" },
-      { id: "PAS_14", category: "실용생활학", name: "장비 가공학", stat: "방직", passive: "임시 정비", effect: "Item_Status = Temporary_Use", constraint: "아이템당 1회" },
-      { id: "PAS_15", category: "실용생활학", name: "심리 상담학", stat: "단선", passive: "정신적 완화", effect: "Mental_Debuff_Duration -1Turn", constraint: "스탯 판정 시" },
-      { id: "PAS_19", category: "실용생활학", name: "조리학", stat: "방직", passive: "식사 재정비", effect: "Next_Check_Bonus +1", constraint: "휴식 후 1회" },
-      { id: "PAS_20", category: "실용생활학", name: "디자인학", stat: "방직", passive: "신분 위장", effect: "Disguise_Dice +1D", constraint: "상시 적용" },
-      { id: "PAS_21", category: "실용생활학", name: "재료 가공학", stat: "방직", passive: "효율 가공", effect: "Material_Destroy_Prevent", constraint: "상시 적용" },
-      { id: "PAS_22", category: "실용생활학", name: "카룬 해부학", stat: "재정", passive: "약점 타격", effect: "Extra_Damage_Dice +1D", constraint: "성공 시" },
-      { id: "PAS_23", category: "실용생활학", name: "응용정리학", stat: "방직", passive: "도구 수색", effect: "Consumable_Cost_Reduce", constraint: "성공 시" }
+      { id: "PAS_14", category: "실용생활학", name: "장비 가공학", stat: "방직", passive: "임시 정비", effect: "Item_Status = Temporary", constraint: "아이템당 1회" },
+      { id: "PAS_15", category: "실용생활학", name: "심리 상담학", stat: "단선", passive: "정신적 완화", effect: "Mental_Debuff -1Turn", constraint: "스탯 판정 시" }
     ];
 
     /* 공통교양 데이터 */
     const GENERAL_EDU_DATA = [
       { id: "PAS_24", category: "공통교양", name: "해독학", stat: "재정", passive: "독성 완화", effect: "Poison_Duration -1Turn", constraint: "상시 적용" },
       { id: "PAS_25", category: "공통교양", name: "응급처치학", stat: "재정", passive: "응급 처치", effect: "HP_Recovery_Check", constraint: "스탯 판정 시" },
-      { id: "PAS_26", category: "공통교양", name: "상황대처학", stat: "단선", passive: "도주 지원", effect: "Escape_Dice +1D (파티 전체)", constraint: "스탯 판정 시" },
-      { id: "PAS_27", category: "공통교양", name: "금전학", stat: "재정", passive: "흥정", effect: "Trade_Discount_Check +1D", constraint: "상시 적용" }
+      { id: "PAS_26", category: "공통교양", name: "상황대처학", stat: "단선", passive: "도주 지원", effect: "Escape_Dice +1D", constraint: "스탯 판정 시" },
+      { id: "PAS_27", category: "공통교양", name: "금전학", stat: "재정", passive: "흥정", effect: "Trade_Discount +1D", constraint: "상시 적용" }
     ];
 
     let currentStep = 1;
     let stats = { klotho: 1, lachesis: 1, atropos: 1 };
     let maxPoints = 7;
-    let isNicknameChecked = false;
 
     window.onload = () => {
       initDropdowns();
       updateMaxPoints();
     };
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.post-more-container')) {
+        document.querySelectorAll('.post-dropdown-menu').forEach(menu => menu.classList.add('hidden'));
+      }
+      if (!e.target.closest('.noti-wrapper')) {
+        document.getElementById('noti-dropdown-menu').classList.add('hidden');
+      }
+    });
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.innerText = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    function getAvatarHtml(avatarUrl, size = 28) {
+      const src = avatarUrl && avatarUrl.trim() !== '' ? avatarUrl : DEFAULT_AVATAR_SVG;
+      return `<img src="${src}" alt="profile" style="width:${size}px; height:${size}px; border-radius:50%; object-fit:cover; vertical-align:middle; background:#2a2a2a; border:1px solid #444;" onerror="this.onerror=null; this.src='${DEFAULT_AVATAR_SVG}';">`;
+    }
+
+    function resizeImage(file, maxWidth = 150, maxHeight = 150) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+          const img = new Image();
+          img.src = event.target.result;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = maxWidth;
+            canvas.height = maxHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, maxWidth, maxHeight);
+            canvas.toBlob((blob) => {
+              if (blob) resolve(blob);
+              else reject(new Error('이미지 압축 실패'));
+            }, 'image/webp', 0.8);
+          };
+          img.onerror = (err) => reject(err);
+        };
+        reader.onerror = (err) => reject(err);
+      });
+    }
 
     function initDropdowns() {
       const mainSelect = document.getElementById('major');
@@ -479,7 +1029,7 @@
 
     function updateMaxPoints() {
       const gradeStr = document.getElementById('grade').value;
-      const gradeNum = parseInt(gradeStr.replace('학년', ''), 10);
+      const gradeNum = parseInt(gradeStr, 10);
 
       maxPoints = (gradeNum >= 9) ? 8 : 7;
       document.getElementById('max-pt').innerText = maxPoints;
@@ -513,18 +1063,8 @@
       if (step === 2) {
         const nickname = document.getElementById('nickname').value.trim();
         const charName = document.getElementById('char-name').value.trim();
-        if (!nickname || !charName) {
-          alert("닉네임과 캐릭터 이름을 입력해주세요.");
-          return;
-        }
-        if (containsBannedWord(nickname) || containsBannedWord(charName)) {
-          alert("사용 불가능한 단어가 포함되어 있습니다.");
-          return;
-        }
-        if (!isNicknameChecked) {
-          alert("닉네임 중복확인을 먼저 진행해 주세요.");
-          return;
-        }
+        if (!nickname || !charName) return alert("닉네임과 캐릭터 이름을 입력해주세요.");
+        if (!isNicknameChecked) return alert("닉네임 중복확인을 먼저 진행해 주세요.");
       }
 
       currentStep = step;
@@ -545,110 +1085,51 @@
       if (currentStep === 1) {
         guideTitle.innerText = "Step 1. 학년 및 캐릭터 가이드";
         const selectedGrade = document.getElementById('grade').value;
-        const gradeNum = parseInt(selectedGrade.replace('학년', ''), 10);
+        const gradeNum = parseInt(selectedGrade, 10);
 
-        let bonusText = "";
-        if (gradeNum <= 4) {
-          bonusText = "기본 스탯 포인트 <strong>7pt</strong> 제공";
-        } else if (gradeNum <= 8) {
-          bonusText = "스탯 포인트 <strong>7pt</strong> + TRPG 어시스트 시 <strong>다이스 판정 +1 (+1D)</strong>";
-        } else {
-          bonusText = "스탯 포인트 <strong>8pt</strong> + TRPG 어시스트 시 <strong>다이스 판정 +1 (+1D)</strong>";
-        }
+        let bonusText = (gradeNum <= 4) ? "기본 스탯 포인트 <strong>7pt</strong> 제공" : 
+                        (gradeNum <= 8) ? "스탯 포인트 <strong>7pt</strong> + TRPG 어시스트 시 다이스 +1D" : 
+                        "스탯 포인트 <strong>8pt</strong> + TRPG 어시스트 시 다이스 +1D";
 
         guideBody.innerHTML = `
           <div class="guide-section">
             <span class="guide-badge">현재 선택: ${selectedGrade}</span>
-            <div class="guide-section-title">🎓 학년별 스탯 및 패시브 혜택</div>
-            <p>· <strong>1~4학년</strong>: 스탯 포인트 7pt</p>
-            <p>· <strong>5~8학년</strong>: 스탯 포인트 7pt + 어시스트 시 다이스 판정 +1</p>
-            <p>· <strong>9~12학년</strong>: 스탯 포인트 8pt + 어시스트 시 다이스 판정 +1</p>
+            <div class="guide-section-title">🎓 학년별 혜택</div>
+            <p>· <strong>1~4학년</strong>: 7pt</p>
+            <p>· <strong>5~8학년</strong>: 7pt + 어시스트 다이스 +1</p>
+            <p>· <strong>9~12학년</strong>: 8pt + 어시스트 다이스 +1</p>
             <div style="margin-top:10px; padding:8px; background:#1e1e24; border-radius:4px; font-size:0.8rem; color:#88aaff;">
-              ✨ <strong>적용 혜택:</strong> ${bonusText}
+              ✨ ${bonusText}
             </div>
           </div>
-          <div class="guide-section">
-            <div class="guide-section-title">💡 계정 및 캐릭터 설정</div>
-            <p>· <strong>본닉</strong>: 커뮤니티 플레이어 식별용 이름</p>
-            <p>· <strong>캐릭터 이름</strong>: RP(Role Play) 진행 시 공식 성명입니다.</p>
-          </div>
         `;
-      } 
-      else if (currentStep === 2) {
+      } else if (currentStep === 2) {
         guideTitle.innerText = "Step 2. 태생 및 전공/교양 정보";
-        
         const originKey = document.getElementById('origin').value;
         const originInfo = ORIGINS_DATA[originKey];
 
-        const mName = document.getElementById('major').value;
-        const s1Name = document.getElementById('sub-major-1').value;
-        const s2Name = document.getElementById('sub-major-2').value;
-        const gName = document.getElementById('general-edu').value;
-
-        const mObj = MAIN_MAJORS.find(x => x.name === mName) || {};
-        const s1Obj = SUB_MAJORS.find(x => x.name === s1Name) || {};
-        const s2Obj = SUB_MAJORS.find(x => x.name === s2Name) || {};
-        const gObj = GENERAL_EDU_DATA.find(x => x.name === gName) || {};
-
         guideBody.innerHTML = `
           <div class="guide-section" style="border-left-color: #ffaa00;">
-            <span class="guide-badge" style="background:#4a3800; color:#ffdd88;">태생 선택</span> <strong>${originInfo.name}</strong>
-            <p style="margin-top:4px;"><strong>특화 형태:</strong> ${originInfo.type}</p>
+            <span class="guide-badge" style="background:#4a3800; color:#ffdd88;">태생</span> <strong>${originInfo.name}</strong>
+            <p style="margin-top:4px;"><strong>특화:</strong> ${originInfo.type}</p>
             <p><strong>장점:</strong> ${originInfo.pros}</p>
             <div class="guide-constraint">⚠️ 단점: ${originInfo.cons}</div>
           </div>
-
-          <div class="guide-section">
-            <span class="guide-badge">주전공</span> <strong>${mObj.name || ''}</strong> (${mObj.category || ''})
-            <p><strong>패시브:</strong> ${mObj.passive || ''} [스탯: ${mObj.stat || ''}]</p>
-            <p>· <strong>효과:</strong> ${mObj.effect || ''}</p>
-            <div class="guide-constraint">⚠️ 제약: ${mObj.constraint || ''}</div>
-          </div>
-
-          <div class="guide-section">
-            <span class="guide-badge">부전공 1</span> <strong>${s1Obj.name || ''}</strong> (${s1Obj.category || ''})
-            <p><strong>패시브:</strong> ${s1Obj.passive || ''} [스탯: ${s1Obj.stat || ''}]</p>
-            <p>· <strong>효과:</strong> ${s1Obj.effect || ''}</p>
-            <div class="guide-constraint">⚠️ 제약: ${s1Obj.constraint || ''}</div>
-          </div>
-
-          <div class="guide-section">
-            <span class="guide-badge">부전공 2</span> <strong>${s2Obj.name || ''}</strong> (${s2Obj.category || ''})
-            <p><strong>패시브:</strong> ${s2Obj.passive || ''} [스탯: ${s2Obj.stat || ''}]</p>
-            <p>· <strong>효과:</strong> ${s2Obj.effect || ''}</p>
-            <div class="guide-constraint">⚠️ 제약: ${s2Obj.constraint || ''}</div>
-          </div>
-
-          <div class="guide-section">
-            <span class="guide-badge">공통교양</span> <strong>${gObj.name || ''}</strong>
-            <p><strong>패시브:</strong> ${gObj.passive || ''} [스탯: ${gObj.stat || ''}]</p>
-            <p>· <strong>효과:</strong> ${gObj.effect || ''}</p>
-            <div class="guide-constraint">⚠️ 제약: ${gObj.constraint || ''}</div>
-          </div>
         `;
-      } 
-      else if (currentStep === 3) {
-        guideTitle.innerText = "Step 3. 스탯 및 단선 토큰 시스템";
+      } else if (currentStep === 3) {
+        guideTitle.innerText = "Step 3. 운명 스탯 시스템";
         guideBody.innerHTML = `
           <div class="guide-section">
-            <div class="guide-section-title">🧵 방직 (紡織 / Clotho)</div>
-            <p>물리/실체 권능. 물리 공격·방어, 신체 행동력, 장비 가공/수리, 물리적 위기 회피 판정에 적용됩니다.</p>
+            <div class="guide-section-title">🧵 방직 (Clotho)</div>
+            <p>물리/실체 권능. 신체 행동력 및 물리 전투 판정.</p>
           </div>
           <div class="guide-section">
-            <div class="guide-section-title">⚖️ 재정 (裁定 / Lachesis)</div>
-            <p>지식/섭리 권능. 마법 행사, 지형/속성/카룬 분석, 결계, 정보 탐색 및 약점 파악 판정에 적용됩니다.</p>
+            <div class="guide-section-title">⚖️ 재정 (Lachesis)</div>
+            <p>지식/섭리 권능. 마법 행사 및 분석 판정.</p>
           </div>
           <div class="guide-section">
-            <div class="guide-section-title">✂️ 단선 (斷線 / Atropos)</div>
-            <p>차단/인과 권능. 불리함 사전 차단 및 상태 이상 해제, 도주, 정화, 사망 유예 판정에 적용됩니다.</p>
-          </div>
-          <div class="guide-section">
-            <div class="guide-section-title">🎟️ 단선 토큰 혜택 (단선 수치만큼 소지)</div>
-            <p>· <strong>1토큰 (해제)</strong>: 본인/아군 상태 이상/디버프 1개 확정 제거 (노 굴림)</p>
-            <p>· <strong>1토큰 (상쇄)</strong>: 판정 직전 불리함(-1D) 사전 확정 제거 (노 굴림)</p>
-            <p>· <strong>2토큰 (확정)</strong>: 주사위 연산 없이 즉시 대성공(Critical) 처리</p>
-            <p>· <strong>2토큰 (정화)</strong>: 파티 전체 디버프 및 불리함(-1D) 일괄 제거</p>
-            <p>· <strong>2토큰 (유예)</strong>: 탈락/사망 상태를 강제 차단하고 1턴간 생존 유지</p>
+            <div class="guide-section-title">✂️ 단선 (Atropos)</div>
+            <p>차단/인과 권능. 상태 이상 해제 및 도주 판정.</p>
           </div>
         `;
       }
@@ -708,7 +1189,11 @@
         .maybeSingle();
 
       if (character) {
-        renderMainApp(character.username || username, character.nickname);
+        currentUserId = authData.user.id;
+        currentUsername = username;
+        currentUserNickname = character.nickname || username;
+        characterData = character;
+        enterCommunity();
       } else {
         alert("프로필 정보가 없습니다. 가입을 완료해 주세요.");
         openSignupModal();
@@ -735,7 +1220,7 @@
 
       if (signUpError) return alert("계정 생성 실패: " + signUpError.message);
 
-      const { error: dbError } = await supabaseClient.from('characters').insert([{
+      const { data: newChar, error: dbError } = await supabaseClient.from('characters').insert([{
         user_id: signUpData.user.id,
         username: username,
         nickname: nickname,
@@ -745,27 +1230,402 @@
         lachesis: stats.lachesis,
         atropos: stats.atropos,
         available_points: 0
-      }]);
+      }]).select().single();
 
       if (dbError) return alert("DB 저장 오류: " + dbError.message);
 
+      currentUserId = signUpData.user.id;
+      currentUsername = username;
+      currentUserNickname = nickname;
+      characterData = newChar;
+
       alert("성공적으로 회원가입이 완료되었습니다!");
-      closeSignupModal();
-      renderMainApp(username, nickname);
+      enterCommunity();
     }
 
-    function renderMainApp(username, nickname) {
-      document.getElementById('step-0-card').classList.add('hidden');
-      document.getElementById('signup-card').classList.add('hidden');
-      document.getElementById('guide-card').classList.add('hidden');
-      document.getElementById('main-app').classList.remove('hidden');
-      document.getElementById('user-info-text').innerText = `${nickname} (${username}) 님으로 접속되었습니다.`;
+    async function enterCommunity() {
+      document.getElementById('auth-flow-container').classList.add('hidden');
+      document.getElementById('main-community-section').classList.remove('hidden');
+
+      document.getElementById('side-char-name').innerText = `${characterData.name} (@${currentUserNickname})`;
+      document.getElementById('side-char-role').innerText = characterData.role;
+      document.getElementById('side-avatar-area').innerHTML = getAvatarHtml(characterData.avatar_url, 44);
+
+      if (currentUsername === ADMIN_USERNAME) {
+        document.getElementById('notice-write-box').classList.remove('hidden');
+      }
+
+      const { data: chars } = await supabaseClient.from('characters').select('*');
+      if (chars) allCharactersList = chars;
+
+      loadNotifications();
+      switchMainTab('notice');
     }
 
-    async function handleLogout() {
-      await supabaseClient.auth.signOut();
-      document.getElementById('main-app').classList.add('hidden');
-      document.getElementById('step-0-card').classList.remove('hidden');
+    function switchMainTab(tab) {
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      ['notice', 'story', 'profile', 'friends'].forEach(t => {
+        document.getElementById(`tab-${t}-content`).classList.add('hidden');
+      });
+
+      document.getElementById(`btn-tab-${tab}`).classList.add('active');
+      document.getElementById(`tab-${tab}-content`).classList.remove('hidden');
+
+      if (tab === 'notice') loadNotices();
+      if (tab === 'story') loadPosts();
+      if (tab === 'profile') renderProfileView();
+      if (tab === 'friends') loadFriends();
+    }
+
+    /* 알림 시스템 */
+    async function loadNotifications() {
+      const { data } = await supabaseClient
+        .from('notifications')
+        .select('*')
+        .eq('user_id', currentUserId)
+        .order('created_at', { ascending: false });
+
+      const notiBody = document.getElementById('noti-list-body');
+      const badge = document.getElementById('noti-badge-count');
+      notiBody.innerHTML = '';
+
+      if (!data || data.length === 0) {
+        notiBody.innerHTML = '<div style="padding:16px; color:#888; text-align:center;">알림이 없습니다.</div>';
+        badge.classList.add('hidden');
+        return;
+      }
+
+      const unreadCount = data.filter(n => !n.is_read).length;
+      if (unreadCount > 0) {
+        badge.innerText = unreadCount;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+
+      data.forEach(n => {
+        const item = document.createElement('div');
+        item.className = `noti-item ${n.is_read ? '' : 'unread'}`;
+        item.innerHTML = `
+          ${getAvatarHtml(n.sender_avatar, 32)}
+          <div class="noti-content">
+            <div><b>${n.sender_name}</b>님이 ${n.message}</div>
+            <div class="noti-time">${new Date(n.created_at).toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'})}</div>
+          </div>
+        `;
+        notiBody.appendChild(item);
+      });
+    }
+
+    async function toggleNotiDropdown(e) {
+      e.stopPropagation();
+      const menu = document.getElementById('noti-dropdown-menu');
+      menu.classList.toggle('hidden');
+
+      if (!menu.classList.contains('hidden')) {
+        await supabaseClient.from('notifications').update({ is_read: true }).eq('user_id', currentUserId);
+        document.getElementById('noti-badge-count').classList.add('hidden');
+      }
+    }
+
+    async function createNotification(targetUserId, message) {
+      if (targetUserId === currentUserId) return;
+      await supabaseClient.from('notifications').insert([{
+        user_id: targetUserId,
+        sender_name: characterData.name,
+        sender_avatar: characterData.avatar_url,
+        message: message
+      }]);
+    }
+
+    /* 피드 및 댓글 */
+    async function loadComments(postId) {
+      const { data } = await supabaseClient
+        .from('comments')
+        .select('*, characters(avatar_url)')
+        .eq('post_id', postId)
+        .order('created_at', { ascending: true });
+
+      const container = document.getElementById(`comments-list-${postId}`);
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (!data) return;
+
+      data.forEach(c => {
+        const isReply = !!c.parent_id;
+        const el = document.createElement('div');
+        el.className = `comment-item ${isReply ? 'reply' : ''}`;
+        el.innerHTML = `
+          <div class="comment-header">
+            <div>
+              ${getAvatarHtml(c.characters?.avatar_url, 24)}
+              <span class="comment-author" onclick="openProfileModal('${c.user_id}')">${c.author_name}</span>
+            </div>
+            <div class="comment-actions">
+              <span class="comment-action-btn" onclick="setReplyTarget('${postId}', '${c.id}', '${c.author_name}')">답글</span>
+              ${c.user_id === currentUserId || currentUsername === ADMIN_USERNAME ? `
+                <span class="comment-action-btn" onclick="deleteComment('${postId}', '${c.id}')">삭제</span>
+              ` : ''}
+            </div>
+          </div>
+          <div style="color:#ccc; font-size:0.85rem; padding-left:28px;">${c.content}</div>
+        `;
+        container.appendChild(el);
+      });
+    }
+
+    function handleCommentInput(e, postId) {
+      const input = e.target;
+      const val = input.value;
+      const dropdown = document.getElementById(`mention-dropdown-${postId}`);
+
+      if (val.endsWith('@')) {
+        dropdown.innerHTML = '';
+        allCharactersList.forEach(c => {
+          const item = document.createElement('div');
+          item.className = 'mention-item';
+          item.innerHTML = `${getAvatarHtml(c.avatar_url, 20)} <span>${c.name}</span>`;
+          item.onclick = () => {
+            input.value = val + c.name + ' ';
+            dropdown.classList.add('hidden');
+            input.focus();
+          };
+          dropdown.appendChild(item);
+        });
+        dropdown.classList.remove('hidden');
+      } else if (!val.includes('@')) {
+        dropdown.classList.add('hidden');
+      }
+    }
+
+    function setReplyTarget(postId, commentId, authorName) {
+      const input = document.getElementById(`comment-input-${postId}`);
+      input.dataset.parentId = commentId;
+      input.placeholder = `@${authorName} 님에게 답글 작성 중...`;
+      input.focus();
+    }
+
+    async function submitComment(postId, postUserId) {
+      const input = document.getElementById(`comment-input-${postId}`);
+      const content = input.value.trim();
+      const parentId = input.dataset.parentId || null;
+      if (!content) return;
+
+      await supabaseClient.from('comments').insert([{
+        post_id: postId,
+        user_id: currentUserId,
+        author_name: `${characterData.name}`,
+        content: content,
+        parent_id: parentId
+      }]);
+
+      await createNotification(postUserId, `내 글에 댓글을 남겼습니다.`);
+
+      input.value = '';
+      delete input.dataset.parentId;
+      loadComments(postId);
+      showToast('댓글 등록 완료');
+    }
+
+    async function deleteComment(postId, commentId) {
+      if (!confirm('댓글을 삭제하시겠습니까?')) return;
+      await supabaseClient.from('comments').delete().eq('id', commentId);
+      loadComments(postId);
+    }
+
+    async function loadNotices() {
+      const { data } = await supabaseClient.from('posts').select('*, characters(avatar_url)').eq('is_notice', true).order('created_at', { ascending: false });
+      renderFeed('notice-feed', data);
+    }
+
+    async function loadPosts() {
+      const { data } = await supabaseClient.from('posts').select('*, characters(avatar_url)').eq('is_notice', false).order('created_at', { ascending: false });
+      renderFeed('posts-feed', data);
+    }
+
+    function renderFeed(containerId, data) {
+      const feed = document.getElementById(containerId);
+      feed.innerHTML = '';
+      if (!data || data.length === 0) {
+        feed.innerHTML = '<p style="color: #888; text-align: center; padding: 20px;">등록된 내용이 없습니다.</p>';
+        return;
+      }
+
+      data.forEach(p => {
+        const isOwner = p.user_id === currentUserId || currentUsername === ADMIN_USERNAME;
+        const item = document.createElement('div');
+        item.className = 'post-box';
+        item.innerHTML = `
+          <div class="post-header">
+            <div class="author-wrapper">
+              ${p.is_notice ? '<span class="notice-badge">공지</span>' : ''}
+              ${getAvatarHtml(p.characters?.avatar_url, 28)}
+              <span class="post-author" style="margin-left: 6px;" onclick="openProfileModal('${p.user_id}')">${p.author_name}</span>
+            </div>
+            <div class="post-header-right">
+              <span>${new Date(p.created_at).toLocaleDateString('ko-KR')}</span>
+              ${isOwner ? `
+                <div class="post-more-container">
+                  <button type="button" class="post-more-btn" onclick="toggleMoreMenu(event, '${p.id}')">⋮</button>
+                  <div id="dropdown-${p.id}" class="post-dropdown-menu hidden">
+                    <button type="button" class="post-dropdown-item" onclick="openEditPostModal('${p.id}', \`${escapeQuotes(p.content)}\`)">수정</button>
+                    <button type="button" class="post-dropdown-item delete" onclick="deletePost('${p.id}')">삭제</button>
+                  </div>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+          <div class="post-content">${p.content}</div>
+          <div class="comments-section">
+            <div id="comments-list-${p.id}"></div>
+            <div class="comment-input-box">
+              <div id="mention-dropdown-${p.id}" class="mention-dropdown hidden"></div>
+              <div style="display:flex; gap:6px; margin-top:6px;">
+                <input type="text" id="comment-input-${p.id}" placeholder="댓글 입력 (@멘션)" oninput="handleCommentInput(event, '${p.id}')">
+                <button type="button" onclick="submitComment('${p.id}', '${p.user_id}')" style="width:70px; margin-top:0; font-size:0.85rem; padding:8px; border:none; border-radius:6px; background:#3b5998; color:#fff; cursor:pointer;">등록</button>
+              </div>
+            </div>
+          </div>
+        `;
+        feed.appendChild(item);
+        loadComments(p.id);
+      });
+    }
+
+    async function submitNotice() {
+      const content = document.getElementById('notice-input').value.trim();
+      if (!content) return;
+      await supabaseClient.from('posts').insert([{ user_id: currentUserId, author_name: `운영진 (@${currentUserNickname})`, content, is_notice: true }]);
+      document.getElementById('notice-input').value = '';
+      loadNotices();
+    }
+
+    async function submitPost() {
+      const content = document.getElementById('post-input').value.trim();
+      const visibility = document.getElementById('post-visibility').value;
+      if (!content) return;
+      await supabaseClient.from('posts').insert([{ user_id: currentUserId, author_name: `${characterData.name} (@${currentUserNickname})`, content, visibility, is_notice: false }]);
+      document.getElementById('post-input').value = '';
+      loadPosts();
+    }
+
+    function toggleMoreMenu(event, postId) {
+      event.stopPropagation();
+      const targetMenu = document.getElementById(`dropdown-${postId}`);
+      document.querySelectorAll('.post-dropdown-menu').forEach(menu => {
+        if (menu !== targetMenu) menu.classList.add('hidden');
+      });
+      targetMenu.classList.toggle('hidden');
+    }
+
+    function escapeQuotes(str) {
+      return str.replace(/`/g, '\\`').replace(/\$/g, '\\$');
+    }
+
+    function openEditPostModal(postId, content) {
+      editingPostId = postId;
+      document.getElementById('edit-post-content').value = content;
+      document.getElementById('edit-post-modal').classList.remove('hidden');
+    }
+
+    function closeEditPostModal() {
+      editingPostId = null;
+      document.getElementById('edit-post-modal').classList.add('hidden');
+    }
+
+    async function saveEditedPost() {
+      if (!editingPostId) return;
+      const content = document.getElementById('edit-post-content').value.trim();
+      if (!content) return;
+      await supabaseClient.from('posts').update({ content }).eq('id', editingPostId);
+      closeEditPostModal();
+      loadNotices();
+      loadPosts();
+    }
+
+    async function deletePost(postId) {
+      if (!confirm('게시글을 삭제하시겠습니까?')) return;
+      await supabaseClient.from('posts').delete().eq('id', postId);
+      loadNotices();
+      loadPosts();
+    }
+
+    function renderProfileView() {
+      document.getElementById('profile-char-name-display').innerText = `${characterData.name} (@${currentUserNickname})`;
+      document.getElementById('profile-role').innerText = characterData.role;
+      document.getElementById('profile-avatar-preview-area').innerHTML = getAvatarHtml(characterData.avatar_url, 70);
+      document.getElementById('profile-klotho').innerText = characterData.klotho;
+      document.getElementById('profile-lachesis').innerText = characterData.lachesis;
+      document.getElementById('profile-atropos').innerText = characterData.atropos;
+      document.getElementById('edit-char-name').value = characterData.name;
+    }
+
+    async function uploadProfileAvatar() {
+      const fileInput = document.getElementById('avatar-file-input');
+      const file = fileInput.files[0];
+      if (!file) return alert('이미지 파일을 선택해주세요.');
+
+      try {
+        showToast('업로드 중...');
+        const resizedBlob = await resizeImage(file, 150, 150);
+        const filePath = `avatars/${currentUserId}.webp`;
+
+        await supabaseClient.storage.from('community-assets').upload(filePath, resizedBlob, { contentType: 'image/webp', upsert: true });
+        const { data } = supabaseClient.storage.from('community-assets').getPublicUrl(filePath);
+        const newAvatarUrl = `${data.publicUrl}?t=${new Date().getTime()}`;
+
+        await supabaseClient.from('characters').update({ avatar_url: newAvatarUrl }).eq('user_id', currentUserId);
+        characterData.avatar_url = newAvatarUrl;
+        document.getElementById('side-avatar-area').innerHTML = getAvatarHtml(newAvatarUrl, 44);
+        renderProfileView();
+        showToast('변경 완료!');
+      } catch (err) {
+        alert('이미지 업로드 중 오류 발생');
+      }
+    }
+
+    async function resetToDefaultAvatar() {
+      if (!confirm('기본 이미지로 변경하시겠습니까?')) return;
+      await supabaseClient.from('characters').update({ avatar_url: null }).eq('user_id', currentUserId);
+      characterData.avatar_url = null;
+      document.getElementById('side-avatar-area').innerHTML = getAvatarHtml(null, 44);
+      renderProfileView();
+    }
+
+    async function updateProfile() {
+      const newName = document.getElementById('edit-char-name').value.trim();
+      if (!newName) return;
+      await supabaseClient.from('characters').update({ name: newName }).eq('user_id', currentUserId);
+      characterData.name = newName;
+      document.getElementById('side-char-name').innerText = `${newName} (@${currentUserNickname})`;
+      renderProfileView();
+      showToast('저장되었습니다.');
+    }
+
+    async function openProfileModal(userId) {
+      const { data } = await supabaseClient.from('characters').select('*').eq('user_id', userId).maybeSingle();
+      if (!data) return;
+
+      document.getElementById('modal-char-name').innerText = data.name;
+      document.getElementById('modal-role').innerText = data.role;
+      document.getElementById('modal-klotho').innerText = data.klotho;
+      document.getElementById('modal-lachesis').innerText = data.lachesis;
+      document.getElementById('modal-atropos').innerText = data.atropos;
+      document.getElementById('modal-avatar-area').innerHTML = getAvatarHtml(data.avatar_url, 50);
+      document.getElementById('profile-modal').classList.remove('hidden');
+    }
+
+    function closeProfileModal() {
+      document.getElementById('profile-modal').classList.add('hidden');
+    }
+
+    function loadFriends() {
+      document.getElementById('friend-list').innerHTML = '<p style="color: #888; text-align: center; padding: 20px;">친구 기능 준비 중입니다.</p>';
+    }
+
+    function addFriendByName() {
+      showToast('준비 중인 기능입니다.');
     }
   </script>
 </body>
