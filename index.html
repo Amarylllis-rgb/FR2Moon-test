@@ -21,14 +21,6 @@
 
     .hidden { display: none !important; }
 
-    .center-wrapper {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-
     .app-container {
       display: flex;
       gap: 20px;
@@ -54,7 +46,7 @@
       background-color: #18181c;
       border-radius: 12px;
       padding: 24px;
-      width: 400px;
+      width: 420px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.6);
       border: 1px solid #2e2e38;
       display: flex;
@@ -82,14 +74,14 @@
 
     .guide-content {
       font-size: 0.85rem;
-      line-height: 1.6;
+      line-height: 1.5;
       color: #ccc;
       overflow-y: auto;
       max-height: 540px;
     }
 
     .guide-section {
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       background: #22222a;
       padding: 12px;
       border-radius: 6px;
@@ -230,7 +222,6 @@
       justify-content: center;
     }
 
-    /* 메인 커뮤니티 헤더 및 레이아웃 */
     .app-header {
       position: sticky;
       top: 0;
@@ -464,7 +455,6 @@
 
     .post-content { font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; }
 
-    /* 댓글 및 멘션 스타일 */
     .comments-section {
       margin-top: 14px;
       padding-top: 12px;
@@ -913,38 +903,43 @@
       }
     };
 
-    /* 주전공 데이터 */
+    /* 주전공 데이터 (이미지2 시트 반영) */
     const MAIN_MAJORS = [
-      { id: "PAS_01", category: "전투사관학", name: "원거리 전투학", stat: "방직", passive: "정밀 사격", effect: "Dice_Bonus +1", constraint: "상시 적용" },
-      { id: "PAS_02", category: "전투사관학", name: "검술학", stat: "방직", passive: "흘려내기", effect: "Durability_Damage_Reduce 50%", constraint: "방어 성공 시" },
-      { id: "PAS_03", category: "전투사관학", name: "마법학", stat: "재정", passive: "마력 효율화", effect: "Resource_Refund_Check +1", constraint: "상시 적용" },
-      { id: "PAS_04", category: "전투사관학", name: "무투학", stat: "방직", passive: "충격 완화", effect: "Take_Damage_Min", constraint: "방어 성공 시" },
-      { id: "PAS_08", category: "전투지원학", name: "지형 활용학", stat: "재정", passive: "우회로 확보", effect: "Move_Penalty -1", constraint: "상시 적용" },
-      { id: "PAS_09", category: "전투지원학", name: "정보 수집학", stat: "단선", passive: "기습 대비", effect: "Disadvantage_Remove", constraint: "스탯 판정 시" },
-      { id: "PAS_10", category: "전투지원학", name: "전술 설계학", stat: "재정", passive: "전술 지휘", effect: "Ally_Check_Bonus +1", constraint: "상시 적용" },
-      { id: "PAS_16", category: "실용생활학", name: "의학", stat: "재정", passive: "응급 지혈", effect: "DoT_Damage -1", constraint: "상시 적용" },
-      { id: "PAS_17", category: "실용생활학", name: "건축학", stat: "방직", passive: "진지 구축", effect: "Rest_Effect +1", constraint: "휴식 시" },
-      { id: "PAS_18", category: "실용생활학", name: "포션학", stat: "재정", passive: "소모 절감", effect: "Ingredient_Refund 30%", constraint: "제작 실패 시" }
+      { id: "PAS_01", category: "전투사관학", name: "원거리 전투학", card: "정밀 사격", stat: "방직", effect: "원거리 공격 판정 성공 시 ATK 결과값 고정 +1 보정", constraint: "시나리오당 2회 선언" },
+      { id: "PAS_02", category: "전투사관학", name: "검술학", card: "흘려내기", stat: "방직", effect: "방어 판정 시 장비 내구도 보호 플래그 적용", constraint: "시나리오당 2회 선언" },
+      { id: "PAS_03", category: "전투사관학", name: "마법학", card: "마력 효율화", stat: "재정", effect: "마법 사용 시 소모되는 MP 고정 -1 감소", constraint: "시나리오당 2회 선언" },
+      { id: "PAS_04", category: "전투사관학", name: "무투학", card: "충격 완화", stat: "방직", effect: "근접 방어 성공 시 피격 대미지 무효화 플래그 적용", constraint: "시나리오당 2회 선언" },
+      { id: "PAS_08", category: "전투지원학", name: "지형 활용학", card: "우회로 확보", stat: "재정", effect: "이동 및 지형 탐색 판정 시 다이스 결과값 고정 +1 보정", constraint: "시나리오당 2회 선언" },
+      { id: "PAS_09", category: "전투지원학", name: "정보 수집학", card: "기습 대비", stat: "단선", effect: "스탯 판정 시 불리함 패널티 상세 플래그 적용", constraint: "시나리오당 2회 선언" },
+      { id: "PAS_10", category: "전투지원학", name: "전술 설계학", card: "전술 지휘", stat: "재정", effect: "파티원 판정 지원 시 추가 보정치 +1 부여", constraint: "시나리오당 2회 선언" },
+      { id: "PAS_16", category: "실용생활학", name: "의학", card: "간이 수술", stat: "재정", effect: "출혈/지속 피해 해제 판정 시도 가능", constraint: "시나리오당 2회 선언" },
+      { id: "PAS_17", category: "실용생활학", name: "건축학", card: "진지 구축", stat: "방직", effect: "휴식 페이즈 회복량 판정 시 다이스 결과값 고정 +1 보정", constraint: "시나리오당 2회 선언" },
+      { id: "PAS_18", category: "실용생활학", name: "포션학", card: "제작 시도", stat: "재정", effect: "시나리오 내 임시 포션 제조 판정 시도 가능", constraint: "시나리오당 2회 선언" }
     ];
 
-    /* 부전공 데이터 */
+    /* 부전공 데이터 (이미지2 시트 반영) */
     const SUB_MAJORS = [
-      { id: "PAS_05", category: "전투사관학", name: "카룬 기초학", stat: "재정", passive: "패턴 분석", effect: "Next_Defense_Dice +1D", constraint: "성공 시" },
-      { id: "PAS_06", category: "전투사관학", name: "전투 심리학", stat: "단선", passive: "사기 진작", effect: "Debuff_Level -1", constraint: "스탯 판정 시" },
-      { id: "PAS_07", category: "전투사관학", name: "전리품 수집학", stat: "방직", passive: "정밀 채취", effect: "Loot_Quality_Dice +1D", constraint: "상시 적용" },
-      { id: "PAS_11", category: "전투지원학", name: "모의전투학", stat: "재정", passive: "경험 활용", effect: "Dice_Bonus +1", constraint: "상시 적용" },
-      { id: "PAS_12", category: "전투지원학", name: "성분분석학", stat: "재정", passive: "속성 간파", effect: "Element_Damage_Reduce", constraint: "성공 시" },
-      { id: "PAS_13", category: "전투지원학", name: "메타모포시스", stat: "재정", passive: "위장 정찰", effect: "Stealth_Dice +1D", constraint: "상시 적용" },
-      { id: "PAS_14", category: "실용생활학", name: "장비 가공학", stat: "방직", passive: "임시 정비", effect: "Item_Status = Temporary", constraint: "아이템당 1회" },
-      { id: "PAS_15", category: "실용생활학", name: "심리 상담학", stat: "단선", passive: "정신적 완화", effect: "Mental_Debuff -1Turn", constraint: "스탯 판정 시" }
+      { id: "PAS_05", category: "전투사관학", name: "카룬 기초학", card: "패턴 분석", stat: "재정", effect: "사용 후 다음 방어 판정 시 다이스 결과값 고정 +1 보정", constraint: "시나리오당 1회 선언" },
+      { id: "PAS_06", category: "전투사관학", name: "전투 심리학", card: "사기 진작", stat: "단선", effect: "파티원 다음 행동 판정 시 다이스 결과값 고정 +1 보정", constraint: "시나리오당 1회 선언" },
+      { id: "PAS_07", category: "전투사관학", name: "전리품 수집학", card: "정밀 채취", stat: "방직", effect: "전리품 획득 판정 시 다이스 결과값 고정 +1 보정", constraint: "시나리오당 1회 선언" },
+      { id: "PAS_11", category: "전투지원학", name: "모의전투학", card: "경험 활용", stat: "재정", effect: "아는 적 상대 판정 시 다이스 결과값 고정 +1 보정", constraint: "시나리오당 1회 선언" },
+      { id: "PAS_12", category: "전투지원학", name: "성분분석학", card: "속성 간파", stat: "재정", effect: "속성 공격 방어 판정 시 다이스 결과값 고정 +2 보정", constraint: "시나리오당 1회 선언" },
+      { id: "PAS_13", category: "전투지원학", name: "메타모포시스", card: "위장 정찰", stat: "재정", effect: "잠입 및 은신 판정 시 다이스 결과값 고정 +1 보정", constraint: "시나리오당 1회 선언" },
+      { id: "PAS_14", category: "실용생활학", name: "장비 가공학", card: "임시 정비", stat: "방직", effect: "파손 장비 수리 판정 시 다이스 결과값 고정 +1 보정", constraint: "시나리오당 1회 선언" },
+      { id: "PAS_15", category: "실용생활학", name: "심리 상담학", card: "정신적 완화", stat: "단선", effect: "정신 이상 회복 판정 시 다이스 결과값 고정 +1 보정", constraint: "시나리오당 1회 선언" },
+      { id: "PAS_19", category: "실용생활학", name: "조리학", card: "식사 대접", stat: "방직", effect: "요리/휴식 후 다음 판정 시 다이스 결과값 고정 +2 보정", constraint: "시나리오당 1회 선언" },
+      { id: "PAS_20", category: "실용생활학", name: "디자인학", card: "신분 위장", stat: "방직", effect: "신분 위장 및 속임수 판정 시 다이스 결과값 고정 +1 보정", constraint: "시나리오당 1회 선언" },
+      { id: "PAS_21", category: "실용생활학", name: "재료 가공학", card: "효율 가공", stat: "방직", effect: "제작/분해 판정 시 다이스 결과값 고정 +1 보정", constraint: "시나리오당 1회 선언" },
+      { id: "PAS_22", category: "실용생활학", name: "카룬 해부학", card: "약점 타격", stat: "재정", effect: "공격 판정 성공 시 추가 대미지 판정 고정 +1 보정", constraint: "시나리오당 1회 선언" },
+      { id: "PAS_23", category: "실용생활학", name: "응용정리학", card: "도구 수색", stat: "방직", effect: "도구/소모품 수색 판정 시 다이스 결과값 고정 +1 보정", constraint: "시나리오당 1회 선언" }
     ];
 
-    /* 공통교양 데이터 */
+    /* 공통교양 데이터 (이미지2 시트 반영) */
     const GENERAL_EDU_DATA = [
-      { id: "PAS_24", category: "공통교양", name: "해독학", stat: "재정", passive: "독성 완화", effect: "Poison_Duration -1Turn", constraint: "상시 적용" },
-      { id: "PAS_25", category: "공통교양", name: "응급처치학", stat: "재정", passive: "응급 처치", effect: "HP_Recovery_Check", constraint: "스탯 판정 시" },
-      { id: "PAS_26", category: "공통교양", name: "상황대처학", stat: "단선", passive: "도주 지원", effect: "Escape_Dice +1D", constraint: "스탯 판정 시" },
-      { id: "PAS_27", category: "공통교양", name: "금전학", stat: "재정", passive: "흥정", effect: "Trade_Discount +1D", constraint: "상시 적용" }
+      { id: "PAS_24", category: "공통교양", name: "해독학", card: "독성 완화", stat: "재정", effect: "독 상태이상 저항 판정 시 다이스 결과값 고정 +1 보정", constraint: "시나리오당 1회 선언" },
+      { id: "PAS_25", category: "공통교양", name: "응급처치학", card: "응급 처치", stat: "재정", effect: "HP 회복 고정 3", constraint: "시나리오당 1회 선언" },
+      { id: "PAS_26", category: "공통교양", name: "상황대처학", card: "도주 지원", stat: "단선", effect: "전투 포기 및 도주 판정 시 다이스 결과값 고정 +1 보정", constraint: "시나리오당 1회 선언" },
+      { id: "PAS_27", category: "공통교양", name: "금전학", card: "흥정", stat: "재정", effect: "상점 거래 또는 대화 판정 시 다이스 결과값 고정 +1 보정", constraint: "시나리오당 1회 선언" }
     ];
 
     let currentStep = 1;
@@ -1131,26 +1126,26 @@
           ${majorObj ? `
           <div class="guide-section">
             <span class="guide-badge">주전공</span> <strong>${majorObj.name} (${majorObj.category})</strong>
-            <p style="margin-top:4px;"><strong>스탯:</strong> ${majorObj.stat} | <strong>패시브:</strong> ${majorObj.passive}</p>
-            <p><strong>효과:</strong> ${majorObj.effect} (${majorObj.constraint})</p>
+            <p style="margin-top:4px;">관련 스탯 : ${majorObj.stat} / ${majorObj.constraint.includes('2회') ? '시나리오당 2회' : '시나리오당 1회'} 사용 가능한 "${majorObj.card}" 카드를 얻습니다.</p>
+            <p style="margin-top:2px;"><strong>${majorObj.card}</strong> : ${majorObj.effect}</p>
           </div>` : ''}
           ${sub1Obj ? `
           <div class="guide-section">
             <span class="guide-badge">부전공 1</span> <strong>${sub1Obj.name} (${sub1Obj.category})</strong>
-            <p style="margin-top:4px;"><strong>스탯:</strong> ${sub1Obj.stat} | <strong>패시브:</strong> ${sub1Obj.passive}</p>
-            <p><strong>효과:</strong> ${sub1Obj.effect} (${sub1Obj.constraint})</p>
+            <p style="margin-top:4px;">관련 스탯 : ${sub1Obj.stat} / ${sub1Obj.constraint.includes('2회') ? '시나리오당 2회' : '시나리오당 1회'} 사용 가능한 "${sub1Obj.card}" 카드를 얻습니다.</p>
+            <p style="margin-top:2px;"><strong>${sub1Obj.card}</strong> : ${sub1Obj.effect}</p>
           </div>` : ''}
           ${sub2Obj ? `
           <div class="guide-section">
             <span class="guide-badge">부전공 2</span> <strong>${sub2Obj.name} (${sub2Obj.category})</strong>
-            <p style="margin-top:4px;"><strong>스탯:</strong> ${sub2Obj.stat} | <strong>패시브:</strong> ${sub2Obj.passive}</p>
-            <p><strong>효과:</strong> ${sub2Obj.effect} (${sub2Obj.constraint})</p>
+            <p style="margin-top:4px;">관련 스탯 : ${sub2Obj.stat} / ${sub2Obj.constraint.includes('2회') ? '시나리오당 2회' : '시나리오당 1회'} 사용 가능한 "${sub2Obj.card}" 카드를 얻습니다.</p>
+            <p style="margin-top:2px;"><strong>${sub2Obj.card}</strong> : ${sub2Obj.effect}</p>
           </div>` : ''}
           ${genObj ? `
           <div class="guide-section">
             <span class="guide-badge">공통교양</span> <strong>${genObj.name}</strong>
-            <p style="margin-top:4px;"><strong>스탯:</strong> ${genObj.stat} | <strong>패시브:</strong> ${genObj.passive}</p>
-            <p><strong>효과:</strong> ${genObj.effect} (${genObj.constraint})</p>
+            <p style="margin-top:4px;">관련 스탯 : ${genObj.stat} / ${genObj.constraint.includes('2회') ? '시나리오당 2회' : '시나리오당 1회'} 사용 가능한 "${genObj.card}" 카드를 얻습니다.</p>
+            <p style="margin-top:2px;"><strong>${genObj.card}</strong> : ${genObj.effect}</p>
           </div>` : ''}
         `;
       } else if (currentStep === 3) {
@@ -1314,7 +1309,6 @@
       if (tab === 'friends') loadFriends();
     }
 
-    /* 알림 시스템 */
     async function loadNotifications() {
       const { data } = await supabaseClient
         .from('notifications')
@@ -1375,7 +1369,6 @@
       }]);
     }
 
-    /* 피드 및 댓글 */
     async function loadComments(postId) {
       const { data } = await supabaseClient
         .from('comments')
