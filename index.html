@@ -34,8 +34,11 @@
       gap: 20px;
       max-width: 960px;
       width: 100%;
-      align-items: stretch;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
       margin: 0 auto;
+      padding: 20px;
     }
 
     .card {
@@ -582,7 +585,7 @@
 </head>
 <body>
 
-  <!-- 전체 레이아웃 래퍼 -->
+  <!-- 전체 레이아웃 래퍼 (중앙 정렬 적용) -->
   <div class="app-container" id="auth-flow-container">
     
     <!-- STEP 0: 로그인 메인 -->
@@ -872,7 +875,7 @@
 
     const ADMIN_USERNAME = 'admin';
     const BANNED_WORDS = ['관리자', '운영진', 'admin', '운영자', 'system', 'fuck', 'shit', '낙화'];
-    const DEFAULT_AVATAR_SVG = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzg4ODg4OCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSI+PHBhdGggZD0iTTEyIDJDNi44OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTAgM2MxLjY2IDAgMyAxLjM0IDMgM3MtMS4zNCAzLTMgMy0zLTEuMzQtMy0zIDEuMzQtMyAzLTN6bTAgMTQuMmMtMi41IDAtNC43MS0xLjI4LTYtMy4yMi4wMy0xLjk5IDQtMy4wOCA2LTMuMDggMS45OSAwIDUuOTcgMS4wOSA2IDMuMDgtMS4yOSAxLjk0LTMuNCAzLjIyLTYgMy4yMnoiLz48L3N2Zz4=';
+    const DEFAULT_AVATAR_SVG = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzg4ODg4OCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSI+PHBhdGggZD0iTTEyIDJDNi44OCAyIDIgNi40OCAyICAyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTAgM2MxLjY2IDAgMyAxLjM0IDMgM3MtMS4zNCAzLTMgMy0zLTEuMzQtMy0zIDEuMzQtMyAzLTN6bTAgMTQuMmMtMi41IDAtNC43MS0xLjI4LTYtMy4yMi4wMy0xLjk5IDQtMy4wOCA2LTMuMDggMS45OSAwIDUuOTcgMS4wOSA2IDMuMDgtMS4yOSAxLjk0LTMuNCAzLjIyLTYgMy4yMnoiLz48L3N2Zz4=';
 
     let currentUserId = null;
     let currentUsername = null;
@@ -1063,8 +1066,8 @@
       if (step === 2) {
         const nickname = document.getElementById('nickname').value.trim();
         const charName = document.getElementById('char-name').value.trim();
-        if (!nickname || !charName) return alert("닉네임과 캐릭터 이름을 입력해주세요.");
-        if (!isNicknameChecked) return alert("닉네임 중복확인을 먼저 진행해 주세요.");
+        if (!nickname || !charName) return showToast("닉네임과 캐릭터 이름을 입력해주세요.");
+        if (!isNicknameChecked) return showToast("닉네임 중복확인을 먼저 진행해 주세요.");
       }
 
       currentStep = step;
@@ -1107,6 +1110,16 @@
         guideTitle.innerText = "Step 2. 태생 및 전공/교양 정보";
         const originKey = document.getElementById('origin').value;
         const originInfo = ORIGINS_DATA[originKey];
+        
+        const majorName = document.getElementById('major').value;
+        const sub1Name = document.getElementById('sub-major-1').value;
+        const sub2Name = document.getElementById('sub-major-2').value;
+        const genName = document.getElementById('general-edu').value;
+
+        const majorObj = MAIN_MAJORS.find(m => m.name === majorName);
+        const sub1Obj = SUB_MAJORS.find(m => m.name === sub1Name);
+        const sub2Obj = SUB_MAJORS.find(m => m.name === sub2Name);
+        const genObj = GENERAL_EDU_DATA.find(g => g.name === genName);
 
         guideBody.innerHTML = `
           <div class="guide-section" style="border-left-color: #ffaa00;">
@@ -1115,6 +1128,30 @@
             <p><strong>장점:</strong> ${originInfo.pros}</p>
             <div class="guide-constraint">⚠️ 단점: ${originInfo.cons}</div>
           </div>
+          ${majorObj ? `
+          <div class="guide-section">
+            <span class="guide-badge">주전공</span> <strong>${majorObj.name} (${majorObj.category})</strong>
+            <p style="margin-top:4px;"><strong>스탯:</strong> ${majorObj.stat} | <strong>패시브:</strong> ${majorObj.passive}</p>
+            <p><strong>효과:</strong> ${majorObj.effect} (${majorObj.constraint})</p>
+          </div>` : ''}
+          ${sub1Obj ? `
+          <div class="guide-section">
+            <span class="guide-badge">부전공 1</span> <strong>${sub1Obj.name} (${sub1Obj.category})</strong>
+            <p style="margin-top:4px;"><strong>스탯:</strong> ${sub1Obj.stat} | <strong>패시브:</strong> ${sub1Obj.passive}</p>
+            <p><strong>효과:</strong> ${sub1Obj.effect} (${sub1Obj.constraint})</p>
+          </div>` : ''}
+          ${sub2Obj ? `
+          <div class="guide-section">
+            <span class="guide-badge">부전공 2</span> <strong>${sub2Obj.name} (${sub2Obj.category})</strong>
+            <p style="margin-top:4px;"><strong>스탯:</strong> ${sub2Obj.stat} | <strong>패시브:</strong> ${sub2Obj.passive}</p>
+            <p><strong>효과:</strong> ${sub2Obj.effect} (${sub2Obj.constraint})</p>
+          </div>` : ''}
+          ${genObj ? `
+          <div class="guide-section">
+            <span class="guide-badge">공통교양</span> <strong>${genObj.name}</strong>
+            <p style="margin-top:4px;"><strong>스탯:</strong> ${genObj.stat} | <strong>패시브:</strong> ${genObj.passive}</p>
+            <p><strong>효과:</strong> ${genObj.effect} (${genObj.constraint})</p>
+          </div>` : ''}
         `;
       } else if (currentStep === 3) {
         guideTitle.innerText = "Step 3. 운명 스탯 시스템";
@@ -1141,15 +1178,15 @@
 
     async function checkNicknameDuplicate() {
       const nickname = document.getElementById('nickname').value.trim();
-      if (!nickname) return alert("닉네임을 입력해주세요.");
-      if (containsBannedWord(nickname)) return alert("금지어가 포함되어 있습니다.");
+      if (!nickname) return showToast("닉네임을 입력해주세요.");
+      if (containsBannedWord(nickname)) return showToast("금지어가 포함되어 있습니다.");
 
       const { data } = await supabaseClient.from('characters').select('id').eq('nickname', nickname);
       if (data && data.length > 0) {
-        alert("이미 존재하거나 사용 중인 닉네임입니다.");
+        showToast("이미 존재하거나 사용 중인 닉네임입니다.");
         isNicknameChecked = false;
       } else {
-        alert("사용 가능한 닉네임입니다!");
+        showToast("사용 가능한 닉네임입니다!");
         isNicknameChecked = true;
       }
     }
@@ -1173,14 +1210,14 @@
     async function handleLogin() {
       const username = document.getElementById('login-username').value.trim();
       const password = document.getElementById('login-password').value.trim();
-      if (!username || !password) return alert("아이디와 비밀번호를 입력해 주세요.");
+      if (!username || !password) return showToast("아이디와 비밀번호를 입력해 주세요.");
 
       const { data: authData, error } = await supabaseClient.auth.signInWithPassword({
         email: `${username}@moon.local`,
         password: password
       });
 
-      if (error) return alert("로그인 실패: 아이디 또는 비밀번호가 일치하지 않습니다.");
+      if (error) return showToast("로그인 실패: 아이디 또는 비밀번호가 일치하지 않습니다.");
 
       const { data: character } = await supabaseClient
         .from('characters')
@@ -1195,7 +1232,7 @@
         characterData = character;
         enterCommunity();
       } else {
-        alert("프로필 정보가 없습니다. 가입을 완료해 주세요.");
+        showToast("프로필 정보가 없습니다. 가입을 완료해 주세요.");
         openSignupModal();
       }
     }
@@ -1210,7 +1247,7 @@
       const originName = ORIGINS_DATA[originKey]?.name || originKey;
 
       if (!username || !password || password.length < 6) {
-        return alert("아이디와 6자리 이상의 비밀번호를 입력해 주세요.");
+        return showToast("아이디와 6자리 이상의 비밀번호를 입력해 주세요.");
       }
 
       const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({
@@ -1218,7 +1255,7 @@
         password: password
       });
 
-      if (signUpError) return alert("계정 생성 실패: " + signUpError.message);
+      if (signUpError) return showToast("계정 생성 실패: " + signUpError.message);
 
       const { data: newChar, error: dbError } = await supabaseClient.from('characters').insert([{
         user_id: signUpData.user.id,
@@ -1232,14 +1269,14 @@
         available_points: 0
       }]).select().single();
 
-      if (dbError) return alert("DB 저장 오류: " + dbError.message);
+      if (dbError) return showToast("DB 저장 오류: " + dbError.message);
 
       currentUserId = signUpData.user.id;
       currentUsername = username;
       currentUserNickname = nickname;
       characterData = newChar;
 
-      alert("성공적으로 회원가입이 완료되었습니다!");
+      showToast("성공적으로 회원가입이 완료되었습니다!");
       enterCommunity();
     }
 
@@ -1564,7 +1601,7 @@
     async function uploadProfileAvatar() {
       const fileInput = document.getElementById('avatar-file-input');
       const file = fileInput.files[0];
-      if (!file) return alert('이미지 파일을 선택해주세요.');
+      if (!file) return showToast('이미지 파일을 선택해주세요.');
 
       try {
         showToast('업로드 중...');
@@ -1581,7 +1618,7 @@
         renderProfileView();
         showToast('변경 완료!');
       } catch (err) {
-        alert('이미지 업로드 중 오류 발생');
+        showToast('이미지 업로드 중 오류 발생');
       }
     }
 
