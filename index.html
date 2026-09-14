@@ -342,6 +342,19 @@
       display: flex;
       gap: 24px;
       padding: 0 16px;
+      align-items: flex-start;
+    }
+
+    /* 왼쪽 고정형 스탯 룰 안내 박스 스타일 */
+    .left-sticky-panel {
+      width: 240px;
+      position: sticky;
+      top: 84px; /* 헤더 아래 고정 */
+      background-color: #18181c;
+      border: 1px solid #2e2e38;
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
     }
 
     .feed-container {
@@ -738,6 +751,28 @@
     </header>
 
     <div class="main-layout">
+      
+      <!-- 왼쪽 고정형 스탯 룰 안내 패널 (붉은색 네모칸 위치) -->
+      <div class="left-sticky-panel">
+        <div style="font-size: 0.9rem; font-weight: bold; color: #88aaff; margin-bottom: 12px; border-bottom: 1px solid #333; padding-bottom: 6px;">
+          📖 스탯 사용 롤 안내
+        </div>
+        <div style="font-size: 0.8rem; line-height: 1.4; color: #ccc;">
+          <div style="margin-bottom: 10px; background: #22222a; padding: 8px; border-radius: 6px; border-left: 3px solid #4f70e8;">
+            <div style="font-weight: bold; color: #fff; margin-bottom: 2px;">🧵 방직 (紡織)</div>
+            <div>물리/행동 판정 및 신체 능력 강화</div>
+          </div>
+          <div style="margin-bottom: 10px; background: #22222a; padding: 8px; border-radius: 6px; border-left: 3px solid #4f70e8;">
+            <div style="font-weight: bold; color: #fff; margin-bottom: 2px;">⚖️ 재정 (裁定)</div>
+            <div>지식/분석 및 마법 행사</div>
+          </div>
+          <div style="background: #22222a; padding: 8px; border-radius: 6px; border-left: 3px solid #4f70e8;">
+            <div style="font-weight: bold; color: #fff; margin-bottom: 2px;">✂️ 단선 (斷線)</div>
+            <div>극복/통제 및 단선 토큰 활용</div>
+          </div>
+        </div>
+      </div>
+
       <div class="feed-container">
         
         <!-- 공지사항 탭 -->
@@ -1546,8 +1581,6 @@
 
         const rollResultText = typeof data === 'string' ? data : JSON.stringify(data);
         
-        // 다이스 결과는 텍스트 맨 뒤에 [다이스 결과: ...] 포맷으로 자연스럽게 추가되며, 
-        // 유저가 일반 텍스트는 지울 수 있지만 다이스 결과 영역의 형태를 고정하거나 식별할 수 있게 추가합니다.
         const formattedRoll = `\n[주사위 판정: ${statType}] ${rollResultText}`;
         targetInput.value = (targetInput.value ? targetInput.value + "\n" : "") + formattedRoll.trim();
         targetInput.focus();
