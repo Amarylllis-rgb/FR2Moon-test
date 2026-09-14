@@ -1477,12 +1477,24 @@
     }
 
     async function loadNotices() {
-      const { data } = await supabaseClient.from('posts').select('*, characters(avatar_url)').eq('is_notice', true).order('created_at', { ascending: false });
+      const { data, error } = await supabaseClient
+        .from('posts')
+        .select('*, characters(avatar_url)')
+        .eq('is_notice', true)
+        .order('created_at', { ascending: false });
+        
+      if (error) console.error("공지 로드 에러:", error);
       renderFeed('notice-feed', data);
     }
 
     async function loadPosts() {
-      const { data } = await supabaseClient.from('posts').select('*, characters(avatar_url)').eq('is_notice', false).order('created_at', { ascending: false });
+      const { data, error } = await supabaseClient
+        .from('posts')
+        .select('*, characters(avatar_url)')
+        .eq('is_notice', false)
+        .order('created_at', { ascending: false });
+        
+      if (error) console.error("포스트 로드 에러:", error);
       renderFeed('posts-feed', data);
     }
 
