@@ -576,7 +576,7 @@
 </head>
 <body>
 
-  <!-- 전체 레이아웃 래퍼 (중앙 정렬 적용) -->
+  <!-- 전체 레이아웃 래퍼 -->
   <div class="app-container" id="auth-flow-container">
     
     <!-- STEP 0: 로그인 메인 -->
@@ -628,7 +628,7 @@
             <option value="7학년">7학년 (7pt + 어시스트 보너스)</option>
             <option value="8학년">8학년 (7pt + 어시스트 보너스)</option>
             <option value="9학년">9학년 (8pt + 어시스트 보너스)</option>
-            <option value="10학년">10학년 (8pt + 어시스트 보너스)</option>
+            <option value="10학년">10학년 (10학년 / 8pt + 어시스트 보너스)</option>
             <option value="11학년">11학년 (11학년 / 8pt + 어시스트 보너스)</option>
             <option value="12학년">12학년 (12학년 / 8pt + 어시스트 보너스)</option>
           </select>
@@ -672,7 +672,7 @@
         </div>
 
         <div class="stat-row">
-          <div title="[방직 (紡織)] - 클로토의 권능&#10;&#10;운명의 실을 뽑아 물리적 실체와 구체적인 행위를 자아냅니다."><strong>방직 (紡織 / Clotho)</strong></div>
+          <div><strong>방직 (紡織 / Clotho)</strong></div>
           <div class="stat-ctrl">
             <button class="btn-circle" type="button" onclick="changeStat('klotho', -1)">-</button>
             <span id="val-klotho">1</span>
@@ -681,7 +681,7 @@
         </div>
 
         <div class="stat-row">
-          <div title="[재정 (裁定)] - 라케시스의 권능&#10;&#10;세계의 섭리를 읽어내고 각자에게 부여된 마력과 지혜의 몫을 측정합니다."><strong>재정 (裁定 / Lachesis)</strong></div>
+          <div><strong>재정 (裁定 / Lachesis)</strong></div>
           <div class="stat-ctrl">
             <button class="btn-circle" type="button" onclick="changeStat('lachesis', -1)">-</button>
             <span id="val-lachesis">1</span>
@@ -690,7 +690,7 @@
         </div>
 
         <div class="stat-row">
-          <div title="[단선 (斷線)] - 아트로포스의 권능&#10;&#10;비틀린 섭리 속에서 닥쳐오는 운명의 실타래를 직접 끊어내어 인과를 결정합니다."><strong>단선 (斷線 / Atropos)</strong></div>
+          <div><strong>단선 (斷線 / Atropos)</strong></div>
           <div class="stat-ctrl">
             <button class="btn-circle" type="button" onclick="changeStat('atropos', -1)">-</button>
             <span id="val-atropos">1</span>
@@ -755,11 +755,8 @@
         <!-- 커뮤니티(이야기) 탭 -->
         <div id="tab-story-content" class="hidden">
           <div class="post-box">
-            <!-- 유저 임의 수정 방지를 위해 readonly 적용 및 초기화 버튼 추가 -->
-            <div style="position: relative;">
-              <textarea id="post-input" placeholder="오늘 어떤 일이 있었나요? 이야기를 남겨보세요..." readonly></textarea>
-              <button type="button" onclick="clearInput('post-input')" style="position: absolute; right: 8px; top: 8px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: #aaa; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; cursor: pointer;">초기화</button>
-            </div>
+            <!-- 자유 텍스트 입력을 위한 textarea (readonly 해제) -->
+            <textarea id="post-input" placeholder="오늘 어떤 일이 있었나요? 이야기를 남겨보세요... (자유 텍스트 입력 가능)"></textarea>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
               <select id="post-visibility" style="width: 140px;">
                 <option value="public">전체공개</option>
@@ -802,9 +799,9 @@
             <hr style="border-color: #333; margin-bottom: 16px;">
             <p style="margin-bottom: 6px;"><b>운명 스탯 현황</b></p>
             <p style="font-size: 0.9rem; color: #ccc;">
-              <span title="[방직 (紡織)] - 클로토의 권능&#10;&#10;운명의 실을 뽑아 물리적 실체와 구체적인 행위를 자아냅니다.">방직: <b id="profile-klotho">1</b></span> | 
-              <span title="[재정 (裁定)] - 라케시스의 권능&#10;&#10;세계의 섭리를 읽어내고 각자에게 부여된 마력과 지혜의 몫을 측정합니다.">재정: <b id="profile-lachesis">1</b></span> | 
-              <span title="[단선 (斷線)] - 아트로포스의 권능&#10;&#10;비틀린 섭리 속에서 닥쳐오는 운명의 실타래를 직접 끊어내어 인과를 결정합니다.">단선: <b id="profile-atropos">1</b></span>
+              <span>방직: <b id="profile-klotho">1</b></span> | 
+              <span>재정: <b id="profile-lachesis">1</b></span> | 
+              <span>단선: <b id="profile-atropos">1</b></span>
             </p>
             
             <hr style="border-color: #333; margin: 16px 0;">
@@ -865,9 +862,9 @@
       <div style="background-color: #2a2a2a; padding: 12px; border-radius: 6px; font-size: 0.85rem;">
         <p style="color: #ffc107; font-weight: bold; margin-bottom: 6px;">운명 스탯 정보</p>
         <p>
-          <span title="[방직 (紡織)] - 클로토의 권능&#10;&#10;운명의 실을 뽑아 물리적 실체와 구체적인 행위를 자아냅니다.">방직: <span id="modal-klotho">1</span></span> | 
-          <span title="[재정 (裁定)] - 라케시스의 권능&#10;&#10;세계의 섭리를 읽어내고 각자에게 부여된 마력과 지혜의 몫을 측정합니다.">재정: <span id="modal-lachesis">1</span></span> | 
-          <span title="[단선 (斷線)] - 아트로포스의 권능&#10;&#10;비틀린 섭리 속에서 닥쳐오는 운명의 실타래를 직접 끊어내어 인과를 결정합니다.">단선: <span id="modal-atropos">1</span></span>
+          <span>방직: <span id="modal-klotho">1</span></span> | 
+          <span>재정: <span id="modal-lachesis">1</span></span> | 
+          <span>단선: <span id="modal-atropos">1</span></span>
         </p>
       </div>
     </div>
@@ -892,35 +889,13 @@
     let editingPostId = null;
     let allCharactersList = [];
 
-    /* 태생 데이터 */
     const ORIGINS_DATA = {
-      "직계x고대세대": {
-        name: "직계 × 고대세대",
-        type: "하이리스크 하이리턴 / 공격 특화",
-        pros: "공격 판정 시 대성공 범위 +2 (18~20)",
-        cons: "방어 판정 대실패(1) 발생 시 패널티 2배"
-      },
-      "직계x신세대": {
-        name: "직계 × 신세대",
-        type: "방어 기동 / 유리대포",
-        pros: "방어 판정 시 대성공 범위 +2 (18~20)",
-        cons: "탐색 판정 대실패(1) 발생 시 패널티 2배"
-      },
-      "방계x고대세대": {
-        name: "방계 × 고대세대",
-        type: "탐색 및 분석 특화",
-        pros: "탐색 판정 시 대성공 범위 +2 (18~20)",
-        cons: "공격 판정 대실패(1) 발생 시 패널티 2배"
-      },
-      "방계x신세대": {
-        name: "방계 × 신세대",
-        type: "유틸리티 및 안정성 특화",
-        pros: "유틸리티 판정 시 대성공 범위 +1 (19~20)",
-        cons: "없음 (안정성 중심)"
-      }
+      "직계x고대세대": { name: "직계 × 고대세대", type: "하이리스크 하이리턴 / 공격 특화", pros: "공격 판정 시 대성공 범위 +2 (18~20)", cons: "방어 판정 대실패(1) 발생 시 패널티 2배" },
+      "직계x신세대": { name: "직계 × 신세대", type: "방어 기동 / 유리대포", pros: "방어 판정 시 대성공 범위 +2 (18~20)", cons: "탐색 판정 대실패(1) 발생 시 패널티 2배" },
+      "방계x고대세대": { name: "방계 × 고대세대", type: "탐색 및 분석 특화", pros: "탐색 판정 시 대성공 범위 +2 (18~20)", cons: "공격 판정 대실패(1) 발생 시 패널티 2배" },
+      "방계x신세대": { name: "방계 × 신세대", type: "유틸리티 및 안정성 특화", pros: "유틸리티 판정 시 대성공 범위 +1 (19~20)", cons: "없음 (안정성 중심)" }
     };
 
-    /* 주전공 데이터 */
     const MAIN_MAJORS = [
       { id: "PAS_01", category: "전투사관학", name: "원거리 전투학", card: "정밀 사격", stat: "방직", effect: "원거리 공격 판정 성공 시 ATK 결과값 고정 +1 보정", constraint: "시나리오당 2회 선언" },
       { id: "PAS_02", category: "전투사관학", name: "검술학", card: "흘려내기", stat: "방직", effect: "방어 판정 시 장비 내구도 보호 플래그 적용", constraint: "시나리오당 2회 선언" },
@@ -934,7 +909,6 @@
       { id: "PAS_18", category: "실용생활학", name: "포션학", card: "제작 시도", stat: "재정", effect: "시나리오 내 임시 포션 제조 판정 시도 가능", constraint: "시나리오당 2회 선언" }
     ];
 
-    /* 부전공 데이터 */
     const SUB_MAJORS = [
       { id: "PAS_05", category: "전투사관학", name: "카룬 기초학", card: "패턴 분석", stat: "재정", effect: "사용 후 다음 방어 판정 시 다이스 결과값 고정 +1 보정", constraint: "시나리오당 1회 선언" },
       { id: "PAS_06", category: "전투사관학", name: "전투 심리학", card: "사기 진작", stat: "단선", effect: "파티원 다음 행동 판정 시 다이스 결과값 고정 +1 보정", constraint: "시나리오당 1회 선언" },
@@ -951,7 +925,6 @@
       { id: "PAS_23", category: "실용생활학", name: "응용정리학", card: "도구 수색", stat: "방직", effect: "도구/소모품 수색 판정 시 다이스 결과값 고정 +1 보정", constraint: "시나리오당 1회 선언" }
     ];
 
-    /* 공통교양 데이터 */
     const GENERAL_EDU_DATA = [
       { id: "PAS_24", category: "공통교양", name: "해독학", card: "독성 완화", stat: "재정", effect: "독 상태이상 저항 판정 시 다이스 결과값 고정 +1 보정", constraint: "시나리오당 1회 선언" },
       { id: "PAS_25", category: "공통교양", name: "응급처치학", card: "응급 처치", stat: "재정", effect: "HP 회복 고정 3", constraint: "시나리오당 1회 선언" },
@@ -1117,12 +1090,6 @@
               ✨ ${bonusText}
             </div>
           </div>
-          <div class="guide-section" style="border-left-color: #ffaa00;">
-            <div class="guide-section-title">⚙️ 서버 연산 및 판정 룰 (요약)</div>
-            <p>· <strong>3-Track Filter</strong>: 입력 행동은 방직/재정/단선 3개 스탯 판정 중 하나로 정규화</p>
-            <p>· <strong>Max Bonus Cap</strong>: 주사위 보정치는 <strong>최대 +3 초과 불가</strong></p>
-            <p>· <strong>Base Roll</strong>: 기본 판정은 1D20 + Final_Bonus (단 1회)</p>
-          </div>
         `;
       } else if (currentStep === 2) {
         guideTitle.innerText = "Step 2. 태생 및 전공/교양 정보";
@@ -1146,52 +1113,17 @@
             <p><strong>장점:</strong> ${originInfo.pros}</p>
             <div class="guide-constraint">⚠️ 단점: ${originInfo.cons}</div>
           </div>
-          ${majorObj ? `
-          <div class="guide-section">
-            <span class="guide-badge">주전공</span> <strong>${majorObj.name} (${majorObj.category})</strong>
-            <p style="margin-top:4px;">관련 스탯 : ${majorObj.stat} / ${majorObj.constraint.includes('2회') ? '시나리오당 2회' : '시나리오당 1회'} 사용 가능한 "${majorObj.card}" 카드를 얻습니다.</p>
-            <p style="margin-top:2px;"><strong>${majorObj.card}</strong> : ${majorObj.effect}</p>
-          </div>` : ''}
-          ${sub1Obj ? `
-          <div class="guide-section">
-            <span class="guide-badge">부전공 1</span> <strong>${sub1Obj.name} (${sub1Obj.category})</strong>
-            <p style="margin-top:4px;">관련 스탯 : ${sub1Obj.stat} / ${sub1Obj.constraint.includes('2회') ? '시나리오당 2회' : '시나리오당 1회'} 사용 가능한 "${sub1Obj.card}" 카드를 얻습니다.</p>
-            <p style="margin-top:2px;"><strong>${sub1Obj.card}</strong> : ${sub1Obj.effect}</p>
-          </div>` : ''}
-          ${sub2Obj ? `
-          <div class="guide-section">
-            <span class="guide-badge">부전공 2</span> <strong>${sub2Obj.name} (${sub2Obj.category})</strong>
-            <p style="margin-top:4px;">관련 스탯 : ${sub2Obj.stat} / ${sub2Obj.constraint.includes('2회') ? '시나리오당 2회' : '시나리오당 1회'} 사용 가능한 "${sub2Obj.card}" 카드를 얻습니다.</p>
-            <p style="margin-top:2px;"><strong>${sub2Obj.card}</strong> : ${sub2Obj.effect}</p>
-          </div>` : ''}
-          ${genObj ? `
-          <div class="guide-section">
-            <span class="guide-badge">공통교양</span> <strong>${genObj.name}</strong>
-            <p style="margin-top:4px;">관련 스탯 : ${genObj.stat} / ${genObj.constraint.includes('2회') ? '시나리오당 2회' : '시나리오당 1회'} 사용 가능한 "${genObj.card}" 카드를 얻습니다.</p>
-            <p style="margin-top:2px;"><strong>${genObj.card}</strong> : ${genObj.effect}</p>
-          </div>` : ''}
+          ${majorObj ? `<div class="guide-section"><span class="guide-badge">주전공</span> <strong>${majorObj.name}</strong><p>${majorObj.effect}</p></div>` : ''}
+          ${sub1Obj ? `<div class="guide-section"><span class="guide-badge">부전공 1</span> <strong>${sub1Obj.name}</strong><p>${sub1Obj.effect}</p></div>` : ''}
+          ${sub2Obj ? `<div class="guide-section"><span class="guide-badge">부전공 2</span> <strong>${sub2Obj.name}</strong><p>${sub2Obj.effect}</p></div>` : ''}
+          ${genObj ? `<div class="guide-section"><span class="guide-badge">공통교양</span> <strong>${genObj.name}</strong><p>${genObj.effect}</p></div>` : ''}
         `;
       } else if (currentStep === 3) {
         guideTitle.innerText = "Step 3. 운명 스탯 및 토큰 룰";
         guideBody.innerHTML = `
-          <div class="guide-section">
-            <div class="guide-section-title">🧵 방직 (紡織) - 클로토의 권능</div>
-            <p style="font-size:0.8rem; color:#aaa; margin-bottom:4px;">물리 / 행동 | 운명의 실을 뽑아 물리적 실체와 구체적인 행위를 자아냅니다.</p>
-            <p>· 영항 범위: 물리 공격/방어, 신체 행동력, 장비 가공 및 수리, 물리적 위기 회피</p>
-            <p style="margin-top:4px; color:#a3c2ff;">· 스탯 1당 상승: HP +2, ATK +2</p>
-          </div>
-          <div class="guide-section">
-            <div class="guide-section-title">⚖️ 재정 (裁定) - 라케시스의 권능</div>
-            <p style="font-size:0.8rem; color:#aaa; margin-bottom:4px;">지식 / 분석 | 세계의 섭리를 읽어내고 각자에게 부여된 마력과 지혜의 몫을 측정합니다.</p>
-            <p>· 영향 범위: 마법 행사, 카룬/지형/속성 분석, 결계, 정보 탐색 및 약점 파악</p>
-            <p style="margin-top:4px; color:#a3c2ff;">· 스탯 1당 상승: HP +1, ATK +2, MP +1</p>
-          </div>
-          <div class="guide-section">
-            <div class="guide-section-title">✂️ 단선 (斷線) - 아트로포스의 권능</div>
-            <p style="font-size:0.8rem; color:#aaa; margin-bottom:4px;">극복 / 통제 | 비틀린 섭리 속에서 닥쳐오는 운명의 실타래를 직접 끊어내어 인과를 결정합니다.</p>
-            <p>· 영향 범위: 단선 토큰 선언을 통한 클러치 (불리함 사전 차단, 상태 이상 해제, 도주, 정화, 사망 유예 등)</p>
-            <p style="margin-top:4px; color:#a3c2ff;">· 스탯 1당 상승: HP +1, ATK +1, MP +1, 단선 토큰 최대 보유량 +1 (실제 시간 기준 1시간에 1개 충전)</p>
-          </div>
+          <div class="guide-section"><div class="guide-section-title">🧵 방직 (紡織)</div><p>물리/행동 판정 및 신체 능력 강화</p></div>
+          <div class="guide-section"><div class="guide-section-title">⚖️ 재정 (裁定)</div><p>지식/분석 및 마법 행사</p></div>
+          <div class="guide-section"><div class="guide-section-title">✂️ 단선 (斷線)</div><p>극복/통제 및 단선 토큰 활용</p></div>
         `;
       }
     }
@@ -1428,7 +1360,7 @@
               ` : ''}
             </div>
           </div>
-          <div style="color:#ccc; font-size:0.85rem; padding-left:28px;">${c.content}</div>
+          <div style="color:#ccc; font-size:0.85rem; padding-left:28px; white-space: pre-wrap;">${c.content}</div>
         `;
         container.appendChild(el);
       });
@@ -1500,7 +1432,6 @@
         .eq('is_notice', true)
         .order('created_at', { ascending: false });
         
-      if (error) console.error("공지 로드 에러:", error);
       renderFeed('notice-feed', data);
     }
 
@@ -1511,7 +1442,6 @@
         .eq('is_notice', false)
         .order('created_at', { ascending: false });
         
-      if (error) console.error("포스트 로드 에러:", error);
       renderFeed('posts-feed', data);
     }
 
@@ -1552,10 +1482,9 @@
             <div id="comments-list-${p.id}"></div>
             <div class="comment-input-box">
               <div id="mention-dropdown-${p.id}" class="mention-dropdown hidden"></div>
-              <!-- 댓글/답글 영역에도 다이스 기능 및 readonly 입력창 반영 -->
               <div style="position: relative; margin-top: 6px;">
-                <input type="text" id="comment-input-${p.id}" placeholder="댓글 입력 (@멘션 또는 🎲 굴리기)" oninput="handleCommentInput(event, '${p.id}')" readonly style="padding-right: 55px;">
-                <button type="button" onclick="clearInput('comment-input-${p.id}')" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); border: 1px solid #444; color: #aaa; font-size: 0.7rem; padding: 2px 5px; border-radius: 4px; cursor: pointer;">초기화</button>
+                <!-- 댓글/답글 영역 자유 텍스트 입력 가능 (readonly 제거) -->
+                <textarea id="comment-input-${p.id}" placeholder="댓글 입력 (@멘션 또는 🎲 굴리기)" oninput="handleCommentInput(event, '${p.id}')" style="min-height: 60px;"></textarea>
               </div>
               <div style="display:flex; gap:6px; margin-top:6px; align-items: center; justify-content: flex-end;">
                 <select id="comment-stat-select-${p.id}" style="width: 80px; padding: 6px; font-size: 0.8rem;">
@@ -1591,17 +1520,6 @@
       loadPosts();
     }
 
-    function clearInput(elementId) {
-      const el = document.getElementById(elementId);
-      if (el) {
-        el.value = '';
-        if (el.dataset.parentId) {
-          delete el.dataset.parentId;
-          el.placeholder = "댓글 입력 (@멘션 또는 🎲 굴리기)";
-        }
-      }
-    }
-
     async function handleRulebookRoll(selectId, inputId) {
       const statType = document.getElementById(selectId).value;
       const targetInput = document.getElementById(inputId);
@@ -1618,8 +1536,13 @@
         }
 
         const rollResultText = typeof data === 'string' ? data : JSON.stringify(data);
-        targetInput.value = (targetInput.value ? targetInput.value + "\n" : "") + `[주사위 판정: ${statType}] ${rollResultText}`;
-        showToast("다이스 결과가 입력되었습니다!");
+        
+        // 다이스 결과는 텍스트 맨 뒤에 [다이스 결과: ...] 포맷으로 자연스럽게 추가되며, 
+        // 유저가 일반 텍스트는 지울 수 있지만 다이스 결과 영역의 형태를 고정하거나 식별할 수 있게 추가합니다.
+        const formattedRoll = `\n[주사위 판정: ${statType}] ${rollResultText}`;
+        targetInput.value = (targetInput.value ? targetInput.value + "\n" : "") + formattedRoll.trim();
+        targetInput.focus();
+        showToast("다이스 결과가 추가되었습니다!");
       } catch (err) {
         showToast("RPC 호출 중 오류가 발생했습니다.");
       }
