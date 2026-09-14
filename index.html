@@ -671,7 +671,7 @@
         </div>
 
         <div class="stat-row">
-          <div><strong>방직 (紡織 / Clotho)</strong></div>
+          <div title="[방직 (紡織)] - 클로토의 권능&#10;&#10;운명의 실을 뽑아 물리적 실체와 구체적인 행위를 자아냅니다."><strong>방직 (紡織 / Clotho)</strong></div>
           <div class="stat-ctrl">
             <button class="btn-circle" type="button" onclick="changeStat('klotho', -1)">-</button>
             <span id="val-klotho">1</span>
@@ -680,7 +680,7 @@
         </div>
 
         <div class="stat-row">
-          <div><strong>재정 (裁定 / Lachesis)</strong></div>
+          <div title="[재정 (裁定)] - 라케시스의 권능&#10;&#10;세계의 섭리를 읽어내고 각자에게 부여된 마력과 지혜의 몫을 측정합니다."><strong>재정 (裁定 / Lachesis)</strong></div>
           <div class="stat-ctrl">
             <button class="btn-circle" type="button" onclick="changeStat('lachesis', -1)">-</button>
             <span id="val-lachesis">1</span>
@@ -689,7 +689,7 @@
         </div>
 
         <div class="stat-row">
-          <div><strong>단선 (斷線 / Atropos)</strong></div>
+          <div title="[단선 (斷線)] - 아트로포스의 권능&#10;&#10;비틀린 섭리 속에서 닥쳐오는 운명의 실타래를 직접 끊어내어 인과를 결정합니다."><strong>단선 (斷線 / Atropos)</strong></div>
           <div class="stat-ctrl">
             <button class="btn-circle" type="button" onclick="changeStat('atropos', -1)">-</button>
             <span id="val-atropos">1</span>
@@ -760,7 +760,15 @@
                 <option value="public">전체공개</option>
                 <option value="friends">친구공개</option>
               </select>
-              <button type="button" onclick="submitPost()" style="width: 90px; margin-top: 0; padding:10px; border:none; border-radius:6px; background:#3b5998; color:#fff; cursor:pointer;">올리기</button>
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <select id="rulebook-stat-select" style="width: 90px; padding: 8px;">
+                  <option value="방직">방직</option>
+                  <option value="재정">재정</option>
+                  <option value="단선">단선</option>
+                </select>
+                <button type="button" onclick="handleRulebookRoll()" style="width: auto; margin-top: 0; padding: 8px 12px; border: none; border-radius: 6px; background: #4f70e8; color: #fff; cursor: pointer; white-space: nowrap;">🎲 굴리기</button>
+                <button type="button" onclick="submitPost()" style="width: 90px; margin-top: 0; padding: 10px; border: none; border-radius: 6px; background: #3b5998; color: #fff; cursor: pointer;">올리기</button>
+              </div>
             </div>
           </div>
           <div id="posts-feed"></div>
@@ -789,9 +797,9 @@
             <hr style="border-color: #333; margin-bottom: 16px;">
             <p style="margin-bottom: 6px;"><b>운명 스탯 현황</b></p>
             <p style="font-size: 0.9rem; color: #ccc;">
-              방직: <b id="profile-klotho">1</b> | 
-              재정: <b id="profile-lachesis">1</b> | 
-              단선: <b id="profile-atropos">1</b>
+              <span title="[방직 (紡織)] - 클로토의 권능&#10;&#10;운명의 실을 뽑아 물리적 실체와 구체적인 행위를 자아냅니다.">방직: <b id="profile-klotho">1</b></span> | 
+              <span title="[재정 (裁定)] - 라케시스의 권능&#10;&#10;세계의 섭리를 읽어내고 각자에게 부여된 마력과 지혜의 몫을 측정합니다.">재정: <b id="profile-lachesis">1</b></span> | 
+              <span title="[단선 (斷線)] - 아트로포스의 권능&#10;&#10;비틀린 섭리 속에서 닥쳐오는 운명의 실타래를 직접 끊어내어 인과를 결정합니다.">단선: <b id="profile-atropos">1</b></span>
             </p>
             
             <hr style="border-color: #333; margin: 16px 0;">
@@ -851,7 +859,11 @@
       
       <div style="background-color: #2a2a2a; padding: 12px; border-radius: 6px; font-size: 0.85rem;">
         <p style="color: #ffc107; font-weight: bold; margin-bottom: 6px;">운명 스탯 정보</p>
-        <p>방직: <span id="modal-klotho">1</span> | 재정: <span id="modal-lachesis">1</span> | 단선: <span id="modal-atropos">1</span></p>
+        <p>
+          <span title="[방직 (紡織)] - 클로토의 권능&#10;&#10;운명의 실을 뽑아 물리적 실체와 구체적인 행위를 자아냅니다.">방직: <span id="modal-klotho">1</span></span> | 
+          <span title="[재정 (裁定)] - 라케시스의 권능&#10;&#10;세계의 섭리를 읽어내고 각자에게 부여된 마력과 지혜의 몫을 측정합니다.">재정: <span id="modal-lachesis">1</span></span> | 
+          <span title="[단선 (斷線)] - 아트로포스의 권능&#10;&#10;비틀린 섭리 속에서 닥쳐오는 운명의 실타래를 직접 끊어내어 인과를 결정합니다.">단선: <span id="modal-atropos">1</span></span>
+        </p>
       </div>
     </div>
   </div>
@@ -1562,6 +1574,29 @@
       await supabaseClient.from('posts').insert([{ user_id: currentUserId, author_name: `${characterData.name} (@${currentUserNickname})`, content, visibility, is_notice: false }]);
       document.getElementById('post-input').value = '';
       loadPosts();
+    }
+
+    async function handleRulebookRoll() {
+      const statType = document.getElementById('rulebook-stat-select').value;
+      const postInput = document.getElementById('post-input');
+      
+      try {
+        const { data, error } = await supabaseClient.rpc('execute_rulebook_roll', {
+          p_user_id: currentUserId,
+          p_stat_type: statType
+        });
+
+        if (error) {
+          showToast("다이스 굴리기 실패: " + error.message);
+          return;
+        }
+
+        const rollResultText = typeof data === 'string' ? data : JSON.stringify(data);
+        postInput.value = (postInput.value ? postInput.value + "\n" : "") + `[주사위 판정: ${statType}] ${rollResultText}`;
+        showToast("다이스 결과가 글 내용에 추가되었습니다!");
+      } catch (err) {
+        showToast("RPC 호출 중 오류가 발생했습니다.");
+      }
     }
 
     function toggleMoreMenu(event, postId) {
