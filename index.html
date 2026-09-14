@@ -336,20 +336,23 @@
     .noti-content { flex: 1; color: #ddd; }
     .noti-time { font-size: 0.75rem; color: #888; margin-top: 4px; }
 
+    /* 메인 레이아웃 확장 수정부 */
     .main-layout {
-      max-width: 960px;
+      max-width: 1260px; /* 전체 컨테이너 너비를 확장하여 공간 확보 */
       margin: 24px auto;
       display: flex;
-      gap: 24px;
+      gap: 20px;
       padding: 0 16px;
       align-items: flex-start;
+      justify-content: center;
     }
 
-    /* 왼쪽 고정형 스탯 룰 안내 박스 스타일 */
+    /* 왼쪽 고정형 스탯 룰 안내 박스 스타일 (좌측 밀착) */
     .left-sticky-panel {
-      width: 240px;
+      width: 230px;
+      flex-shrink: 0;
       position: sticky;
-      top: 84px; /* 헤더 아래 고정 */
+      top: 84px;
       background-color: #18181c;
       border: 1px solid #2e2e38;
       border-radius: 10px;
@@ -357,16 +360,22 @@
       box-shadow: 0 4px 16px rgba(0,0,0,0.4);
     }
 
+    /* 중앙 메인 피드 슬롯 대폭 확장 */
     .feed-container {
       flex: 1;
-      max-width: 620px;
+      max-width: 720px; /* 기존보다 넓게 확장 */
+      min-width: 0;
     }
 
+    /* 우측 사이드 패널 (우측 밀착) */
     .side-panel {
-      width: 280px;
+      width: 250px;
+      flex-shrink: 0;
       display: flex;
       flex-direction: column;
       gap: 16px;
+      position: sticky;
+      top: 84px;
     }
 
     .panel-card {
@@ -752,7 +761,7 @@
 
     <div class="main-layout">
       
-      <!-- 왼쪽 고정형 스탯 룰 안내 패널 (붉은색 네모칸 위치) -->
+      <!-- 왼쪽 고정형 스탯 룰 안내 패널 -->
       <div class="left-sticky-panel">
         <div style="font-size: 0.9rem; font-weight: bold; color: #88aaff; margin-bottom: 12px; border-bottom: 1px solid #333; padding-bottom: 6px;">
           📖 스탯 사용 롤 안내
@@ -773,6 +782,7 @@
         </div>
       </div>
 
+      <!-- 가운데 메인 커뮤니티 슬롯 (확장됨) -->
       <div class="feed-container">
         
         <!-- 공지사항 탭 -->
@@ -790,7 +800,6 @@
         <!-- 커뮤니티(이야기) 탭 -->
         <div id="tab-story-content" class="hidden">
           <div class="post-box">
-            <!-- 자유 텍스트 입력을 위한 textarea (readonly 해제) -->
             <textarea id="post-input" placeholder="오늘 어떤 일이 있었나요? 이야기를 남겨보세요... (자유 텍스트 입력 가능)"></textarea>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
               <select id="post-visibility" style="width: 140px;">
@@ -859,7 +868,7 @@
 
       </div>
 
-      <!-- 우측 사이드 패널 -->
+      <!-- 우측 사이드 패널 (간이 프로필) -->
       <div class="side-panel">
         <div class="panel-card" style="display: flex; align-items: center; gap: 12px;">
           <div id="side-avatar-area"></div>
@@ -1527,7 +1536,6 @@
             <div class="comment-input-box">
               <div id="mention-dropdown-${p.id}" class="mention-dropdown hidden"></div>
               <div style="position: relative; margin-top: 6px;">
-                <!-- 댓글/답글 영역 자유 텍스트 입력 가능 (readonly 제거) -->
                 <textarea id="comment-input-${p.id}" placeholder="댓글 입력 (@멘션 또는 🎲 굴리기)" oninput="handleCommentInput(event, '${p.id}')" style="min-height: 60px;"></textarea>
               </div>
               <div style="display:flex; gap:6px; margin-top:6px; align-items: center; justify-content: flex-end;">
