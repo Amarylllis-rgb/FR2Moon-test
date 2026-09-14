@@ -1100,6 +1100,12 @@
               ✨ ${bonusText}
             </div>
           </div>
+          <div class="guide-section" style="border-left-color: #ffaa00;">
+            <div class="guide-section-title">⚙️ 서버 연산 및 판정 룰 (요약)</div>
+            <p>· <strong>3-Track Filter</strong>: 입력 행동은 방직/재정/단선 3개 스탯 판정 중 하나로 정규화</p>
+            <p>· <strong>Max Bonus Cap</strong>: 주사위 보정치는 <strong>최대 +3 초과 불가</strong></p>
+            <p>· <strong>Base Roll</strong>: 기본 판정은 1D20 + Final_Bonus (단 1회)</p>
+          </div>
         `;
       } else if (currentStep === 2) {
         guideTitle.innerText = "Step 2. 태생 및 전공/교양 정보";
@@ -1149,19 +1155,25 @@
           </div>` : ''}
         `;
       } else if (currentStep === 3) {
-        guideTitle.innerText = "Step 3. 운명 스탯 시스템";
+        guideTitle.innerText = "Step 3. 운명 스탯 및 토큰 룰";
         guideBody.innerHTML = `
           <div class="guide-section">
-            <div class="guide-section-title">🧵 방직 (Clotho)</div>
-            <p>물리/실체 권능. 신체 행동력 및 물리 전투 판정.</p>
+            <div class="guide-section-title">🧵 방직 (紡織) - 클로토의 권능</div>
+            <p style="font-size:0.8rem; color:#aaa; margin-bottom:4px;">물리 / 행동 | 운명의 실을 뽑아 물리적 실체와 구체적인 행위를 자아냅니다.</p>
+            <p>· 영항 범위: 물리 공격/방어, 신체 행동력, 장비 가공 및 수리, 물리적 위기 회피</p>
+            <p style="margin-top:4px; color:#a3c2ff;">· 스탯 1당 상승: HP +2, ATK +2</p>
           </div>
           <div class="guide-section">
-            <div class="guide-section-title">⚖️ 재정 (Lachesis)</div>
-            <p>지식/섭리 권능. 마법 행사 및 분석 판정.</p>
+            <div class="guide-section-title">⚖️ 재정 (裁定) - 라케시스의 권능</div>
+            <p style="font-size:0.8rem; color:#aaa; margin-bottom:4px;">지식 / 분석 | 세계의 섭리를 읽어내고 각자에게 부여된 마력과 지혜의 몫을 측정합니다.</p>
+            <p>· 영향 범위: 마법 행사, 카룬/지형/속성 분석, 결계, 정보 탐색 및 약점 파악</p>
+            <p style="margin-top:4px; color:#a3c2ff;">· 스탯 1당 상승: HP +1, ATK +2, MP +1</p>
           </div>
           <div class="guide-section">
-            <div class="guide-section-title">✂️ 단선 (Atropos)</div>
-            <p>차단/인과 권능. 상태 이상 해제 및 도주 판정.</p>
+            <div class="guide-section-title">✂️ 단선 (斷線) - 아트로포스의 권능</div>
+            <p style="font-size:0.8rem; color:#aaa; margin-bottom:4px;">극복 / 통제 | 비틀린 섭리 속에서 닥쳐오는 운명의 실타래를 직접 끊어내어 인과를 결정합니다.</p>
+            <p>· 영향 범위: 단선 토큰 선언을 통한 클러치 (불리함 사전 차단, 상태 이상 해제, 도주, 정화, 사망 유예 등)</p>
+            <p style="margin-top:4px; color:#a3c2ff;">· 스탯 1당 상승: HP +1, ATK +1, MP +1, 단선 토큰 최대 보유량 +1 (실제 시간 기준 1시간에 1개 충전)</p>
           </div>
         `;
       }
